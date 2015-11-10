@@ -1,3 +1,11 @@
+(* type of value *)
+type t 
+type operator
+type table
+type condition = colname * operator * t
+type condition lst
+type order = DESC | ASC
+type top_t = TopNum of int | TopPercent of int
 
 (*
 SQL: 

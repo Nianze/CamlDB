@@ -1,40 +1,12 @@
-(*
-SELECT col1,col2 FROM Customers WHERE;
-
-SELECT - extracts data from a database
-UPDATE - updates data in a database
-DELETE - deletes data from a database
-INSERT INTO - inserts new data into a database
-CREATE DATABASE - creates a new database
-ALTER DATABASE - modifies a database
-CREATE TABLE - creates a new table
-ALTER TABLE - modifies a table
-DROP TABLE - deletes a table
-CREATE INDEX - creates an index (search key)
-DROP INDEX - deletes an index
-*)
-
-(*
-EQ: =	Equal
-NE: <>	Not equal
-GT: >	Greater than
-LT: <	Less than
-GE: >=	Greater than or equal
-LE: <=	Less than or equal
-*)
-type operator = EQ | NE | GT | LT | GE | LE
-
 (* type of value *)
 type t 
-
-type colname = string 
+type operator
 type table
-type condition = colname * operator * t
+type condition
 type condition lst
-type order = DESC | ASC
+type order
+type top_t
 
-type datatype 
-type top_t = TopNum of int | TopPercent of int
 (*
 SQL: 
 SELECT column_name, column_name FROM table_name;
@@ -116,9 +88,9 @@ val update_all: colname * t list -> table -> table
 
 (*
 SQL:
-UPDATE Customers
-SET ContactName='Alfred Schmidt', City='Hamburg'
-WHERE CustomerName='Alfreds Futterkiste';
+UPDATE table_name
+SET column1=value1,column2=value2,...
+WHERE condition list;
 
 update all the rows that satisfy the conditions in [cond_list] 
 in the table [t] according to the column and value specified 
@@ -139,7 +111,7 @@ val delete_all: table -> table
 (*
 SQL:
 DELETE FROM table_name
-WHERE some_column=some_value;
+WHERE condition list;
 
 delete all rows in the table [t] that satisfies the conditions in
 [cond_list], disable the row under the hood
@@ -160,7 +132,7 @@ column_name3 data_type(size),
 create a table with name [table_name], specify the type and 
 column name of each column by [col_name_list]
 *)
-val create_table: colname * datatype list -> string -> table
+val create_table: colname * t list -> string -> table
 
 
 
