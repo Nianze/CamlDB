@@ -4,7 +4,7 @@ type vis_method = Scatter2d | Hist2d | BarGraph
 (* print_tabular [t] prints the table [t] to the console in tabular form *)
 val print_tabular: table -> unit
 
-(* visualize [t] [v]: visualize the table [t] graphically using
+(* visualize [t] [v]: visualize the table [t] graphically using *)
 (* the specified method [v]. *)
 (* Throws an exception if the method is not compatible with *)
 (* the table contents. *)
