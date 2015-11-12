@@ -1,16 +1,13 @@
+open Table
+
 (** store column names, table names *)
 type name = string
 
 (** store column types*)
-type typ =
-  | Bool of bool
-  | Int of int
-  | Float of float
-  | String of string
+type typ = Table.t
 
 (** the binary operators *)
-type operator =
-  | Gt | Lt | Eq | GE | LE | NE  (** >, <, =, >=, <=, <> *)
+type operator = Table.operator
 
 (** (OCaml) values of type expr represent SQL expressions.
     Here are some examples of how expressions are represented:
