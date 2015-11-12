@@ -1,3 +1,5 @@
+open Table
+
 (* represents supported visualization methods *)
 type vis_method = Scatter2d | Hist2d | BarGraph | LineGraph
 

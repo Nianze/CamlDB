@@ -5,13 +5,17 @@ type colname
  * pointers to previous and/or next nodes. *)
 type node
 (* A [t] stores the type and values of each value *)
-type t
+type t = 
+	| Int of int 
+	| String of string 
+	| Float of float 
+	| Bool of bool
 
 type condition = colname * operator * t
 
 type condition lst
 (* Operators for comparing values *)
-type operator
+type operator = EQ | NE | GT | LT | GE | LE
 (* An [table] is a table.
  * [name] is the table name
  * [colnames] c a list of column names
