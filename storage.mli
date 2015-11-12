@@ -1,3 +1,5 @@
+open Table
+
 (* save_table [t] [filename] saves the table [t] in a file with *)
 (* filename [filename]. *)
 val save_table: table -> string -> unit
