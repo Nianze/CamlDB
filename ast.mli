@@ -1,5 +1,12 @@
 (** store column names, table names *)
-type var = string
+type name = string
+
+(** store column types*)
+type typ =
+  | Bool of bool
+  | Int of int
+  | Float of float
+  | String of string
 
 (** the binary operators *)
 type operator =
@@ -32,7 +39,8 @@ type operator =
        DELETE FROM table_name WHERE condition1, condition2,...
      - DelAll (TbName GPA) represents DELETE FROM "GPA"
      - Create (e,[e1;e2;...]) represents
-       CREATE TABLE table_name (col1 type1, col2, type2)
+       CREATE TABLE table_name
+       (col_name1 type1, col_name2, type2, ...)
      - Union (e1,e2) represents
        SELECT * FROM table1
        UNION ALL
@@ -40,10 +48,13 @@ type operator =
      *)
 type expr =
   | Int      of int
+  | Float    of float
   | Percent  of float
   | Bool     of bool
   | Order    of bool
-  | TbName   of string
+  | TbName   of name
+  | ColName  of name
+  | ColType  of typ
   | String   of string
   | BinOp    of operator * expr * expr
   | SelCol   of expr * expr * expr
@@ -57,5 +68,5 @@ type expr =
   | UpdAll   of expr * expr list
   | Delete   of expr * expr list
   | DelAll   of expr
-  | Create   of expr * expr list
+  | Create   of expr * (expr * expr) list
   | Union    of expr * expr

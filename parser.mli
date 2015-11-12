@@ -28,10 +28,12 @@ type token =
   | CREATEID
   | DROPID
   | INT of (int)
+  | FLOAT of (float)
   | PERCENT of (float)
   | STRING of (string)
   | ORDER of (float)
   | TBNAME of (string)
+  | COLNAME of (string)
   | EOF
 
 (* This exception is raised by the monolithic API functions. *)
