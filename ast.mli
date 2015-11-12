@@ -3,30 +3,59 @@ type var = string
 
 (** the binary operators *)
 type operator =
-  | Gt | Lt | Eq | GtEq | LtEq | NotEq  (** >, <, =, >=, <=, <> *)
+  | Gt | Lt | Eq | GE | LE | NE  (** >, <, =, >=, <=, <> *)
 
 (** (OCaml) values of type expr represent SQL expressions.
     Here are some examples of how expressions are represented:
-     - Unit represents ()
      - Int 7 represents 7
+     - Percent 60.1 represents 60.1%
      - Bool true represents true
-     - String "hello" represents "hello"
-     - Binop (Plus, e1, e2) represents e1 + e2
-     - If (e1,e2,3) represents if e1 then e2 else e3
-     - Var "x" represents the variable x
-     - Let ("x",e1,e2) represents let x = e1 in e2
-     - LetRec ("x",e1,e2) represents let rec x = e1 in e2
-     - App (e1,e2) represents (e1 e2)
-     - Fun (x,e) represents (fun x -> e)
-     - Pair (e1,e2) represents (e1,e2)
-     - Variant ("Cons", e) represents Cons e
-       (where Cons could be any constructor name
-     - Match (e, [(p1,e1);(p2,e2);...]) represents
-       match e with | p1 -> e1 | p2 -> e1 | ...
+     - Order true represents Ascending, false represents descending order
+     - TbName "GPA" represents table_name "GPA"
+     - String "Tom" represents value "Tom"
+     - BinOp (Gt, e1, e2) represents e1 > e2
+     - SelCol (e1, e2, e3) represents SELECT col_name, col_name FROM table_name
+     - SelTop (e1, e2) represents SELECT TOP 11% col_name
+     - Distin (e1, e2) represents SELECT DISTINCT col_name FROM table_name
+     - Where (e1, e2) represents WHERE col_name true|false
+     - Sort (e1, e2) represents ORDER BY col_name ASC|DESC
+     - Insert (e, [e1;e2;...])
+       represents INSERT INTO table_name VALUES (val1,val2,...)
+     - InsCol (e,[e11;e12;...], [e21;e22;...]) represents
+       INSERT INTO table_name (col1,col2,...) VALUES (val1, val2,...)
+     - Update (e, [e1;e2;...], [e1';e2';...]) represents
+       UPDATE table_name SET col1=val1, col2=val2, ...
+       WHERE condition1, condition2, ...
+     - UpdAll (e, [e1;e2;...]) represents
+       UPDATE table_name SET col1=val1, col2=val2, ...
+     - Delete (e, [e1;e2;...]) represents
+       DELETE FROM table_name WHERE condition1, condition2,...
+     - DelAll (TbName GPA) represents DELETE FROM "GPA"
+     - Create (e,[e1;e2;...]) represents
+       CREATE TABLE table_name (col1 type1, col2, type2)
+     - Union (e1,e2) represents
+       SELECT * FROM table1
+       UNION ALL
+       SELECT * FROM table2;
      *)
 type expr =
   | Int      of int
+  | Percent  of float
   | Bool     of bool
+  | Order    of bool
+  | TbName   of string
   | String   of string
   | BinOp    of operator * expr * expr
-  | Var      of var
+  | SelCol   of expr * expr * expr
+  | SelTop   of expr * expr
+  | Distin   of expr * expr
+  | Where    of expr * expr
+  | Sort     of expr * expr
+  | Insert   of expr * expr list
+  | InsCol   of expr * expr list * expr list
+  | Update   of expr * expr list * expr list
+  | UpdAll   of expr * expr list
+  | Delete   of expr * expr list
+  | DelAll   of expr
+  | Create   of expr * expr list
+  | Union    of expr * expr
