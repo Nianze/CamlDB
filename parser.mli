@@ -7,12 +7,12 @@ type token =
   | TRUE
   | RPAREN
   | LPAREN
-  | GT
-  | LT
-  | EQ
-  | NE
-  | GE
-  | LE
+  | GT (*>*)
+  | LT (*<*)
+  | EQ (*=*)
+  | NE (*<>*)
+  | GE (*>=*)
+  | LE (*>=*)
   | SELECT
   | FROM
   | WHERE
@@ -28,7 +28,10 @@ type token =
   | CREATEID
   | DROPID
   | INT of (int)
+  | PERCENT of (float)
   | STRING of (string)
+  | ORDER of (float)
+  | TBNAME of (string)
   | EOF
 
 (* This exception is raised by the monolithic API functions. *)
