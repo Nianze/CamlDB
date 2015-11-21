@@ -3,28 +3,43 @@ type colname
  * It stores a row in the table.
  * It contains a value of type [val] and optionally has
  * pointers to previous and/or next nodes. *)
-type node
+type node = {
+	mutable prev : node option;
+	mutable next : node option;
+	mutable value : t list
+}
+
 (* A [t] stores the type and values of each value *)
 type t = 
-	| Int of int 
-	| String of string 
-	| Float of float 
-	| Bool of bool
+	| Int of ref int 
+	| String of ref string 
+	| Float of ref float 
+	| Bool of ref bool
 
 type condition = colname * operator * t
 
 type condition lst
+
 (* Operators for comparing values *)
 type operator = EQ | NE | GT | LT | GE | LE
 (* An [table] is a table.
  * [name] is the table name
  * [colnames] c a list of column names
  * [coltypes] is a list of column types and the default values
+ * [numcol] is the number of columns in the table
+ * [numrow] is the number of rows in the table
  * The table content is stored in a doubly linked list
  * Each row is stored in a 'a node.
  *)
-type table
-
+type table = {
+	name: string;
+	colnames: colname list;
+	coltypes: t list;
+	numcol : int;
+	mutable numrow : int;
+	mutable first : node option;
+	mutable last : node option;
+}
 (* [create_node v] is a node containing value [v] with
  * no links to other nodes. *)
 val create_node: val -> node
