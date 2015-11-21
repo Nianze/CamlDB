@@ -67,11 +67,9 @@ val find: condition lst -> table -> table status
 (* [get_tablename t] gets table name of table [t] *)
 val get_tablename: table -> string
 
-(* [get_colnames t] gets a list of column name of table [t] *)
-val get_colnames: table -> colname list
-
-(* [get_coltypes t] gets a list of column types of table [t] *)
-val get_coltypes: table -> t list 
+(* [get_colnames t] gets a list of column name and type tuples 
+of table [t] *)
+val get_colnames: table -> colname * t list
 
 (* [get_first t] gets the first node in table [t] *)
 val get_first: table -> node option
