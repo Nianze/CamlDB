@@ -1,14 +1,40 @@
-type colname = string 
+(******************* Basic data type *******************)
 
-(* Operators for comparing values
-EQ: =	Equal
-NE: <>	Not equal
-GT: >	Greater than
-LT: <	Less than
-GE: >=	Greater than or equal
-LE: <=	Less than or equal
-*)
-type operator = EQ | NE | GT | LT | GE | LE
+(* A [t] stores the type and values of each value *)
+type t = 
+	| Int of int 
+	| String of string 
+	| Float of float 
+	| Bool of bool
+
+(* [match_type t1 t2] returns true if the type of t1 t2 is the same
+ * false otherwise
+ *)
+let match_type (t1:t) (t2:t) : bool = 
+	match (t1, t2) with
+	| (Int _, Int _) | (Float _, Float _) | (String _, String _)
+	| (Bool _, Bool _) -> true
+	| _ -> false
+
+(* [type_string v] convert a [v] to a string of its type 
+ *)
+let type_string (v:t) : string =
+	match v with
+	| Int _ -> "int"
+	| String _ -> "string"
+	| Bool _ -> "bool"
+	| Float _ -> "float"
+
+(******************* Status of operations *******************)
+
+(* [status] is the status of operations, it includes all the erros *)
+
+type status = 
+	| Success
+	| DBError of string
+
+
+(******************* Node *******************)
 
 (* A [node] is a node of a mutable doubly-linked list.
  * It stores a row in the table.
@@ -20,16 +46,45 @@ type node = {
 	mutable value : ref t list
 }
 
-(* A [t] stores the type and values of each value *)
-type t = 
-	| Int of int 
-	| String of string 
-	| Float of float 
-	| Bool of bool
+(* [create_node v] is a node containing value [v] with
+ * no links to other nodes. *)
+let create_node v = {prev=None; next=None; value=v}
 
-type condition = colname * operator * t
 
-type condition lst
+
+(******************* Compare *******************)
+(* Operators for comparing values
+EQ: =	Equal
+NE: <>	Not equal
+GT: >	Greater than
+LT: <	Less than
+GE: >=	Greater than or equal
+LE: <=	Less than or equal
+*)
+type operator = EQ | NE | GT | LT | GE | LE
+
+(* [compare_value v1 v2] compare two primitive types *)
+let compare_value (op: operator) (v1: 'a) (v2: 'a) : bool = 
+	match op with 
+	| EQ -> v1 = v2
+	| NE -> v1 <> v2
+	| GT -> v1 > v2
+	| LT -> v1 < v2
+	| GE -> v1 >= v2
+	| LE -> v1 <= v2
+
+(* [compare_value t1 t2] compare two data of type [t] *)
+let compare (op: operator) (v1:t) (v2:t) : bool * status =
+	match (v1, v2) with
+	| (Int i1, Int i2) -> (compare_value i1 i2, Success)
+	| (Float f1, Float f2) -> (compare_value f1 f2, Success)
+	| (String s1, String s2) -> (compare_value s1 s2, Success)
+	| (Bool b1, Bool b2) -> (compare_value b1 b2, Success)
+	| _ -> false, DBError "compare: wrong type in table contents"
+
+
+(******************* Table type *******************)
+type colname = string 
 
 (* An [table] is a table.
  * [name] is the table name
@@ -48,12 +103,13 @@ type table = {
 	mutable last : node option;
 }
 
-type status = 
-	| Success
-	| DBError of string
+
+(******************* Condition *******************)
+(* ex. ("column1", Eq, 3) *)
+type condition = colname * operator * t
 
 
-type table status = table * status
+(******************* Table Accessor *******************)
 
 (* [get_tablename t] gets table name of table [t] *)
 let get_tablename (t:table) : string = t.name
@@ -67,9 +123,8 @@ let get_first (t:table) : node option = t.first
 (* [get_types t] gets the last node in table [t] *)
 let get_last (t:table) : node option = t.last
 
-(* [create_node v] is a node containing value [v] with
- * no links to other nodes. *)
-let create_node v = {prev=None; next=None; value=v}
+
+(******************* Table Helper *******************)
 
 (* [empty_table name colnames coltypes] is an empty table. *)
 let empty_table (name :string) (colnames: colname * t list):table = 
@@ -101,46 +156,13 @@ let insert (r: node) (t:table) : status =
 		t.numrow <- (t.numrow + 1); 
 		Success
 
-	
-
-let match_type (t1:t) (t2:t) : bool = 
-	match (t1, t2) with
-	| (Int _, Int _) | (Float _, Float _) | (String _, String _)
-	| (Bool _, Bool _) -> true
-	| _ -> false
-
-let type_string (v:t) : string =
-	match v with
-	| Int _ -> "int"
-	| String _ -> "string"
-	| Bool _ -> "bool"
-	| Float _ -> "float"
-
-let compare_value (op: operator) (v1: 'a) (v2: 'a) : bool = 
-	match op with 
-	| EQ -> v1 = v2
-	| NE -> v1 <> v2
-	| GT -> v1 > v2
-	| LT -> v1 < v2
-	| GE -> v1 >= v2
-	| LE -> v1 <= v2
-
-
-let compare (op: operator) (v1:t) (v2:t) : bool * status =
-	match (v1, v2) with
-	| (Int i1, Int i2) -> (compare_value i1 i2, Success)
-	| (Float f1, Float f2) -> (compare_value f1 f2, Success)
-	| (String s1, String s2) -> (compare_value s1 s2, Success)
-	| (Bool b1, Bool b2) -> (compare_value b1 b2, Success)
-	| _ -> false, DBError "compare: wrong type in table contents"
-
-
 
 (* [cond_row cond_list r] checks if row [n] satisfies condions in 
  * [cond_list] and returns true or false and the status 
  * requires: [n] to be non-empty
  *)
-let rec cond_row (cond_list: condition lst) (colnames: colname * t list) (n: node) : bool * status =
+let rec cond_row (cond_list: condition list) (colnames: colname * t list) 
+(n: node) : bool * status =
 	match cond_list with
 	| [] -> (true, Success)
 	| (col, op, v)::cond_list' -> 
@@ -168,9 +190,10 @@ let rec cond_row (cond_list: condition lst) (colnames: colname * t list) (n: nod
 		| (true, Success) -> cond_row cond_list' colnames n
 		| _ -> res
 
+
 (* [delete cond_list t] finds rows satisfies condions in 
  * [cond_list] in table [t]. *)
-let find (cond_list: condition lst) (t: table): table status =
+let find (cond_list: condition lst) (t: table): table * status =
 	let t' = empty_table t.name t.colnames in
 	let rec helper (n : node option) : status = 
 		match n with
@@ -191,7 +214,7 @@ let in_some (a: 'a option) : 'a =
 	| Some b -> b
 
 (* [delete r t] deletes a row [r] to from table [t]. *)
-let delete (r: node) (t:table) :table status = 
+let delete (r: node) (t:table) : table * status = 
 	if t.first == r and t.last == r then 
 		t.first <- None;
 		t.last <- None;
