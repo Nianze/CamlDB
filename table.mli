@@ -22,10 +22,10 @@ type condition lst
 
 (* Operators for comparing values *)
 type operator = EQ | NE | GT | LT | GE | LE
+
 (* An [table] is a table.
  * [name] is the table name
- * [colnames] c a list of column names
- * [coltypes] is a list of column types and the default values
+ * [colnames] c a list of column names and column types tuple
  * [numcol] is the number of columns in the table
  * [numrow] is the number of rows in the table
  * The table content is stored in a doubly linked list
@@ -33,30 +33,36 @@ type operator = EQ | NE | GT | LT | GE | LE
  *)
 type table = {
 	name: string;
-	colnames: colname list;
-	coltypes: t list;
+	colnames: colname * t list;
 	numcol : int;
 	mutable numrow : int;
 	mutable first : node option;
 	mutable last : node option;
 }
+
+(* [status] is the status of operations, it includes all the erros *)
+type status
+
+(* [table status] is a tuple of table and status *)
+type table status = table * status
+
 (* [create_node v] is a node containing value [v] with
  * no links to other nodes. *)
 val create_node: val -> node
 
 (* [empty_table name colnames coltypes] is an empty table. *)
-val empty_table: string -> colname list -> t list -> table
+val empty_table: string -> colname * t list -> table
 
 (* [insert r t] inserts a row [r] to the top of a 
  * table [t]. *)
-val insert: node -> table -> table
+val insert: node -> table -> table status
 
 (* [delete r t] deletes a row [r] to from table [t]. *)
-val delete: node -> table -> table
+val delete: node -> table -> table status
 
 (* [delete cond_list t] finds rows satisfies condions in 
  * [cond_list] in table [t]. *)
-val find: condition lst -> table -> table
+val find: condition lst -> table -> table status
 
 (* [get_tablename t] gets table name of table [t] *)
 val get_tablename: table -> string
