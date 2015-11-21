@@ -1,22 +1,22 @@
 (******************* Basic data type *******************)
 
 (* A [t] stores the type and values of each value *)
-type t = 
-	| Int of int 
-	| String of string 
-	| Float of float 
+type t =
+	| Int of int
+	| String of string
+	| Float of float
 	| Bool of bool
 
 (* [match_type t1 t2] returns true if the type of t1 t2 is the same
  * false otherwise
  *)
-let match_type (t1:t) (t2:t) : bool = 
+let match_type (t1:t) (t2:t) : bool =
 	match (t1, t2) with
 	| (Int _, Int _) | (Float _, Float _) | (String _, String _)
 	| (Bool _, Bool _) -> true
 	| _ -> false
 
-(* [type_string v] convert a [v] to a string of its type 
+(* [type_string v] convert a [v] to a string of its type
  *)
 let type_string (v:t) : string =
 	match v with
@@ -29,7 +29,7 @@ let type_string (v:t) : string =
 
 (* [status] is the status of operations, it includes all the erros *)
 
-type status = 
+type status =
 	| Success
 	| DBError of string
 
@@ -43,12 +43,12 @@ type status =
 type node = {
 	mutable prev : node option;
 	mutable next : node option;
-	mutable value : ref t list
+	mutable value : (t ref) list
 }
 
 (* [create_node v] is a node containing value [v] with
  * no links to other nodes. *)
-let create_node v = {prev=None; next=None; value=v}
+let create_node v  = {prev=None; next=None; value=v}
 
 
 
@@ -64,8 +64,8 @@ LE: <=	Less than or equal
 type operator = EQ | NE | GT | LT | GE | LE
 
 (* [compare_value v1 v2] compare two primitive types *)
-let compare_value (op: operator) (v1: 'a) (v2: 'a) : bool = 
-	match op with 
+let compare_value (op: operator) (v1: 'a) (v2: 'a) : bool =
+	match op with
 	| EQ -> v1 = v2
 	| NE -> v1 <> v2
 	| GT -> v1 > v2
@@ -76,15 +76,15 @@ let compare_value (op: operator) (v1: 'a) (v2: 'a) : bool =
 (* [compare_value t1 t2] compare two data of type [t] *)
 let compare (op: operator) (v1:t) (v2:t) : bool * status =
 	match (v1, v2) with
-	| (Int i1, Int i2) -> (compare_value i1 i2, Success)
-	| (Float f1, Float f2) -> (compare_value f1 f2, Success)
-	| (String s1, String s2) -> (compare_value s1 s2, Success)
-	| (Bool b1, Bool b2) -> (compare_value b1 b2, Success)
+	| (Int i1, Int i2) -> (compare_value op i1 i2, Success)
+	| (Float f1, Float f2) -> (compare_value op f1 f2, Success)
+	| (String s1, String s2) -> (compare_value op s1 s2, Success)
+	| (Bool b1, Bool b2) -> (compare_value op b1 b2, Success)
 	| _ -> false, DBError "compare: wrong type in table contents"
 
 
 (******************* Table type *******************)
-type colname = string 
+type colname = string
 
 (* An [table] is a table.
  * [name] is the table name
@@ -96,7 +96,7 @@ type colname = string
  *)
 type table = {
 	name: string;
-	colnames: colname * t list;
+	colnames: (colname * t) list;
 	numcol : int;
 	mutable numrow : int;
 	mutable first : node option;
@@ -115,7 +115,7 @@ type condition = colname * operator * t
 let get_tablename (t:table) : string = t.name
 
 (* [get_colnames t] gets a list of column name of table [t] *)
-let get_colnames (t:table) : colname * t list = t.colnames
+let get_colnames (t:table) : (colname * t) list = t.colnames
 
 (* [get_first t] gets the first node in table [t] *)
 let get_first (t:table) : node option = t.first
@@ -127,112 +127,123 @@ let get_last (t:table) : node option = t.last
 (******************* Table Helper *******************)
 
 (* [empty_table name colnames coltypes] is an empty table. *)
-let empty_table (name :string) (colnames: colname * t list):table = 
+let empty_table (name :string) (colnames: (colname * t) list):table =
 	{
 		name = name;
 		colnames = colnames;
+		numcol = List.length colnames;
+		numrow = 0;
 		first = None;
 		last = None
 	}
 
-(* [insert r t] inserts a row [r] to the top of a 
- * table [t]. 
+(* [insert r t] inserts a row [r] to the top of a
+ * table [t].
  * require: nothing about the default prev, next of [r]
  *)
-let insert (r: node) (t:table) : status = 
+let insert (r: node) (t:table) : status =
 	match t.first with
-	| None -> 
+	| None ->
 		r.prev <- None;
 		r.next <- None;
-		t.first <- r; 
-		t.last <- r; 
-		t.numrow <- (t.numrow + 1); 
+		t.first <- Some r;
+		t.last <- Some r;
+		t.numrow <- (t.numrow + 1);
 		Success
-	| Some n -> 
+	| Some n ->
 		r.prev <- None;
-		r.next <- Some n; 
-		t.first <- r; 
-		n.prev <- Some r; 
-		t.numrow <- (t.numrow + 1); 
+		r.next <- Some n;
+		t.first <- Some r;
+		n.prev <- Some r;
+		t.numrow <- (t.numrow + 1);
 		Success
 
 
-(* [cond_row cond_list r] checks if row [n] satisfies condions in 
- * [cond_list] and returns true or false and the status 
+(* [cond_row cond_list r] checks if row [n] satisfies condions in
+ * [cond_list] and returns true or false and the status
  * requires: [n] to be non-empty
  *)
-let rec cond_row (cond_list: condition list) (colnames: colname * t list) 
+let rec cond_row (cond_list: condition list) (colnames: (colname * t) list)
 (n: node) : bool * status =
 	match cond_list with
 	| [] -> (true, Success)
-	| (col, op, v)::cond_list' -> 
+	| (col, op, v)::cond_list' ->
 		let num_found = List.(length (filter (fun (n,t) -> n = col) colnames)) in
-		
-		if num_found < 1 
-		then (false, DBError "Column name " ^ col ^ " is not found.")
-		
-		else if num_found > 1 
-		then (false, DBError "Duplicate columns " ^ col ^ " found.")
-		
-		else if List.(length colnames <> length n.value) 
+
+		if num_found < 1
+		then (false, DBError ("Column name " ^ col ^ " is not found.") )
+
+		else if num_found > 1
+		then (false, DBError ("Duplicate columns " ^ col ^ " found.") )
+
+		else if List.(length colnames <> length n.value)
 		then (false, DBError
 		"cond_row: Number of columns mismatch between colname and row content.")
-		
-		else if 
-		List.(length (filter (fun (n,t) -> (n = col) && (match_type t v)))) <> 1
-		then (false, DBError "Column " ^ col ^ " has the wrong type")
-		
-		else 
+
+		else if
+		List.(length
+			(filter (fun (n,t) -> (n = col) && (match_type t v)) colnames)
+		) <> 1
+		then (false, DBError ("Column " ^ col ^ " has the wrong type") )
+
+		else
 		let pair_list = List.combine colnames n.value in
 		let (_, content) = List.find (fun ((cn, _), _) -> cn = col) pair_list in
-		let res = compare op v content in
+		let res = compare op !content v in
 		match res with
 		| (true, Success) -> cond_row cond_list' colnames n
 		| _ -> res
 
 
-(* [delete cond_list t] finds rows satisfies condions in 
+(* [delete cond_list t] finds rows satisfies condions in
  * [cond_list] in table [t]. *)
-let find (cond_list: condition lst) (t: table): table * status =
+let find (cond_list: condition list) (t: table): table * status =
 	let t' = empty_table t.name t.colnames in
-	let rec helper (n : node option) : status = 
+	let rec helper (n : node option) : status =
 		match n with
 		| None -> Success
-		| Some r > 
+		| Some r ->
 			match cond_row cond_list t.colnames r with
-			| (true, Success) -> 
+			| (true, Success) ->
 				let r' = create_node r.value in
-				ignore (t'.insert r'); helper r.next
+				ignore (insert r' t'); helper r.next
 			| (false, Success) -> helper r.next
 		| (_, error) -> error
 	in (t', helper t.first)
 
 
 let in_some (a: 'a option) : 'a =
-	match a with 
-	| None -> failwith "in_some" 
+	match a with
+	| None -> failwith "in_some"
 	| Some b -> b
 
 (* [delete r t] deletes a row [r] to from table [t]. *)
-let delete (r: node) (t:table) : table * status = 
-	if t.first == r and t.last == r then 
-		t.first <- None;
-		t.last <- None;
-		Success
-	else if t.first == r && r.next <> None then 
-		t.first <- r.next;
-		(in_some r.next).prev <- None;
-		Success
-	else if t.last == r && r.prev <> None then 
-		t.last <- r.prev;
-		(in_some r.prev).next <- None;
-		Success
-	else if r.prev <> None && r.next <> None then
-		(in_some r.prev).next = r.next;
-		(in_some r.next).prev = r.prev;
-		Success
-	else 
-		DBError "delete: row not found"
+let delete (r: node) (t:table) : status =
+	match (t.first, t.last) with
+	| (None, None) -> DBError ("delete: table " ^ t.name ^ " is empty")
+	| (Some x, Some y) when x = r && y = r ->
+			(t.first <- None);
+			(t.last <- None);
+			t.numrow <- 0;
+			Success
+	| (Some x, Some _) when x = r ->
+			print_endline "current as first";
+			t.first <- r.next;
+			(in_some r.next).prev <- None;
+			t.numrow <- t.numrow - 1;
+			Success
+	| (Some _, Some y) when y = r ->
+			print_endline "current as last";
+			t.last <- r.prev;
+			(in_some r.prev).next <- None;
+			t.numrow <- t.numrow - 1;
+			Success
+	| (Some _, Some _) ->
+			(in_some r.prev).next <- r.next;
+			(in_some r.next).prev <- r.prev;
+			t.numrow <- t.numrow - 1;
+			Success
+	| _ -> DBError "delete: row not found"
 
 
 
