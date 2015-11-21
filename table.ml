@@ -22,10 +22,10 @@ type node = {
 
 (* A [t] stores the type and values of each value *)
 type t = 
-	| Int of int 
-	| String of string 
-	| Float of float 
-	| Bool of bool
+	| Int of ref int 
+	| String of ref string 
+	| Float of ref float 
+	| Bool of ref bool
 
 type condition = colname * operator * t
 
@@ -45,6 +45,29 @@ type table = {
 	mutable first : node option;
 	mutable last : node option;
 }
+
+let get_tablename (t:table) : string = t.name
+
+let get_colnames (t:table) : colname list = t.colnames
+
+let get_coltypes (t:table) : t list = t.coltypes
+
+
+(* let get_column (t:table) (c:colname) =
+	failwith "unimplemented"
+
+let get_column_i (t:table) (c: colname) (i: int) =
+	failwith "unimplemented"	
+
+let set_column_i (t:table) (c: colname) (i: int) =
+	failwith "unimplemented"  *)
+
+
+let get_table_contents : t list list
+
+
+
+
 
 (* [create_node v] is a node containing value [v] with
  * no links to other nodes. *)
@@ -74,4 +97,5 @@ let delete (r: node) (t:table) :table =
  * [cond_list] in table [t]. *)
 let find (cond_list: condition lst) (t: table): table =
 	failwith "unimplemented"
+
 

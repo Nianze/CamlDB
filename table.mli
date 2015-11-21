@@ -42,3 +42,20 @@ val delete: node -> table -> table
 (* [delete cond_list t] finds rows satisfies condions in 
  * [cond_list] in table [t]. *)
 val find: condition lst -> table -> table
+
+(* [get_tablename t] gets table name of table [t] *)
+val get_tablename: table -> string
+
+(* [get_colnames t] gets a list of column name of table [t] *)
+val get_colnames: table -> colname list
+
+(* [get_coltypes t] gets a list of column types of table [t] *)
+val get_coltypes: table -> t list 
+
+(* [get_first t] gets the first node in table [t] *)
+val get_first: table -> node option
+
+(* [get_last t] gets the last node in table [t] *)
+val get_last: table -> node option
+
+
