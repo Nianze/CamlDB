@@ -80,7 +80,7 @@ let compare (op: operator) (v1:t) (v2:t) : bool * status =
 	| (Float f1, Float f2) -> (compare_value op f1 f2, Success)
 	| (String s1, String s2) -> (compare_value op s1 s2, Success)
 	| (Bool b1, Bool b2) -> (compare_value op b1 b2, Success)
-	| _ -> false, DBError "compare: wrong type in table contents"
+	| _ -> false, DBError "compare: compare type mismatch"
 
 
 (******************* Table type *******************)
@@ -125,6 +125,10 @@ let get_last (t:table) : node option = t.last
 
 
 (******************* Table Helper *******************)
+let in_some (a: 'a option) : 'a =
+	match a with
+	| None -> failwith "in_some"
+	| Some b -> b
 
 (* [empty_table name colnames coltypes] is an empty table. *)
 let empty_table (name :string) (colnames: (colname * t) list):table =
@@ -195,45 +199,50 @@ let rec cond_row (cond_list: condition list) (colnames: (colname * t) list)
 		| _ -> res
 
 
-(* [delete cond_list t] finds rows satisfies condions in
- * [cond_list] in table [t]. *)
-let find (cond_list: condition list) (t: table): table * status =
-	let t' = empty_table t.name t.colnames in
-	let rec helper (n : node option) : status =
+(* [find cond_list t] finds rows satisfies condions in
+ * [cond_list] in table [t].
+ *)
+let find (cond_list: condition list) (t: table): (node list) * status =
+	let rec helper (n : node option) (l: node list): (node list) * status =
 		match n with
-		| None -> Success
+		| None -> (l,Success)
 		| Some r ->
 			match cond_row cond_list t.colnames r with
-			| (true, Success) ->
-				let r' = create_node r.value in
-				ignore (insert r' t'); helper r.next
-			| (false, Success) -> helper r.next
-		| (_, error) -> error
-	in (t', helper t.first)
+			| (true, Success) -> helper r.next (r::l)
+			| (false, Success) -> helper r.next l
+		| (_, error) -> ([], error)
+	in helper t.first []
+
+(* [list_to_table node_list] makes a copy of each node in [node_list]
+ * and insert them into a new table and return that table
+ *)
+let list_to_table (node_list: node list) (table_name: string)
+(colnames: (colname * t) list) : table =
+	let t = empty_table table_name colnames in
+	let rec helper = function
+		| [] -> ()
+		| hd::tl ->
+			let r = create_node hd.value in
+			let _ = insert r t in
+			helper tl
+	in helper node_list; t
 
 
-let in_some (a: 'a option) : 'a =
-	match a with
-	| None -> failwith "in_some"
-	| Some b -> b
-
-(* [delete r t] deletes a row [r] to from table [t]. *)
+(* [delete r t] deletes a row [r] from table [t]. *)
 let delete (r: node) (t:table) : status =
 	match (t.first, t.last) with
 	| (None, None) -> DBError ("delete: table " ^ t.name ^ " is empty")
-	| (Some x, Some y) when x = r && y = r ->
+	| (Some x, Some y) when x == r && y == r ->
 			(t.first <- None);
 			(t.last <- None);
 			t.numrow <- 0;
 			Success
-	| (Some x, Some _) when x = r ->
-			print_endline "current as first";
+	| (Some x, Some _) when x == r ->
 			t.first <- r.next;
 			(in_some r.next).prev <- None;
 			t.numrow <- t.numrow - 1;
 			Success
-	| (Some _, Some y) when y = r ->
-			print_endline "current as last";
+	| (Some _, Some y) when y == r ->
 			t.last <- r.prev;
 			(in_some r.prev).next <- None;
 			t.numrow <- t.numrow - 1;
@@ -244,6 +253,24 @@ let delete (r: node) (t:table) : status =
 			t.numrow <- t.numrow - 1;
 			Success
 	| _ -> DBError "delete: row not found"
+
+(* [delete_list n_list t] deletes a list of rows [n_list] from table [t]. *)
+let rec delete_list (n_list: node list) (t:table) : status =
+	match n_list with
+		| [] -> Success
+		| hd::tl ->
+			match delete hd t with
+				| Success -> delete_list tl t
+				| x -> x
+
+(* [delete_find cond_list t] delete all the rows that satisfy [cond_list]
+ * in table [t]
+ *)
+let delete_find (cond_list: condition list) (t: table): status =
+	let (node_list, s) = find cond_list t in
+	match s with
+		| Success -> delete_list node_list t
+		| x -> x
 
 
 

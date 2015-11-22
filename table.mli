@@ -103,16 +103,12 @@ val get_last: table -> node option
 
 (******************* Table Helper *******************)
 
-
 (* [empty_table name colnames coltypes] is an empty table. *)
 val empty_table: string -> (colname * t) list -> table
 
 (* [insert r t] inserts a row [r] to the top of a
  * table [t]. *)
 val insert: node -> table -> status
-
-(* [delete r t] deletes a row [r] to from table [t]. *)
-val delete: node -> table -> status
 
 (* [cond_row cond_list r] checks if row [n] satisfies condions in
  * [cond_list] and returns true or false and the status
@@ -122,8 +118,18 @@ val cond_row: condition list -> (colname * t) list ->  node -> bool * status
 
 (* [delete cond_list t] finds rows satisfies condions in
  * [cond_list] in table [t]. *)
-val find: condition list -> table -> table * status
+val find: condition list -> table -> (node list) * status
+
+(* [delete r t] deletes a row [r] to from table [t]. *)
+val delete: node -> table -> status
+
+(* [delete_list n_list t] deletes a list of rows [n_list] from table [t]. *)
+val delete_list: node list -> table -> status
+
+(* [delete_find cond_list t] delete all the rows that satisfy [cond_list]
+ * in table [t]
+ *)
+val delete_find: condition list -> table -> status
 
 
-
-
+val in_some: 'a option -> 'a
