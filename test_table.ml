@@ -63,8 +63,20 @@ TEST "delete" = t1.numrow = 1
 let _ = delete (in_some t1.first) t1
 TEST "delete" = t1.numrow = 0
 
+let _ = insert n1 t1
+let _ = insert n2 t1
+let _ = insert n3 t1
+let _ = insert n4 t1
+TEST "find" =
+  let (l, s) =
+  find [("c2", EQ, String "2"); ("c1", EQ, Int 2)] t1 in
+  !(List.hd (List.hd l).value) = Int 2
 
+TEST "find" =
+  let (l, s) =
+  find [("c2", GT, String "0"); ("c1", GT, Int 1)] t1 in
+  List.length l = 2
 
-(* let _ = find [("c2", GT, String "0"); ("c1", GT, Int 0)] t1
-
-let t2 = empty_table "test1" [("c1", Int 0);("c2", String "")] *)
+TEST "delete_find" =
+  let _ = delete_find [("c2", GT, String "0"); ("c1", GT, Int 2)] t1
+  in t1.numrow = 3
