@@ -108,7 +108,7 @@ val empty_table: string -> (colname * t) list -> table
 
 (* [insert r t] inserts a row [r] to the top of a
  * table [t]. *)
-val insert: node -> table -> status
+val insert: node -> table -> unit
 
 (* [cond_row cond_list r] checks if row [n] satisfies condions in
  * [cond_list] and returns true or false and the status
@@ -121,10 +121,10 @@ val cond_row: condition list -> (colname * t) list ->  node -> bool * status
 val find: condition list -> table -> (node list) * status
 
 (* [delete r t] deletes a row [r] to from table [t]. *)
-val delete: node -> table -> status
+val delete: node -> table -> unit
 
 (* [delete_list n_list t] deletes a list of rows [n_list] from table [t]. *)
-val delete_list: node list -> table -> status
+val delete_list: node list -> table -> unit
 
 (* [delete_find cond_list t] delete all the rows that satisfy [cond_list]
  * in table [t]

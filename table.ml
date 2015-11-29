@@ -145,23 +145,81 @@ let empty_table (name :string) (colnames: (colname * t) list):table =
  * table [t].
  * require: nothing about the default prev, next of [r]
  *)
-let insert (r: node) (t:table) : status =
+let insert (r: node) (t:table) : unit =
 	match t.first with
 	| None ->
 		r.prev <- None;
 		r.next <- None;
 		t.first <- Some r;
 		t.last <- Some r;
-		t.numrow <- (t.numrow + 1);
-		Success
+		t.numrow <- 1;
+		()
 	| Some n ->
 		r.prev <- None;
 		r.next <- Some n;
 		t.first <- Some r;
 		n.prev <- Some r;
 		t.numrow <- (t.numrow + 1);
-		Success
+		()
 
+(* [delete r t] deletes a row [r] from table [t]. *)
+let delete (r: node) (t:table) : unit =
+	match (r.prev, r.next) with
+	| (None, None) ->
+		(t.first <- None);
+		(t.last <- None);
+		(r.prev <- None);
+		(r.next <- None);
+		t.numrow <- 0;
+		()
+	| (Some x, None) ->
+		(x.next <- None);
+		(t.last <- Some x);
+		(r.prev <- None);
+		(r.next <- None);
+		t.numrow <- t.numrow - 1;
+		()
+	| (None, Some y) ->
+		(y.prev <- None);
+		(t.first <- Some y);
+		(r.prev <- None);
+		(r.next <- None);
+		t.numrow <- t.numrow - 1;
+		()
+	| (Some x, Some y) ->
+		(x.next <- Some y);
+		(y.prev <- Some x);
+		(r.prev <- None);
+		(r.next <- None);
+		t.numrow <- t.numrow - 1;
+		()
+
+
+
+(* let delete (r: node) (t:table) : status =
+	match (t.first, t.last) with
+	| (None, None) -> DBError ("delete: table " ^ t.name ^ " is empty")
+	| (Some x, Some y) when x == r && y == r ->
+			(t.first <- None);
+			(t.last <- None);
+			t.numrow <- 0;
+			Success
+	| (Some x, Some _) when x == r ->
+			t.first <- r.next;
+			(in_some r.next).prev <- None;
+			t.numrow <- t.numrow - 1;
+			Success
+	| (Some _, Some y) when y == r ->
+			t.last <- r.prev;
+			(in_some r.prev).next <- None;
+			t.numrow <- t.numrow - 1;
+			Success
+	| (Some _, Some _) ->
+			(in_some r.prev).next <- r.next;
+			(in_some r.next).prev <- r.prev;
+			t.numrow <- t.numrow - 1;
+			Success
+	| _ -> DBError "delete: row not found" *)
 
 (* [cond_row cond_list r] checks if row [n] satisfies condions in
  * [cond_list] and returns true or false and the status
@@ -208,10 +266,16 @@ let find (cond_list: condition list) (t: table): (node list) * status =
 		| None -> (l,Success)
 		| Some r ->
 			match cond_row cond_list t.colnames r with
-			| (true, Success) -> helper r.next (r::l)
+			| (true, Success) ->
+				(* move to front *)
+				helper r.next (r::l)
 			| (false, Success) -> helper r.next l
 		| (_, error) -> ([], error)
-	in helper t.first []
+	in
+	let (l, s) = helper t.first [] in
+	List.iter (fun n -> delete n t; insert n t) l;
+	(l, s)
+
 
 (* [list_to_table node_list] makes a copy of each node in [node_list]
  * and insert them into a new table and return that table
@@ -223,45 +287,19 @@ let list_to_table (node_list: node list) (table_name: string)
 		| [] -> ()
 		| hd::tl ->
 			let r = create_node hd.value in
-			let _ = insert r t in
+			(insert r t);
 			helper tl
 	in helper node_list; t
 
 
-(* [delete r t] deletes a row [r] from table [t]. *)
-let delete (r: node) (t:table) : status =
-	match (t.first, t.last) with
-	| (None, None) -> DBError ("delete: table " ^ t.name ^ " is empty")
-	| (Some x, Some y) when x == r && y == r ->
-			(t.first <- None);
-			(t.last <- None);
-			t.numrow <- 0;
-			Success
-	| (Some x, Some _) when x == r ->
-			t.first <- r.next;
-			(in_some r.next).prev <- None;
-			t.numrow <- t.numrow - 1;
-			Success
-	| (Some _, Some y) when y == r ->
-			t.last <- r.prev;
-			(in_some r.prev).next <- None;
-			t.numrow <- t.numrow - 1;
-			Success
-	| (Some _, Some _) ->
-			(in_some r.prev).next <- r.next;
-			(in_some r.next).prev <- r.prev;
-			t.numrow <- t.numrow - 1;
-			Success
-	| _ -> DBError "delete: row not found"
 
 (* [delete_list n_list t] deletes a list of rows [n_list] from table [t]. *)
-let rec delete_list (n_list: node list) (t:table) : status =
+let rec delete_list (n_list: node list) (t:table) : unit =
 	match n_list with
-		| [] -> Success
+		| [] -> ()
 		| hd::tl ->
-			match delete hd t with
-				| Success -> delete_list tl t
-				| x -> x
+			delete hd t;
+			delete_list tl t
 
 (* [delete_find cond_list t] delete all the rows that satisfy [cond_list]
  * in table [t]
@@ -269,7 +307,7 @@ let rec delete_list (n_list: node list) (t:table) : status =
 let delete_find (cond_list: condition list) (t: table): status =
 	let (node_list, s) = find cond_list t in
 	match s with
-		| Success -> delete_list node_list t
+		| Success -> delete_list node_list t; Success
 		| x -> x
 
 

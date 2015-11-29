@@ -67,15 +67,22 @@ let _ = insert n1 t1
 let _ = insert n2 t1
 let _ = insert n3 t1
 let _ = insert n4 t1
+
 TEST "find" =
   let (l, s) =
   find [("c2", EQ, String "2"); ("c1", EQ, Int 2)] t1 in
   !(List.hd (List.hd l).value) = Int 2
 
+
 TEST "find" =
   let (l, s) =
   find [("c2", GT, String "0"); ("c1", GT, Int 1)] t1 in
   List.length l = 2
+
+TEST "find" =
+  let (l, s) =
+  find [] t1 in
+  List.length l = 4
 
 TEST "delete_find" =
   let _ = delete_find [("c2", GT, String "0"); ("c1", GT, Int 2)] t1
