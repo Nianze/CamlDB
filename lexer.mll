@@ -5,7 +5,7 @@ open Parser
 }
 
 (* identifiers *)
-let white = ['' '\t']+
+let white = [' ' '\t']+
 let digit = ['0'-'9']
 let int = '-'?digit+
 let letter = ['a'-'z' 'A'-'Z']
@@ -45,9 +45,15 @@ rule read =
   | "DELETE" { DELETE }
   | "CREATE" { CREATE }
   | "TABLE"  { TABLE }
+  | "INT"    { TINT }
+  | "STRING" { TSTRING }
   | "UNION"  { UNION }
   | "ALL"    { ALL }
-  | "JOINS"   { JOINS }
+  | "JOIN"   { JOIN }
+  | "ON"     { ON }
+  | "."      { DOT }
+  | "true"   { BOOL true }
+  | "false"  { BOOL false }
   | str as id   { ID (Lexing.lexeme lexbuf) }
   | int   { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | '"' ([^'"']* as str) '"' { STRING str }
