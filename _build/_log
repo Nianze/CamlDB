@@ -1,0 +1,26 @@
+### Starting build.
+# Target: test_storage.ml.depends, tags: { extension:ml, file:test_storage.ml, ocaml, ocamldep, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules test_storage.ml > test_storage.ml.depends # cached
+# Target: storage.mli.depends, tags: { extension:mli, file:storage.mli, ocaml, ocamldep, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules storage.mli > storage.mli.depends # cached
+# Target: table.mli.depends, tags: { extension:mli, file:table.mli, ocaml, ocamldep, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules table.mli > table.mli.depends # cached
+# Target: table.cmi, tags: { byte, compile, extension:mli, file:table.mli, interf, ocaml, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -o table.cmi table.mli # cached
+# Target: storage.cmi, tags: { byte, compile, extension:mli, file:storage.mli, interf, ocaml, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -o storage.cmi storage.mli # cached
+# Target: test_storage.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:test_storage.cmo, file:test_storage.ml, implem, ocaml, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -o test_storage.cmo test_storage.ml # cached
+# Target: test_storage.d.cmo, tags: { byte, compile, debug, extension:cmo, extension:ml, file:test_storage.d.cmo, file:test_storage.ml, implem, ocaml, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -g -o test_storage.d.cmo test_storage.ml # cached
+# Target: storage.ml.depends, tags: { extension:ml, file:storage.ml, ocaml, ocamldep, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules storage.ml > storage.ml.depends # cached
+# Target: storage.d.cmo, tags: { byte, compile, debug, extension:cmo, extension:ml, file:storage.d.cmo, file:storage.ml, implem, ocaml, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -g -o storage.d.cmo storage.ml # cached
+# Target: table.ml.depends, tags: { extension:ml, file:table.ml, ocaml, ocamldep, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules table.ml > table.ml.depends # cached
+# Target: table.d.cmo, tags: { byte, compile, debug, extension:cmo, extension:ml, file:table.d.cmo, file:table.ml, implem, ocaml, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -g -o table.d.cmo table.ml # cached
+# Target: test_storage.d.byte, tags: { byte, debug, dont_link_with, extension:byte, file:test_storage.d.byte, link, ocaml, program, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf uutf.cma jsonm.cma -g table.d.cmo storage.d.cmo test_storage.d.cmo -o test_storage.d.byte # cached
+# Compilation successful.
