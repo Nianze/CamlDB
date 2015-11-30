@@ -1,18 +1,18 @@
 (* type of value *)
-type t 
+(* type t
 type operator
 type table
 type condition
-type condition lst
+type condition lst *)
 type order
 type top_t
 
 (*
-SQL: 
+SQL:
 SELECT column_name, column_name FROM table_name;
 
-select some particular columns in a list of colunms [col_list] 
-from table [t] and return a subtable 
+select some particular columns in a list of colunms [col_list]
+from table [t] and return a subtable
 *)
 val select_col: colname list -> table -> table
 
@@ -20,13 +20,13 @@ val select_col: colname list -> table -> table
 SELECT TOP number|percent column_name(s)
 FROM table_name;
 
-select some particular columns in a list of colunms [col_list] 
-from table [t] and return a subtable 
+select some particular columns in a list of colunms [col_list]
+from table [t] and return a subtable
 *)
 val select_top: top_t -> table -> table
 
 (*
-SQL: 
+SQL:
 SELECT DISTINCT column_name FROM table_name;
 
 get all the distinct values of a column with the name of [col_name]
@@ -35,7 +35,7 @@ from table t and return a subtable
 val distinct: colname -> table -> table
 
 (*
-SQL: 
+SQL:
 SELECT *
 FROM table_name
 WHERE column_name operator value;
@@ -46,7 +46,7 @@ and return a subtable
 val where: condition list -> table -> table
 
 (*
-SQL: 
+SQL:
 SELECT *
 FROM table_name
 ORDER BY column_name ASC|DESC;
@@ -64,17 +64,18 @@ VALUES (value1,value2,value3,...);
 insert a new row with values [val_list] in the order of columns
 into table [t]
 *)
-val insert: t list -> table -> table
+val insert: t list -> table -> unit
 
 (*
 SQL:
 INSERT INTO table_name (column1,column2,column3,...)
 VALUES (value1,value2,value3,...);
 
-insert a new row with values [val_list] in the order of columns
-[col_list] into table [t] and return a subtable
+insert a new row, both the column names and the values to be
+inserted [val_list] are speicified in [col_list]
 *)
-val insert_col: colname list -> t list -> table -> table 
+val insert_col: (colname * t) list -> table -> unit
+
 
 (*
 SQL:
@@ -92,8 +93,8 @@ UPDATE table_name
 SET column1=value1,column2=value2,...
 WHERE condition list;
 
-update all the rows that satisfy the conditions in [cond_list] 
-in the table [t] according to the column and value specified 
+update all the rows that satisfy the conditions in [cond_list]
+in the table [t] according to the column and value specified
 by [pair_list]
 *)
 val update: condition lst -> colname * t list -> table -> table
@@ -129,10 +130,10 @@ column_name3 data_type(size),
 ....
 );
 
-create a table with name [table_name], specify the type and 
+create a table with name [table_name], specify the type and
 column name of each column by [col_name_list]
 *)
-val create_table: colname * t list -> string -> table
+val create_table: string -> (colname * t) list -> table
 
 
 
@@ -142,8 +143,8 @@ SELECT * FROM table1
 UNION ALL
 SELECT * FROM table2;
 
-concatenate two tables [t1] and [t2] given [t1] and [t2] the same 
+concatenate two tables [t1] and [t2] given [t1] and [t2] the same
 number of columns. Assign the concatenated table column names
 specified in [col_name_list]
 *)
-val union_rows: table -> table -> colname list ->  table 
+val union_rows: table -> table -> colname list ->  table

@@ -9,17 +9,28 @@ type typ = Table.t
 (** the binary operators *)
 type operator = Table.operator
 
+(* ex. ("column1", Eq, 3) *)
+type cond = Table.condition
+
+(** SELECT TOP int (PERCENT) *)
+type top_t = TopNum of int | TopPercent of int
+
+type datatype = TString | TInt
+
+type order = DESC | ASC
+
 (** (OCaml) values of type expr represent SQL expressions.
     Here are some examples of how expressions are represented:
      - Int 7 represents 7
-     - Percent 60.1 represents 60.1%
      - Bool true represents true
-     - Order true represents Ascending, false represents descending order
+     - Order: ASC represents Ascending, DESC represents descending order
      - TbName "GPA" represents table_name "GPA"
      - String "Tom" represents value "Tom"
      - BinOp (Gt, e1, e2) represents e1 > e2
      - SelCol (e1, e2, e3) represents SELECT col_name, col_name FROM table_name
-     - SelTop (e1, e2) represents SELECT TOP 11% col_name
+     - SelTop (e1, e2) represents SELECT TOP (11%||2) col_name
+       e2:Top (11,true) represents TOP 11 PERCENT
+          Top (2,false) represents TOP 2
      - Distin (e1, e2) represents SELECT DISTINCT col_name FROM table_name
      - Where (e1, e2) represents WHERE col_name true|false
      - Sort (e1, e2) represents ORDER BY col_name ASC|DESC
@@ -45,25 +56,23 @@ type operator = Table.operator
      *)
 type expr =
   | Int      of int
-  | Float    of float
-  | Percent  of float
   | Bool     of bool
-  | Order    of bool
+  | String   of string
   | TbName   of name
   | ColName  of name
-  | ColType  of typ
-  | String   of string
-  | BinOp    of operator * expr * expr
-  | SelCol   of expr * expr * expr
-  | SelTop   of expr * expr
+  | Path     of expr * expr
+  | SelCol   of expr list * expr
+  | SelTop   of top_t * expr
   | Distin   of expr * expr
-  | Where    of expr * expr
-  | Sort     of expr * expr
-  | Insert   of expr * expr list
-  | InsCol   of expr * expr list * expr list
-  | Update   of expr * expr list * expr list
-  | UpdAll   of expr * expr list
-  | Delete   of expr * expr list
+  | Where    of cond list * expr
+  | Sort     of expr * order * expr
+  | InsRow   of typ list * expr
+  | InsCol   of expr list * typ list * expr
+  | UpdAll   of (expr * typ) list * expr
+  | Update   of cond list * (expr * typ) list * expr
   | DelAll   of expr
-  | Create   of expr * (expr * expr) list
+  | Delete   of cond list * expr
+  | Create   of expr * (expr * datatype) list
   | Union    of expr * expr
+  | Joins    of expr * expr * expr list * (expr * expr) (* (Tb1, Tb2, path list, (path1,path2)) *)
+
