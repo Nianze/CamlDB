@@ -12,6 +12,8 @@ type operator = Table.operator
 (* ex. ("column1", Eq, 3) *)
 type cond = Table.condition
 
+type c_tree = Table.cond_tree
+
 (** SELECT TOP int (PERCENT) *)
 type top_t = TopNum of int | TopPercent of int
 
@@ -64,15 +66,14 @@ type expr =
   | SelCol   of expr list * expr
   | SelTop   of top_t * expr
   | Distin   of expr * expr
-  | Where    of cond list * expr
+  | Where    of c_tree * expr
   | Sort     of expr * order * expr
   | InsRow   of typ list * expr
   | InsCol   of expr list * typ list * expr
   | UpdAll   of (expr * typ) list * expr
-  | Update   of cond list * (expr * typ) list * expr
+  | Update   of c_tree * (expr * typ) list * expr
   | DelAll   of expr
-  | Delete   of cond list * expr
+  | Delete   of c_tree * expr
   | Create   of expr * (expr * datatype) list
   | Union    of expr * expr
   | Joins    of expr * expr * expr list * (expr * expr) (* (Tb1, Tb2, path list, (path1,path2)) *)
-
