@@ -17,8 +17,6 @@ type c_tree = Table.cond_tree
 (** SELECT TOP int (PERCENT) *)
 type top_t = TopNum of int | TopPercent of int
 
-type datatype = TString | TInt
-
 type order = DESC | ASC
 
 (** (OCaml) values of type expr represent SQL expressions.
@@ -74,6 +72,6 @@ type expr =
   | Update   of c_tree * (expr * typ) list * expr
   | DelAll   of expr
   | Delete   of c_tree * expr
-  | Create   of expr * (expr * datatype) list
+  | Create   of expr * (expr * typ) list
   | Union    of expr * expr
   | Joins    of expr * expr * expr list * (expr * expr) (* (Tb1, Tb2, path list, (path1,path2)) *)

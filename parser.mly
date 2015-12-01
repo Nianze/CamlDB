@@ -25,6 +25,8 @@ open Table
 %token PERCENT
 %token DISTINCT
 %token WHERE
+%token AND
+%token OR
 %token ORDER
 %token BY
 %token ASC
@@ -38,6 +40,7 @@ open Table
 %token CREATE
 %token TINT
 %token TSTRING
+%token TBOOL
 %token TABLE
 %token LPAREN
 %token RPAREN
@@ -60,6 +63,9 @@ open Table
 %nonassoc INT ID
 %nonassoc LPAREN RPAREN
 *)
+%left OR
+%left AND
+%nonassoc LPAREN RPAREN
 
 (* declare the starting point *)
 %start <Ast.expr> prog
@@ -74,7 +80,6 @@ prog:
   ;
 
 expr:
-  | LPAREN; e = expr; RPAREN { e }
   | s = statement; SEMICOLON { s }
   ;
 
@@ -106,7 +111,15 @@ col_field:
   ;
 
 cond_list:
-  cond = separated_list(COMMA, cond_field)  { cond };
+  | LPAREN; cond = cond_list; RPAREN { cond }
+  | c = cond_tree; { c }
+  ;
+
+cond_tree:
+  | single = cond_field  { (Cond single) }
+  | left = cond_tree; AND; right = cond_tree { (And (left,right)) }
+  | left = cond_tree; OR ; right = cond_tree { (Or  (left,right)) }
+  ;
 
 cond_field:
   | e1 = ID; GT; e2 = value_field { (e1,GT,e2) }
@@ -136,8 +149,9 @@ col_typ_list:
   typs = separated_list(COMMA, typ_field)  { typs };
 
 typ_field:
-  | col = ID; TINT ; LPAREN; i = INT; RPAREN { (ColName col, TInt) }
-  | col = ID; TSTRING; LPAREN; i = INT; RPAREN { (ColName col, TString) }
+  | col = ID; TINT ; LPAREN; i = INT; RPAREN { (ColName col, Int 0) }
+  | col = ID; TSTRING; LPAREN; i = INT; RPAREN { (ColName col, String "") }
+  | col = ID; TBOOL; LPAREN; i = INT; RPAREN { (ColName col, Bool false) }
   ;
 
 join_cond:

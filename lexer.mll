@@ -33,6 +33,8 @@ rule read =
   | "PERCENT" { PERCENT }
   | "DISTINCT" { DISTINCT }
   | "WHERE"  { WHERE }
+  | "AND"    { AND }
+  | "OR"     { OR }
   | "ORDER"  { ORDER }
   | "BY"     { BY }
   | "ASC"    { ASC }
@@ -45,13 +47,14 @@ rule read =
   | "DELETE" { DELETE }
   | "CREATE" { CREATE }
   | "TABLE"  { TABLE }
-  | "INT"    { TINT }
-  | "STRING" { TSTRING }
   | "UNION"  { UNION }
   | "ALL"    { ALL }
   | "JOIN"   { JOIN }
   | "ON"     { ON }
   | "."      { DOT }
+  | "INT"    { TINT }
+  | "STRING" { TSTRING }
+  | "BOOL"   { TBOOL }
   | "true"   { BOOL true }
   | "false"  { BOOL false }
   | str as id   { ID (Lexing.lexeme lexbuf) }
