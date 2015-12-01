@@ -9,15 +9,16 @@ let white = [' ' '\t']+
 let digit = ['0'-'9']
 let int = '-'?digit+
 let letter = ['a'-'z' 'A'-'Z']
-let str = letter+
+let ident = (['a'-'z'] | '_') (['a'-'z'] | ['A'-'Z'] | ['0'-'9'] | '_' | '\'')*
+(*let str = letter+*)
 
 (* token difinition *)
 
 rule read =
   parse
   | white { read lexbuf }
-  | '('   { LPAREN }
-  | ')'   { RPAREN }
+  | "("   { LPAREN }
+  | ")"   { RPAREN }
   | "="   { EQ }
   | "<>"  { NE }
   | "<="  { LE }
@@ -55,9 +56,9 @@ rule read =
   | "INT"    { TINT }
   | "STRING" { TSTRING }
   | "BOOL"   { TBOOL }
-  | "true"   { BOOL true }
-  | "false"  { BOOL false }
-  | str as id   { ID (Lexing.lexeme lexbuf) }
+  | "true"   { TRUE }
+  | "false"  { FALSE }
+  | ident    { ID (Lexing.lexeme lexbuf) }
   | int   { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | '"' ([^'"']* as str) '"' { STRING str }
   | eof   { EOF }

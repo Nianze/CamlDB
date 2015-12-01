@@ -8,7 +8,8 @@ open Table
 (* *declarations* *)
 
 %token <int> INT
-%token <bool> BOOL
+%token TRUE
+%token FALSE
 %token <string> ID
 %token <string> STRING
 %token GT  (*>*)
@@ -42,8 +43,7 @@ open Table
 %token TSTRING
 %token TBOOL
 %token TABLE
-%token LPAREN
-%token RPAREN
+%token LPAREN RPAREN
 %token UNION
 %token ALL
 %token JOIN
@@ -53,19 +53,9 @@ open Table
 %token EOF
 
 (* info about precedence & associativity *)
-(*)
-%nonassoc UNION JOIN
-%nonassoc SEL UPDATE DELETE CREATE
-%nonassoc FROM WHERE ORDER
-%nonassoc COMMA SEMICOLON
-%left GT LT LE GE EQ NE
-%nonassoc TOP PERCENT
-%nonassoc INT ID
-%nonassoc LPAREN RPAREN
-*)
 %left OR
 %left AND
-%nonassoc LPAREN RPAREN
+%nonassoc INT STRING TRUE FALSE LPAREN
 
 (* declare the starting point *)
 %start <Ast.expr> prog
@@ -87,7 +77,7 @@ statement:
   | SEL; cols = col_list; FROM; tb = ID { SelCol (cols,TbName tb)}
   | SEL; TOP; i = INT; PERCENT; FROM; tb = ID  { SelTop(TopPercent i,TbName tb) }
   | SEL; TOP; i = INT; FROM; tb = ID { SelTop(TopNum i,TbName tb) }
-  | SEL; DISTINCT; col = ID; tb = ID { Distin(ColName col,TbName tb) }
+  | SEL; DISTINCT; col = ID; FROM; tb = ID { Distin(ColName col,TbName tb) }
   | FROM; tb = ID; WHERE; conds = cond_list  { Where (conds,TbName tb) }
   | FROM; tb = ID; ORDER; BY; col = ID; ASC {Sort (ColName col, ASC,TbName tb) }
   | FROM; tb = ID; ORDER; BY; col = ID; DESC {Sort (ColName col, DESC,TbName tb) }
@@ -116,6 +106,7 @@ cond_list:
   ;
 
 cond_tree:
+  | LPAREN; c = cond_tree; RPAREN  { c }
   | single = cond_field  { (Cond single) }
   | left = cond_tree; AND; right = cond_tree { (And (left,right)) }
   | left = cond_tree; OR ; right = cond_tree { (Or  (left,right)) }
@@ -133,7 +124,8 @@ cond_field:
 value_field:
   | i = INT { Int i }
   | s = STRING { String s }
-  | b = BOOL { Bool b }
+  | b = TRUE { Bool true }
+  | b = FALSE { Bool false }
   ;
 
 val_list:
@@ -149,9 +141,9 @@ col_typ_list:
   typs = separated_list(COMMA, typ_field)  { typs };
 
 typ_field:
-  | col = ID; TINT ; LPAREN; i = INT; RPAREN { (ColName col, Int 0) }
-  | col = ID; TSTRING; LPAREN; i = INT; RPAREN { (ColName col, String "") }
-  | col = ID; TBOOL; LPAREN; i = INT; RPAREN { (ColName col, Bool false) }
+  | col = ID; TINT { (ColName col, Int 0) }
+  | col = ID; TSTRING { (ColName col, String "") }
+  | col = ID; TBOOL  { (ColName col, Bool false) }
   ;
 
 join_cond:
