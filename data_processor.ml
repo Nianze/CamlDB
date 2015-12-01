@@ -62,10 +62,18 @@ ORDER BY column_name ASC|DESC;
 sort the table [t] in the ascending or descending order of [o]
 of column [col_name] and return a subtable
 *)
-let sort (col_name: colname) (o: order) (t: table) :table =
-	failwith "unimplemented"
-
-
+let sort (col_name: colname) (o: order) (t: table) : table * status =
+	let colnames = get_colnames t in
+	if (List.mem_assoc col_name colnames) = false then
+		(t, DBError "sort: col_name not found")
+	else
+		let l = table_to_list t in
+		let sorted = List.sort
+		(fun n1 n2 ->
+			if (List.assoc col_name n1) > (List.assoc col_name n2) then 1
+			else if (List.assoc col_name n1) = (List.assoc col_name n2) then 0
+			else -1) l in
+		list_to_table (get_tablename table) (get_colnames table) sorted
 
 
 (*
@@ -97,7 +105,7 @@ let insert_col (col_list : (colname * t) list)
 	let col = List.map (fun (x,y) -> y) colnames in
 	let row = create_node col in
 	insert row t
-
+s
 
 (*
 SQL:

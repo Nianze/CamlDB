@@ -310,9 +310,34 @@ let delete_find (cond_list: condition list) (t: table): status =
 		| Success -> delete_list node_list t; Success
 		| x -> x
 
+(* [iter f t] iterate the table [t] and apply [f] on every row
+ *)
+let iter (f: node -> unit) (t:table): unit =
+	let rec helper f node_o : unit =
+		match node_o with
+			| Some node -> (f node); helper f (node.next)
+			| None -> ()
+	in helper f t.first
 
+(* [table_to_list t] iterate the table [t] return a list of nodes
+ *)
+let table_to_list (t: table): (node list) =
+	let rec helper l node_o  =
+		match node_o with
+			| Some node -> helper (node::l) (node.next)
+			| None -> l
+	in helper [] t.first
 
-
+(* [list_to_table names colnames rows] converts a list to a table.
+ * [name] - table name
+ * [colnames] - colnames
+ * [rows] - a list of node
+ *)
+let list_to_table (name :string) (colnames: (colname * t) list)
+	(rows: node list) : table =
+	let t = empty_table name colnames in
+	List.iter (fun n -> insert n t) rows in
+	t
 
 
 

@@ -131,5 +131,19 @@ val delete_list: node list -> table -> unit
  *)
 val delete_find: condition list -> table -> status
 
+(* [iter f t] iterate the table [t] and apply [f] on every row
+ *)
+val iter: (node -> unit) -> table -> unit
+
+(* [table_to_list t] iterate the table [t] return a list of nodes
+ *)
+val table_to_list: table -> node list
+
+(* [list_to_table names colnames rows] converts a list to a table.
+ * [name] - table name
+ * [colnames] - colnames
+ * [rows] - a list of node
+ *)
+val list_to_table: string) -> ((colname * t) list) -> (node list) -> table
 
 val in_some: 'a option -> 'a
