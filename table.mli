@@ -84,6 +84,10 @@ type table = {
 (* ex. ("column1", Eq, 3) *)
 type condition = colname * operator * t
 
+type cond_tree =
+  | Cond of condition
+  | AND of cond_tree * cond_tree
+  | OR of cond_tree * cond_tree
 
 (******************* Table Accessor *******************)
 
@@ -114,11 +118,11 @@ val insert: node -> table -> unit
  * [cond_list] and returns true or false and the status
  * requires: [n] to be non-empty
  *)
-val cond_row: condition list -> (colname * t) list ->  node -> bool * status
+val cond_row: cond_tree -> (colname * t) list ->  node -> bool * status
 
 (* [delete cond_list t] finds rows satisfies condions in
  * [cond_list] in table [t]. *)
-val find: condition list -> table -> (node list) * status
+val find: cond_tree -> table -> (node list) * status
 
 (* [delete r t] deletes a row [r] to from table [t]. *)
 val delete: node -> table -> unit
@@ -129,7 +133,7 @@ val delete_list: node list -> table -> unit
 (* [delete_find cond_list t] delete all the rows that satisfy [cond_list]
  * in table [t]
  *)
-val delete_find: condition list -> table -> status
+val delete_find: cond_tree -> table -> status
 
 (* [iter f t] iterate the table [t] and apply [f] on every row
  *)
