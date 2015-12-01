@@ -9,14 +9,23 @@ type typ = Table.t
 (** the binary operators *)
 type operator = Table.operator
 
-(** the condition for where statement *)
+(* ex. ("column1", Eq, 3) *)
 type cond = Table.condition
+
+type c_tree = Table.cond_tree
+
+(** SELECT TOP int (PERCENT) *)
+type top_t = TopNum of int | TopPercent of int
+
+type datatype = TString | TInt
+
+type order = DESC | ASC
 
 (** (OCaml) values of type expr represent SQL expressions.
     Here are some examples of how expressions are represented:
      - Int 7 represents 7
      - Bool true represents true
-     - Order true represents Ascending, false represents descending order
+     - Order: ASC represents Ascending, DESC represents descending order
      - TbName "GPA" represents table_name "GPA"
      - String "Tom" represents value "Tom"
      - BinOp (Gt, e1, e2) represents e1 > e2
@@ -49,27 +58,22 @@ type cond = Table.condition
      *)
 type expr =
   | Int      of int
-  | Float    of float
   | Bool     of bool
-  | Order    of bool
-  | Cond    of cond
-  | List     of expr list
+  | String   of string
   | TbName   of name
   | ColName  of name
-  | String   of string
-  | BinOp    of operator * expr * expr
+  | Path     of expr * expr
   | SelCol   of expr list * expr
-  | SelTop   of expr * expr
-  | Top      of float * float
+  | SelTop   of top_t * expr
   | Distin   of expr * expr
-  | Where    of cond list * expr
-  | Sort     of expr * expr
-  | InsRow   of expr * expr list
-  | InsCol   of expr * expr list * expr list
-  | Update   of expr * expr list * expr list
+  | Where    of c_tree * expr
+  | Sort     of expr * order * expr
+  | InsRow   of typ list * expr
+  | InsCol   of expr list * typ list * expr
   | UpdAll   of (expr * typ) list * expr
-  | Delete   of expr * expr list
+  | Update   of c_tree * (expr * typ) list * expr
   | DelAll   of expr
-  | Create   of expr * (expr * expr) list
+  | Delete   of c_tree * expr
+  | Create   of expr * (expr * datatype) list
   | Union    of expr * expr
-  | Join     of expr * expr
+  | Joins    of expr * expr * expr list * (expr * expr) (* (Tb1, Tb2, path list, (path1,path2)) *)

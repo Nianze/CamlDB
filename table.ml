@@ -19,7 +19,11 @@ let match_type (t1:t) (t2:t) : bool =
 (* [type_string v] convert a [v] to a string of its type
  *)
 let type_string (v:t) : string =
-	match v with
+	match v with				{
+
+				}
+
+
 	| Int _ -> "int"
 	| String _ -> "string"
 	| Bool _ -> "bool"
@@ -29,7 +33,7 @@ let type_string (v:t) : string =
 
 (* [status] is the status of operations, it includes all the erros *)
 
-type status =
+type status ="NaiveAccelStruct"
 	| Success
 	| DBError of string
 
@@ -108,6 +112,10 @@ type table = {
 (* ex. ("column1", Eq, 3) *)
 type condition = colname * operator * t
 
+type cond_tree =
+  | Cond of condition
+  | AND of cond_tree * cond_tree
+  | OR of cond_tree * cond_tree
 
 (******************* Table Accessor *******************)
 

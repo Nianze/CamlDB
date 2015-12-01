@@ -8,14 +8,9 @@ open Table
 (* *declarations* *)
 
 %token <int> INT
-%token <float> FLOAT
-%token <float> TOP
-%token PERCENT
+%token <bool> BOOL
+%token <string> ID
 %token <string> STRING
-%token <string> COLNAME
-%token <string> TBNAME
-%token FALSE
-%token TRUE
 %token GT  (*>*)
 %token LT  (*<*)
 %token GE  (*>=*)
@@ -26,6 +21,8 @@ open Table
 %token SEL
 %token COMMA
 %token FROM
+%token TOP
+%token PERCENT
 %token DISTINCT
 %token WHERE
 %token ORDER
@@ -39,24 +36,30 @@ open Table
 %token SET
 %token DELETE
 %token CREATE
+%token TINT
+%token TSTRING
 %token TABLE
 %token LPAREN
 %token RPAREN
-(*%token UNION*)
-(*%token JOIN*)
-%token COLON
+%token UNION
+%token ALL
+%token JOIN
+%token ON
+%token DOT
+%token SEMICOLON
 %token EOF
 
 (* info about precedence & associativity *)
-(*%nonassoc UNION*)
-%nonassoc SEL INSROW INSCOL UPDATE DELETE CREATE
+(*)
+%nonassoc UNION JOIN
+%nonassoc SEL UPDATE DELETE CREATE
 %nonassoc FROM WHERE ORDER
-%nonassoc COMMA COLON
-%left GT LT LE GE EQ NE ANY
+%nonassoc COMMA SEMICOLON
+%left GT LT LE GE EQ NE
 %nonassoc TOP PERCENT
-%nonassoc ASC DESC
-%nonassoc TRUE FALSE INT STRING TBNAME COLNAME
+%nonassoc INT ID
 %nonassoc LPAREN RPAREN
+*)
 
 (* declare the starting point *)
 %start <Ast.expr> prog
@@ -72,55 +75,52 @@ prog:
 
 expr:
   | LPAREN; e = expr; RPAREN { e }
-  | t = TRUE { Bool true }
-  | f = FALSE { Bool false }
-  | a = ASC { Order true }
-  | d = DESC { Order false }
-  | tb = TBNAME { TbName tb }
-  | col = COLNAME { ColName col }
-  | s = statement { s }
+  | s = statement; SEMICOLON { s }
   ;
 
 statement:
-  | SEL; cols = col_list; FROM; tb = TBNAME; COLON { SelCol (List(cols),tb)}
-  | SEL; TOP; f = FLOAT; PERCENT; FROM; tb = TBNAME; COLON  { SelTop(Top (f,true),tb) }
-  | SEL; TOP; f = FLOAT; FROM; tb = TBNAME; COLON { SelTop(Top(f,false),tb) }
-  | SEL; DISTINCT; col = COLNAME; tb = TBNAME; COLON { Distin(col,tb) }
-  | FROM; tb = TBNAME; WHERE; conds = cond_list; COLON  { Where (List(conds),tb) }
-  | FROM; tb = TBNAME; ORDER; BY; col = COLNAME; ACS; COLON {Sort (col,Order(true),tb) }
-  | FROM; tb = TBNAME; ORDER; BY; col = COLNAME; DESC; COLON {Sort (col,Order(false),tb) }
-  | INSERT; INTO; tb = TBNAME; VALUES; LPAREN; vals = val_list;RPAREN; COLON {InsRow (List(vals),tb)}
-  | INSERT; INTO; tb = TBNAME; LPAREN; cols = col_list; RPAREN; VALUES; LPAREN; vals = val_list;RPAREN; COLON {InsCol (List(cols),List(vals),tb)}
-  | UPDATE; tb = TBNAME; SET; pairs = pair_list; COLON {UpdAll (List(pairs),tb) }
-  | UPDATE; tb = TBNAME; SET; pairs = pair_list; WHERE; conds = cond_list; COLON {Update (List(conds),List(pairs),tb) }
-  | DELETE; FROM; tb = TBNAME; COLON { DelAll tb }
-  | DELETE; FROM; tb = TBNAME; WHERE; conds = cond_list; COLON {Delete (List(conds),tb) }
-  | CREATE; TABLE; tb = TBNAME; LPAREN; colsets = col_typ_list; RPAREN; COLON {Create (tb,List(colsets))}
+  | SEL; cols = col_list; FROM; tb = ID { SelCol (cols,TbName tb)}
+  | SEL; TOP; i = INT; PERCENT; FROM; tb = ID  { SelTop(TopPercent i,TbName tb) }
+  | SEL; TOP; i = INT; FROM; tb = ID { SelTop(TopNum i,TbName tb) }
+  | SEL; DISTINCT; col = ID; tb = ID { Distin(ColName col,TbName tb) }
+  | FROM; tb = ID; WHERE; conds = cond_list  { Where (conds,TbName tb) }
+  | FROM; tb = ID; ORDER; BY; col = ID; ASC {Sort (ColName col, ASC,TbName tb) }
+  | FROM; tb = ID; ORDER; BY; col = ID; DESC {Sort (ColName col, DESC,TbName tb) }
+  | INSERT; INTO; tb = ID; VALUES; LPAREN; vals = val_list;RPAREN {InsRow (vals,TbName tb)}
+  | INSERT; INTO; tb = ID; LPAREN; cols = col_list; RPAREN; VALUES; LPAREN; vals = val_list;RPAREN {InsCol (cols,vals,TbName(tb))}
+  | UPDATE; tb = ID; SET; pairs = pair_list {UpdAll (pairs,TbName tb) }
+  | UPDATE; tb = ID; SET; pairs = pair_list; WHERE; conds = cond_list {Update (conds,pairs,TbName tb) }
+  | DELETE; FROM; tb = ID { DelAll (TbName tb) }
+  | DELETE; FROM; tb = ID; WHERE; conds = cond_list { Delete (conds,TbName tb) }
+  | CREATE; TABLE; tb = ID; LPAREN; colsets = col_typ_list; RPAREN { Create (TbName tb, colsets) }
+  | SEL; ANY; FROM; tb1 = ID; UNION; ALL; SEL; ANY; FROM; tb2 = ID { Union (TbName tb1,TbName tb2) }
+  | SEL; cols = col_list;FROM; tb1 = ID; JOIN; tb2 = ID;ON; j_cond = join_cond { Joins (TbName tb1,TbName tb2, cols, j_cond) }
   ;
-(*  | UNION *)
-(*  | JOIN  *)
+
 col_list:
-  col = separated_list(COMMA, col_field)   { col };
+  cols = separated_list(COMMA, col_field) { cols };
 
 col_field:
-  c = COLNAME { c };
+  | col = ID { ColName col }
+  | tb = ID; DOT; col = ID { Path(TbName tb, ColName col) }
+  ;
 
 cond_list:
   cond = separated_list(COMMA, cond_field)  { cond };
 
 cond_field:
-  | e1 = TBNAME; GT; e2 = value_field { BinOp (GT,e1,e2) }
-  | e1 = TBNAME; LT; e2 = value_field { BinOp (LT,e1,e2) }
-  | e1 = TBNAME; GE; e2 = value_field { BinOp (GE,e1,e2) }
-  | e1 = TBNAME; LE; e2 = value_field { BinOp (LE,e1,e2) }
-  | e1 = TBNAME; EQ; e2 = value_field { BinOp (EQ,e1,e2) }
-  | e1 = TBNAME; NE; e2 = value_field { BinOp (NE,e1,e2) }
+  | e1 = ID; GT; e2 = value_field { (e1,GT,e2) }
+  | e1 = ID; LT; e2 = value_field { (e1,LT,e2) }
+  | e1 = ID; GE; e2 = value_field { (e1,GE,e2) }
+  | e1 = ID; LE; e2 = value_field { (e1,LE,e2) }
+  | e1 = ID; EQ; e2 = value_field { (e1,EQ,e2) }
+  | e1 = ID; NE; e2 = value_field { (e1,NE,e2) }
   ;
 
 value_field:
   | i = INT { Int i }
-  | f = FLOAT { Float f }
   | s = STRING { String s }
+  | b = BOOL { Bool b }
   ;
 
 val_list:
@@ -130,4 +130,16 @@ pair_list:
   pr = separated_list(COMMA, pair_field)   { pr };
 
 pair_field:
-  col = COLNAME; EQ; vl = value_field  { (col, vl) };
+  col = ID; EQ; vl = value_field      { (ColName col, vl) };
+
+col_typ_list:
+  typs = separated_list(COMMA, typ_field)  { typs };
+
+typ_field:
+  | col = ID; TINT ; LPAREN; i = INT; RPAREN { (ColName col, TInt) }
+  | col = ID; TSTRING; LPAREN; i = INT; RPAREN { (ColName col, TString) }
+  ;
+
+join_cond:
+  tb1 = ID; DOT; col1 = ID; EQ;
+  tb2 = ID; DOT; col2 = ID { (Path(TbName tb1, ColName col1),Path(TbName tb2, ColName col2)) }
