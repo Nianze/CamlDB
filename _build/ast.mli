@@ -1,8 +1,26 @@
-open Ast
 open Table
-open Storage
-open Data_processor
-(*
+
+(** store column names, table names *)
+type name = string
+
+(** store column types*)
+type typ = Table.t
+
+(** the binary operators *)
+type operator = Table.operator
+
+(* ex. ("column1", Eq, 3) *)
+type cond = Table.condition
+
+type c_tree = Table.cond_tree
+
+(** SELECT TOP int (PERCENT) *)
+type top_t = TopNum of int | TopPercent of int
+
+type datatype = TString | TInt
+
+type order = DESC | ASC
+
 (** (OCaml) values of type expr represent SQL expressions.
     Here are some examples of how expressions are represented:
      - Int 7 represents 7
@@ -48,70 +66,14 @@ type expr =
   | SelCol   of expr list * expr
   | SelTop   of top_t * expr
   | Distin   of expr * expr
-  | Where    of cond list * expr
+  | Where    of c_tree * expr
   | Sort     of expr * order * expr
   | InsRow   of typ list * expr
   | InsCol   of expr list * typ list * expr
   | UpdAll   of (expr * typ) list * expr
-  | Update   of cond list * (expr * typ) list * expr
+  | Update   of c_tree * (expr * typ) list * expr
   | DelAll   of expr
-  | Delete   of cond list * expr
-  | Create   of expr * (expr * datatype) list
+  | Delete   of c_tree * expr
+  | Create   of expr * (expr * typ) list
   | Union    of expr * expr
   | Joins    of expr * expr * expr list * (expr * expr) (* (Tb1, Tb2, path list, (path1,path2)) *)
-*)
-
-let open_tables = ref []
-
-let table_named n =
-  if List.mem_assoc n !open_tables then
-    List.assoc n !open_tables
-  else
-    let t = load_table n in
-    open_tables := (n, t)::!open_tables;
-    t
-
-let name_of_expr = function
-  | ColName n -> n
-  | TbName n -> n
-  | _ -> failwith "Syntax error"
-
-let rec eval = function
-  | TbName n ->
-     table_named n
-  | SelCol (lst, n) ->
-     select_col (List.map name_of_expr lst) (eval n)
-  | SelTop (top, n) ->
-     select_top top (eval n)
-  | Distin (colname, n) ->
-     distinct (name_of_expr colname) (eval n)
-  | Where (cond_lst, expr) ->
-     where cond_lst (eval expr)
-  | Sort (colname, order, expr) ->
-     sort colname order (eval expr)
-  | InsRow (typ_lst, expr) ->
-     insert typ_lst (eval expr);
-     (eval expr)
-  | InsCol (expr_lst, typ_lst, expr) ->
-     insert_col (List.combine expr_lst typ_lst) (eval expr);
-     (eval expr)
-  | UpdAll (lst, expr) ->
-     let (es, typs) = List.split lst in
-     let colnames = List.map name_of_expr es in
-     update_all (List.combine colnames typs) (eval expr)
-  | Update (conds, lst, expr) ->
-     let (es, typs) = List.split lst in
-     let colnames = List.map name_of_expr es in
-     update conds (List.combine colnames typs) (eval expr)
-  | DelAll e ->
-     delete_all (eval e)
-  | Delete (cond_lst, e) ->
-     delete cond_lst (eval e)
-  | Create (n, lst) ->
-     let (es, typs) = List.split lst in
-     let colnames = List.map name_of_expr es in
-     create_table (name_of_expr n) (List.combine colnames typs)
-  | Union (e1, e2) ->
-     let t1 = (eval e1) in
-     union_rows t1 (eval e2) (fst (List.split (get_colnames t1)))
-  | Joins _ -> failwith "unimplemented"
