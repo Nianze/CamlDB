@@ -1,6 +1,6 @@
 ### Starting build.
 # Target: test_visualizer.ml.depends, tags: { extension:ml, file:test_visualizer.ml, ocaml, ocamldep, quiet }
-/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules test_visualizer.ml > test_visualizer.ml.depends
+/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules test_visualizer.ml > test_visualizer.ml.depends # cached
 # Target: table.mli.depends, tags: { extension:mli, file:table.mli, ocaml, ocamldep, quiet }
 /Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules table.mli > table.mli.depends # cached
 # Target: table.cmi, tags: { byte, compile, extension:mli, file:table.mli, interf, ocaml, quiet }
@@ -10,15 +10,15 @@
 # Target: visualizer.cmi, tags: { byte, compile, extension:mli, file:visualizer.mli, interf, ocaml, quiet }
 /Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -o visualizer.cmi visualizer.mli # cached
 # Target: test_visualizer.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:test_visualizer.cmo, file:test_visualizer.ml, implem, ocaml, quiet }
-/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -o test_visualizer.cmo test_visualizer.ml
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -o test_visualizer.cmo test_visualizer.ml # cached
 # Target: table.ml.depends, tags: { extension:ml, file:table.ml, ocaml, ocamldep, quiet }
 /Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules table.ml > table.ml.depends # cached
 # Target: table.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:table.cmo, file:table.ml, implem, ocaml, quiet }
 /Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -o table.cmo table.ml # cached
 # Target: visualizer.ml.depends, tags: { extension:ml, file:visualizer.ml, ocaml, ocamldep, quiet }
-/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules visualizer.ml > visualizer.ml.depends # cached
+/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules visualizer.ml > visualizer.ml.depends
 # Target: visualizer.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:visualizer.cmo, file:visualizer.ml, implem, ocaml, quiet }
-/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -o visualizer.cmo visualizer.ml # cached
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -o visualizer.cmo visualizer.ml
 # Target: test_visualizer.byte, tags: { byte, dont_link_with, extension:byte, file:test_visualizer.byte, link, ocaml, program, quiet }
 /Users/andrew/.opam/4.02.1/bin/ocamlc.opt table.cmo visualizer.cmo test_visualizer.cmo -o test_visualizer.byte
 # Compilation successful.
