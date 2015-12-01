@@ -74,13 +74,10 @@ expr:
   ;
 
 statement:
-  | SEL; cols = col_list; FROM; tb = ID { SelCol (cols,TbName tb)}
-  | SEL; TOP; i = INT; PERCENT; FROM; tb = ID  { SelTop(TopPercent i,TbName tb) }
-  | SEL; TOP; i = INT; FROM; tb = ID { SelTop(TopNum i,TbName tb) }
-  | SEL; DISTINCT; col = ID; FROM; tb = ID { Distin(ColName col,TbName tb) }
-  | FROM; tb = ID; WHERE; conds = cond_list  { Where (conds,TbName tb) }
-  | FROM; tb = ID; ORDER; BY; col = ID; ASC {Sort (ColName col, ASC,TbName tb) }
-  | FROM; tb = ID; ORDER; BY; col = ID; DESC {Sort (ColName col, DESC,TbName tb) }
+  | SEL; cols = col_list; FROM; f_tb = filtered_table { SelCol (cols, f_tb)}
+  | SEL; TOP; i = INT; PERCENT; FROM; f_tb = filtered_table  { SelTop(TopPercent i, f_tb) }
+  | SEL; TOP; i = INT; FROM; f_tb = filtered_table { SelTop(TopNum i, f_tb) }
+  | SEL; DISTINCT; col = ID; FROM; f_tb = filtered_table { Distin(ColName col, f_tb) }
   | INSERT; INTO; tb = ID; VALUES; LPAREN; vals = val_list;RPAREN {InsRow (vals,TbName tb)}
   | INSERT; INTO; tb = ID; LPAREN; cols = col_list; RPAREN; VALUES; LPAREN; vals = val_list;RPAREN {InsCol (cols,vals,TbName(tb))}
   | UPDATE; tb = ID; SET; pairs = pair_list {UpdAll (pairs,TbName tb) }
@@ -90,6 +87,15 @@ statement:
   | CREATE; TABLE; tb = ID; LPAREN; colsets = col_typ_list; RPAREN { Create (TbName tb, colsets) }
   | SEL; ANY; FROM; tb1 = ID; UNION; ALL; SEL; ANY; FROM; tb2 = ID { Union (TbName tb1,TbName tb2) }
   | SEL; cols = col_list;FROM; tb1 = ID; JOIN; tb2 = ID;ON; j_cond = join_cond { Joins (TbName tb1,TbName tb2, cols, j_cond) }
+  ;
+
+filtered_table:
+  | tb = ID  { TbName tb }
+  | tb = ID; WHERE; conds = cond_list  { Where (conds,TbName tb) }
+  | tb = ID; WHERE; conds = cond_list; ORDER; BY; col = ID; ASC { Where (conds, Sort (ColName col, ASC, TbName tb) ) }
+  | tb = ID; WHERE; conds = cond_list; ORDER; BY; col = ID; DESC { Where (conds, Sort (ColName col, DESC, TbName tb) ) }
+  | tb = ID; ORDER; BY; col = ID; ASC  { Sort (ColName col, ASC, TbName tb) }
+  | tb = ID; ORDER; BY; col = ID; DESC { Sort (ColName col, DESC,TbName tb) }
   ;
 
 col_list:
