@@ -1,5 +1,4 @@
 (******************* Basic data type *******************)
-
 (* A [t] stores the type and values of each value *)
 type t =
 	| Int of int
@@ -86,8 +85,9 @@ type condition = colname * operator * t
 
 type cond_tree =
   | Cond of condition
-  | AND of cond_tree * cond_tree
-  | OR of cond_tree * cond_tree
+  | And of cond_tree * cond_tree
+  | Or of cond_tree * cond_tree
+
 
 (******************* Table Accessor *******************)
 
@@ -148,6 +148,7 @@ val table_to_list: table -> node list
  * [colnames] - colnames
  * [rows] - a list of node
  *)
-val list_to_table: string) -> ((colname * t) list) -> (node list) -> table
+val list_to_table: string -> ((colname * t) list) -> (node list) -> table
+
 
 val in_some: 'a option -> 'a
