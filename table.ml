@@ -19,11 +19,7 @@ let match_type (t1:t) (t2:t) : bool =
 (* [type_string v] convert a [v] to a string of its type
  *)
 let type_string (v:t) : string =
-	match v with				{
-
-				}
-
-
+	match v with
 	| Int _ -> "int"
 	| String _ -> "string"
 	| Bool _ -> "bool"
@@ -33,7 +29,7 @@ let type_string (v:t) : string =
 
 (* [status] is the status of operations, it includes all the erros *)
 
-type status ="NaiveAccelStruct"
+type status =
 	| Success
 	| DBError of string
 
@@ -114,8 +110,8 @@ type condition = colname * operator * t
 
 type cond_tree =
   | Cond of condition
-  | AND of cond_tree * cond_tree
-  | OR of cond_tree * cond_tree
+  | And of cond_tree * cond_tree
+  | Or of cond_tree * cond_tree
 
 (******************* Table Accessor *******************)
 
@@ -233,7 +229,48 @@ let delete (r: node) (t:table) : unit =
  * [cond_list] and returns true or false and the status
  * requires: [n] to be non-empty
  *)
-let rec cond_row (cond_list: condition list) (colnames: (colname * t) list)
+let rec cond_row (cond_list: cond_tree) (colnames: (colname * t) list)
+(n: node) : bool * status =
+	match cond_list with
+	| Cond (col, op, v) -> (
+		let num_found = List.(length (filter (fun (n,t) -> n = col) colnames)) in
+
+		if num_found < 1
+		then (false, DBError ("Column name " ^ col ^ " is not found.") )
+		else if num_found > 1
+		then (false, DBError ("Duplicate columns " ^ col ^ " found.") )
+		else if List.(length colnames <> length n.value)
+		then (false, DBError
+		"cond_row: Number of columns mismatch between colname and row content.")
+		else if
+		List.(length
+			(filter (fun (n,t) -> (n = col) && (match_type t v)) colnames)
+		) <> 1
+		then (false, DBError ("Column " ^ col ^ " has the wrong type") )
+
+		else
+		let pair_list = List.combine colnames n.value in
+		let (_, content) = List.find (fun ((cn, _), _) -> cn = col) pair_list in
+		compare op !content v
+		)
+	| And (c1, c2) -> (
+		match (cond_row c1 colnames n, cond_row c1 colnames n) with
+			| ((_, DBError e), _) -> (false, DBError e)
+			| (_, (_, DBError e)) -> (false, DBError e)
+			| ((true, _), (true, _)) -> (true, Success)
+			| _ -> (false, Success)
+		)
+	| Or (c1, c2) -> (
+		match (cond_row c1 colnames n, cond_row c1 colnames n) with
+			| ((_, DBError e), _) -> (false, DBError e)
+			| (_, (_, DBError e)) -> (false, DBError e)
+			| ((false, _), (false, _))  -> (false, Success)
+			| _ -> (true, Success)
+		)
+
+
+
+(* let rec cond_row (cond_list: condition list) (colnames: (colname * t) list)
 (n: node) : bool * status =
 	match cond_list with
 	| [] -> (true, Success)
@@ -263,12 +300,12 @@ let rec cond_row (cond_list: condition list) (colnames: (colname * t) list)
 		match res with
 		| (true, Success) -> cond_row cond_list' colnames n
 		| _ -> res
-
+ *)
 
 (* [find cond_list t] finds rows satisfies condions in
  * [cond_list] in table [t].
  *)
-let find (cond_list: condition list) (t: table): (node list) * status =
+let find (cond_list: cond_tree) (t: table): (node list) * status =
 	let rec helper (n : node option) (l: node list): (node list) * status =
 		match n with
 		| None -> (l,Success)
@@ -312,7 +349,7 @@ let rec delete_list (n_list: node list) (t:table) : unit =
 (* [delete_find cond_list t] delete all the rows that satisfy [cond_list]
  * in table [t]
  *)
-let delete_find (cond_list: condition list) (t: table): status =
+let delete_find (cond_list: cond_tree) (t: table): status =
 	let (node_list, s) = find cond_list t in
 	match s with
 		| Success -> delete_list node_list t; Success
@@ -344,7 +381,7 @@ let table_to_list (t: table): (node list) =
 let list_to_table (name :string) (colnames: (colname * t) list)
 	(rows: node list) : table =
 	let t = empty_table name colnames in
-	List.iter (fun n -> insert n t) rows in
+	List.iter (fun n -> insert n t) rows;
 	t
 
 

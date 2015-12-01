@@ -15,7 +15,7 @@ SELECT column_name, column_name FROM table_name;
 select some particular columns in a list of colunms [col_list]
 from table [t] and return a subtable
 *)
-let select_col (col_list :colname list) (t: table): table =
+let select_col (col_list :colname list) (t: table): (status * table) =
 	failwith "unimplemented"
 
 
@@ -107,6 +107,41 @@ let insert_col (col_list : (colname * t) list)
 	insert row t
 s
 
+let update_node (n: node) (colnames: (colname * t) list)
+(pair_list : (colname * t) list): unit =
+	let e = List.(fold_left2 (fun s (c, ts) t ->
+		if mem_assoc c pair_list
+		then t := (assoc c pair_list); s
+		else ()
+		) colnames n )
+
+
+(* check if each columns in pair_list can be found in colnames
+	 return:
+	 	empty string "" if all columns found,
+		string of names of the columns unfound otherwise
+ *)
+let colname_check (pair_list : (colname * t) list)
+(colnames : (colname * t) list): string =
+	List.(fold_left
+		(fun s (c, _) ->
+			if mem_assoc c colnames then s
+			else s ^ ", " ^ c )
+	"" pair_list)
+
+(* check if each columns in pair_list has the same type as originally
+	 defined by table in colnames
+	 return:
+	 	empty string "" if all column types match,
+		string of names of the columns that don't type match
+ *)
+let type_check (pair_list : (colname * t) list)
+(colnames : (colname * t) list): string =
+	List.(fold_left
+		(fun s (c, t) ->
+			if match_type t (mem_assoc c colnames) then s
+			else s ^ ", " ^ c)
+	"" pair_list)
 (*
 SQL:
 UPDATE table_name
@@ -115,8 +150,16 @@ SET column1=value1,column2=value2,...;
 update all the rows in the table [t] according to the column
 and value specified by [pair_list]
 *)
-let update_all (pair_list :colname * t list) (t:table) :table =
-	failwith "unimplemented"
+let update_all (pair_list : (colname * t) list) (t:table) : status =
+	let colnames = get_colnames t in
+	let e_find = colnames_check pair_list colnames in
+	let e_type = type_check pair_list colnames in
+	match (e_find, e_type) with
+		| ("", "") -> iter (fun n -> update_node n colnames pair_list) t; Success
+		| ("", _) ->
+			DBError "update_all: type of column "^e_type^" cannot be modified"
+		| _ -> DBError "update_all: can't find columns: " ^ e_find
+
 
 (*
 SQL:
@@ -128,9 +171,20 @@ update all the rows that satisfy the conditions in [cond_list]
 in the table [t] according to the column and value specified
 by [pair_list]
 *)
-let update (cond_list: condition list) (pair_list :colname * t list)
-(t:table) :table =
-	failwith "unimplemented"
+let update (cond_list: cond_tree) (pair_list :colname * t list)
+(t:table) : status =
+	match find cond_list t with
+	| (nl, Success) -> (
+		let e_find = colnames_check pair_list colnames in
+		let e_type = type_check pair_list colnames in
+		match (e_find, e_type) with
+			| ("", "") ->
+				List.iter (fun n -> update_node n colnames pair_list) nl; Success
+			| ("", _) ->
+				DBError "update_all: type of column "^e_type^" cannot be modified"
+			| _ -> DBError "update_all: can't find columns: " ^ e_find
+		)
+	| (_, DBError e) -> DBError e
 
 
 (*
@@ -139,8 +193,8 @@ DELETE FROM table_name;
 
 delete all rows in the table [t], disable the row under the hood
 *)
-let delete_all (t:table) :table =
-	failwith "unimplemented"
+let delete_all (t:table) : unit =
+	iter (fun n -> delete n t) t
 
 
 (*
@@ -151,9 +205,10 @@ WHERE some_column=some_value;
 delete all rows in the table [t] that satisfies the conditions in
 [cond_list], disable the row under the hood
 *)
-let delete (cond_list: condition list) (t:table) :table =
-	failwith "unimplemented"
-
+let delete (cond_list: cond_tree) (t:table) : status =
+	match find cond_list t with
+	| (nl, Success) -> List.iter (fun n -> delete n t) nl; Success
+	| (_, DBError e) -> DBError e
 
 (*
 SQL:
@@ -184,6 +239,13 @@ number of columns. Assign the concatenated table column names
 specified in [col_name_list]
 *)
 let union_rows (t1: table) (t2: table) (col_name_list: colname list)
-: table =
-	failwith "unimplemented"
+: status * table =
+	(* check colnames in both table, throw error if not exist *)
+	let (s1, t1_cols) = select_col col_name_list t1 in
+	let (s2, t2_cols) = select_col col_name_list t2 in
+	match (s1, s2) with
+		| (DBError e, _) | (_, DBError e) -> (DBError e, t1)
+		| (Success, Success) ->
+				iter (fun x -> insert x t1) t2;
+				(Success, t1)
 

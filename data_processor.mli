@@ -14,7 +14,7 @@ SELECT column_name, column_name FROM table_name;
 select some particular columns in a list of colunms [col_list]
 from table [t] and return a subtable
 *)
-val select_col: colname list -> table -> table
+val select_col: colname list -> table -> (status * table)
 
 (*
 SELECT TOP number|percent column_name(s)
@@ -85,7 +85,7 @@ SET column1=value1,column2=value2,...;
 update all the rows in the table [t] according to the column
 and value specified by pair_list
 *)
-val update_all: colname * t list -> table -> table
+val update_all: (colname * t) list -> table -> status
 
 (*
 SQL:
@@ -97,7 +97,7 @@ update all the rows that satisfy the conditions in [cond_list]
 in the table [t] according to the column and value specified
 by [pair_list]
 *)
-val update: condition lst -> colname * t list -> table -> table
+val update: condition lst -> colname * t list -> table -> status
 
 
 (*
@@ -106,7 +106,7 @@ DELETE FROM table_name;
 
 delete all rows in the table [t], disable the row under the hood
 *)
-val delete_all: table -> table
+val delete_all: table -> unit
 
 
 (*
@@ -117,7 +117,7 @@ WHERE condition list;
 delete all rows in the table [t] that satisfies the conditions in
 [cond_list], disable the row under the hood
 *)
-val delete: condition lst -> table -> table
+val delete: condition lst -> table -> status
 
 
 (*
@@ -147,4 +147,4 @@ concatenate two tables [t1] and [t2] given [t1] and [t2] the same
 number of columns. Assign the concatenated table column names
 specified in [col_name_list]
 *)
-val union_rows: table -> table -> colname list ->  table
+val union_rows: table -> table -> colname list -> status * table
