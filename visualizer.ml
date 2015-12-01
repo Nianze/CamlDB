@@ -15,7 +15,7 @@ let calc_widths t =
     | Some n -> let row =
 		  List.map (fun x -> String.length (string_of_elt !x)) n in
 		row::(elt_widths n.next) in
-  failwith "TODO"		    
+  title_widths (* TODO: dynamic widths *)		    
   
 let make_sep_row widths sep spc =
   List.fold_left
