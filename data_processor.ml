@@ -19,6 +19,9 @@ let select_col (col_list :colname list) (t: table): status * table =
   failwith "TODO"
 
 
+
+
+
 (*
 SELECT TOP number|percent column_name(s)
 FROM table_name;
