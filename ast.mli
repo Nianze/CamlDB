@@ -19,6 +19,8 @@ type top_t = Table.top_t
 
 type order = Table.order
 
+type plot = Visualizer.vis_method
+
 (** (OCaml) values of type expr represent SQL expressions.
     Here are some examples of how expressions are represented:
      - Int 7 represents 7
@@ -61,9 +63,9 @@ type expr =
   | TbName   of name
   | ColName  of name
   | Path     of expr * expr
-  | SelCol   of expr list * expr
-  | SelTop   of top_t * expr
-  | Distin   of expr * expr
+  | SelCol   of expr list * expr * plot
+  | SelTop   of top_t * expr * plot
+  | Distin   of expr * expr * plot
   | Where    of c_tree * expr
   | Sort     of expr * order * expr
   | InsRow   of typ list * expr
