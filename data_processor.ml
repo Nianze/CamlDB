@@ -15,8 +15,6 @@ SELECT column_name, column_name FROM table_name;
 select some particular columns in a list of colunms [col_list]
 from table [t] and return a subtable
 *)
-<<<<<<< HEAD
-
 let select_col (col_list :colname list) (t: table): status * table =
   let colnames = get_colnames t in
   let out_cols = List.filter (fun (x,_)-> List.mem x col_list) colnames in
@@ -25,14 +23,6 @@ let select_col (col_list :colname list) (t: table): status * table =
     | [] -> t'
     | h::t -> List.map (fun pair -> insert_col_values pair t')
                        (List.map  (fun value -> [(h,value)]) (get_col t h))
-=======
-let select_col (col_list :colname list) (t: table): status * table =
-  failwith "TODO"
->>>>>>> 99fbd90f902eecdf9cf4c12fcca4fc9c7fa870fd
-
-
-
-
 
 (*
 SELECT TOP number|percent column_name(s)
