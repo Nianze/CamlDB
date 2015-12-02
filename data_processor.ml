@@ -5,8 +5,8 @@ open Table
 type operator = Table.operator
 type table = Table.table
 type condition = Table.condition *)
-type order = DESC | ASC
-type top_t = TopNum of int | TopPercent of int
+(* type order = DESC | ASC
+type top_t = TopNum of int | TopPercent of int *)
 
 (*
 SQL:
@@ -15,7 +15,7 @@ SELECT column_name, column_name FROM table_name;
 select some particular columns in a list of colunms [col_list]
 from table [t] and return a subtable
 *)
-let select_col (col_list :colname list) (t: table): (status * table) =
+let select_col (col_list :colname list) (t: table): status * table =
 	failwith "unimplemented"
 
 
@@ -26,7 +26,7 @@ FROM table_name;
 select some particular columns in a list of colunms [col_list]
 from table [t] and return a subtable
 *)
-let select_top (top: top_t) (t: table): table =
+let select_top (top: top_t) (t: table): status * table =
 	failwith "unimplemented"
 
 (*
@@ -36,7 +36,7 @@ SELECT DISTINCT column_name FROM table_name;
 get all the distinct values of a column with the name of [col_name]
 from table t and return a subtable
 *)
-let distinct (col_name :colname) (t :table) :table =
+let distinct (col_name :colname) (t :table) : status * table =
 	failwith "unimplemented"
 
 
@@ -49,10 +49,26 @@ WHERE column_name operator value;
 filter the table [t] according to the conditions in [cond_list]
 and return a subtable
 *)
-let where (cond_list: condition list) (t :table) :table =
+let where (cond_list: cond_tree) (t :table) :status * table =
 	failwith "unimplemented"
 
 
+let get_cmp (o: order) (i: int) =
+	match o with
+	| ASC -> (
+			fun n1 n2 ->
+				let v1 = List.nth n1 i in
+				let v2 = List.nth n2 i in
+				if v1 > v2 then 1
+				else if v1 = v2 then 0
+				else -1)
+	| DESC -> (
+			fun n1 n2 ->
+				let v1 = List.nth n1 i in
+				let v2 = List.nth n2 i in
+				if v1 < v2 then 1
+				else if v1 = v2 then 0
+				else -1)
 (*
 SQL:
 SELECT *
@@ -62,18 +78,20 @@ ORDER BY column_name ASC|DESC;
 sort the table [t] in the ascending or descending order of [o]
 of column [col_name] and return a subtable
 *)
-let sort (col_name: colname) (o: order) (t: table) : table * status =
+let sort (col_name: colname) (o: order) (t: table) : status * table =
 	let colnames = get_colnames t in
 	if (List.mem_assoc col_name colnames) = false then
-		(t, DBError "sort: col_name not found")
+		(DBError "sort: col_name not found", t)
 	else
-		let l = table_to_list t in
-		let sorted = List.sort
-		(fun n1 n2 ->
-			if (List.assoc col_name n1) > (List.assoc col_name n2) then 1
-			else if (List.assoc col_name n1) = (List.assoc col_name n2) then 0
-			else -1) l in
-		list_to_table (get_tablename table) (get_colnames table) sorted
+		let l_node = table_to_list t in
+		let l = List.map (fun n -> n.value) l_node in
+		let index = ref 0 in
+		List.iteri
+		(fun i (c, _) -> if c = col_name then index:= i else ())
+		colnames;
+		let sorted = List.sort (get_cmp o !index) l in
+		let node_list = List.map (fun v -> create_node v) sorted in
+		list_to_table (get_tablename t) (get_colnames t) node_list
 
 
 (*
@@ -84,7 +102,7 @@ VALUES (value1,value2,value3,...);
 insert a new row with values [val_list] in the order of columns
 into table [t] and return a subtable
 *)
-let insert (val_list: t list) (t: table) : unit =
+let insert_values (val_list: t list) (t: table) : status =
 	let row = create_node (List.map (fun x -> ref x) val_list) in
 	insert row t
 
@@ -96,8 +114,8 @@ VALUES (value1,value2,value3,...);
 insert a new row, both the column names and the values to be
 inserted [val_list] are speicified in [col_list]
 *)
-let insert_col (col_list : (colname * t) list)
-(t:table) : unit =
+let insert_col_values (col_list : (colname * t) list)
+(t:table) : status =
 	let colnames = List.map (fun (x, y) -> (x, ref y)) (get_colnames t) in
 	List.(iter
 		(fun (x, y) -> if mem_assoc x col_list then y:=assoc x col_list) colnames
@@ -105,15 +123,15 @@ let insert_col (col_list : (colname * t) list)
 	let col = List.map (fun (x,y) -> y) colnames in
 	let row = create_node col in
 	insert row t
-s
 
 let update_node (n: node) (colnames: (colname * t) list)
 (pair_list : (colname * t) list): unit =
-	let e = List.(fold_left2 (fun s (c, ts) t ->
+	List.(iter2
+		(fun (c, ts) t ->
 		if mem_assoc c pair_list
-		then t := (assoc c pair_list); s
-		else ()
-		) colnames n )
+		then (t := (assoc c pair_list))
+		else () )
+	colnames n.value)
 
 
 (* check if each columns in pair_list can be found in colnames
@@ -139,7 +157,7 @@ let type_check (pair_list : (colname * t) list)
 (colnames : (colname * t) list): string =
 	List.(fold_left
 		(fun s (c, t) ->
-			if match_type t (mem_assoc c colnames) then s
+			if match_type t (assoc c colnames) then s
 			else s ^ ", " ^ c)
 	"" pair_list)
 (*
@@ -152,13 +170,13 @@ and value specified by [pair_list]
 *)
 let update_all (pair_list : (colname * t) list) (t:table) : status =
 	let colnames = get_colnames t in
-	let e_find = colnames_check pair_list colnames in
+	let e_find = colname_check pair_list colnames in
 	let e_type = type_check pair_list colnames in
 	match (e_find, e_type) with
 		| ("", "") -> iter (fun n -> update_node n colnames pair_list) t; Success
 		| ("", _) ->
-			DBError "update_all: type of column "^e_type^" cannot be modified"
-		| _ -> DBError "update_all: can't find columns: " ^ e_find
+			DBError ("update_all: type of column "^e_type^" cannot be modified")
+		| _ -> DBError ("update_all: can't find columns: " ^ e_find)
 
 
 (*
@@ -171,18 +189,19 @@ update all the rows that satisfy the conditions in [cond_list]
 in the table [t] according to the column and value specified
 by [pair_list]
 *)
-let update (cond_list: cond_tree) (pair_list :colname * t list)
+let update (cond_list: cond_tree) (pair_list :(colname * t) list)
 (t:table) : status =
 	match find cond_list t with
 	| (nl, Success) -> (
-		let e_find = colnames_check pair_list colnames in
+		let colnames = get_colnames t in
+		let e_find = colname_check pair_list colnames in
 		let e_type = type_check pair_list colnames in
 		match (e_find, e_type) with
 			| ("", "") ->
 				List.iter (fun n -> update_node n colnames pair_list) nl; Success
 			| ("", _) ->
-				DBError "update_all: type of column "^e_type^" cannot be modified"
-			| _ -> DBError "update_all: can't find columns: " ^ e_find
+				DBError ("update_all: type of column "^e_type^" cannot be modified")
+			| _ -> DBError ("update_all: can't find columns: " ^ e_find)
 		)
 	| (_, DBError e) -> DBError e
 
@@ -191,10 +210,15 @@ let update (cond_list: cond_tree) (pair_list :colname * t list)
 SQL:
 DELETE FROM table_name;
 
-delete all rows in the table [t], disable the row under the hood
+delete all rows in the table [t]
 *)
-let delete_all (t:table) : unit =
-	iter (fun n -> delete n t) t
+let delete_all (t:table) : status =
+	fold_left
+	(fun a n ->
+		match a with
+			| Success -> delete n t
+			| DBError e -> a
+	) Success t
 
 
 (*
@@ -207,7 +231,7 @@ delete all rows in the table [t] that satisfies the conditions in
 *)
 let delete (cond_list: cond_tree) (t:table) : status =
 	match find cond_list t with
-	| (nl, Success) -> List.iter (fun n -> delete n t) nl; Success
+	| (nl, Success) -> List.iter (fun n -> ignore (delete n t)) nl; Success
 	| (_, DBError e) -> DBError e
 
 (*
@@ -246,6 +270,6 @@ let union_rows (t1: table) (t2: table) (col_name_list: colname list)
 	match (s1, s2) with
 		| (DBError e, _) | (_, DBError e) -> (DBError e, t1)
 		| (Success, Success) ->
-				iter (fun x -> insert x t1) t2;
+				iter (fun x -> ignore (insert x t1)) t2;
 				(Success, t1)
 

@@ -25,6 +25,9 @@ let type_string (v:t) : string =
 	| Bool _ -> "bool"
 	| Float _ -> "float"
 
+type order = DESC | ASC
+type top_t = TopNum of int | TopPercent of int
+
 (******************* Status of operations *******************)
 
 (* [status] is the status of operations, it includes all the erros *)
@@ -145,29 +148,44 @@ let empty_table (name :string) (colnames: (colname * t) list):table =
 		last = None
 	}
 
+(* check if each columns in pair_list has the same type as originally
+	 defined by table in colnames
+	 return:
+	 	empty string "" if all column types match,
+		string of names of the columns that don't type match
+ *)
+let insert_type_check (d_list : (t ref) list)
+(colnames : (colname * t) list): bool =
+	List.fold_left2
+	(fun a tref (_, d) ->
+		a && (match_type (!tref) d)
+	) true d_list colnames
+
 (* [insert r t] inserts a row [r] to the top of a
  * table [t].
  * require: nothing about the default prev, next of [r]
  *)
-let insert (r: node) (t:table) : unit =
-	match t.first with
-	| None ->
-		r.prev <- None;
-		r.next <- None;
-		t.first <- Some r;
-		t.last <- Some r;
-		t.numrow <- 1;
-		()
-	| Some n ->
-		r.prev <- None;
-		r.next <- Some n;
-		t.first <- Some r;
-		n.prev <- Some r;
-		t.numrow <- (t.numrow + 1);
-		()
+let insert (r: node) (t:table) : status =
+	if insert_type_check r.value t.colnames then
+		match t.first with
+		| None ->
+			r.prev <- None;
+			r.next <- None;
+			t.first <- Some r;
+			t.last <- Some r;
+			t.numrow <- 1;
+			Success
+		| Some n ->
+			r.prev <- None;
+			r.next <- Some n;
+			t.first <- Some r;
+			n.prev <- Some r;
+			t.numrow <- (t.numrow + 1);
+			Success
+	else DBError "insert: row to insert doesn't type match with table"
 
 (* [delete r t] deletes a row [r] from table [t]. *)
-let delete (r: node) (t:table) : unit =
+let delete (r: node) (t:table) : status =
 	match (r.prev, r.next) with
 	| (None, None) ->
 		(t.first <- None);
@@ -175,28 +193,28 @@ let delete (r: node) (t:table) : unit =
 		(r.prev <- None);
 		(r.next <- None);
 		t.numrow <- 0;
-		()
+		Success
 	| (Some x, None) ->
 		(x.next <- None);
 		(t.last <- Some x);
 		(r.prev <- None);
 		(r.next <- None);
 		t.numrow <- t.numrow - 1;
-		()
+		Success
 	| (None, Some y) ->
 		(y.prev <- None);
 		(t.first <- Some y);
 		(r.prev <- None);
 		(r.next <- None);
 		t.numrow <- t.numrow - 1;
-		()
+		Success
 	| (Some x, Some y) ->
 		(x.next <- Some y);
 		(y.prev <- Some x);
 		(r.prev <- None);
 		(r.next <- None);
 		t.numrow <- t.numrow - 1;
-		()
+		Success
 
 
 
@@ -254,14 +272,14 @@ let rec cond_row (cond_list: cond_tree) (colnames: (colname * t) list)
 		compare op !content v
 		)
 	| And (c1, c2) -> (
-		match (cond_row c1 colnames n, cond_row c1 colnames n) with
+		match (cond_row c1 colnames n, cond_row c2 colnames n) with
 			| ((_, DBError e), _) -> (false, DBError e)
 			| (_, (_, DBError e)) -> (false, DBError e)
 			| ((true, _), (true, _)) -> (true, Success)
 			| _ -> (false, Success)
 		)
 	| Or (c1, c2) -> (
-		match (cond_row c1 colnames n, cond_row c1 colnames n) with
+		match (cond_row c1 colnames n, cond_row c2 colnames n) with
 			| ((_, DBError e), _) -> (false, DBError e)
 			| (_, (_, DBError e)) -> (false, DBError e)
 			| ((false, _), (false, _))  -> (false, Success)
@@ -318,7 +336,7 @@ let find (cond_list: cond_tree) (t: table): (node list) * status =
 		| (_, error) -> ([], error)
 	in
 	let (l, s) = helper t.first [] in
-	List.iter (fun n -> delete n t; insert n t) l;
+	List.iter (fun n -> ignore (delete n t); ignore (insert n t)) l;
 	(l, s)
 
 
@@ -326,25 +344,29 @@ let find (cond_list: cond_tree) (t: table): (node list) * status =
  * and insert them into a new table and return that table
  *)
 let list_to_table (node_list: node list) (table_name: string)
-(colnames: (colname * t) list) : table =
+(colnames: (colname * t) list) : status * table =
 	let t = empty_table table_name colnames in
 	let rec helper = function
-		| [] -> ()
+		| [] -> Success
 		| hd::tl ->
 			let r = create_node hd.value in
-			(insert r t);
-			helper tl
-	in helper node_list; t
-
+			(match insert r t with
+				| Success -> helper tl
+				| DBError e -> DBError e )
+	in match helper node_list with
+		| Success -> (Success, t)
+		| DBError e -> (DBError e, t)
 
 
 (* [delete_list n_list t] deletes a list of rows [n_list] from table [t]. *)
-let rec delete_list (n_list: node list) (t:table) : unit =
+let rec delete_list (n_list: node list) (t:table) : status =
 	match n_list with
-		| [] -> ()
-		| hd::tl ->
-			delete hd t;
-			delete_list tl t
+		| [] -> Success
+		| hd::tl -> (
+			match delete hd t with
+				| Success -> delete_list tl t
+				| DBError e -> DBError e
+			)
 
 (* [delete_find cond_list t] delete all the rows that satisfy [cond_list]
  * in table [t]
@@ -352,7 +374,7 @@ let rec delete_list (n_list: node list) (t:table) : unit =
 let delete_find (cond_list: cond_tree) (t: table): status =
 	let (node_list, s) = find cond_list t in
 	match s with
-		| Success -> delete_list node_list t; Success
+		| Success -> delete_list node_list t
 		| x -> x
 
 (* [iter f t] iterate the table [t] and apply [f] on every row
@@ -360,29 +382,63 @@ let delete_find (cond_list: cond_tree) (t: table): status =
 let iter (f: node -> unit) (t:table): unit =
 	let rec helper f node_o : unit =
 		match node_o with
-			| Some node -> (f node); helper f (node.next)
+			| Some node ->
+				let nxt = node.next in
+				(f node); helper f nxt
 			| None -> ()
 	in helper f t.first
 
+(* [fold_left f a t] iterate through table [t], apply [f] on every row
+ * return: [a] accumulator
+ *)
+let fold_left (f: 'a -> node -> 'a) (a: 'a) (t:table): 'a =
+	let rec helper f a node_o=
+		match node_o with
+			| Some node ->
+				let nxt = node.next in
+				helper f (f a node) nxt
+			| None -> a
+	in helper f a t.first
+
 (* [table_to_list t] iterate the table [t] return a list of nodes
+ * the most recent node is the first
  *)
 let table_to_list (t: table): (node list) =
 	let rec helper l node_o  =
 		match node_o with
-			| Some node -> helper (node::l) (node.next)
+			| Some node -> helper (node::l) (node.prev)
 			| None -> l
-	in helper [] t.first
+	in helper [] t.last
 
 (* [list_to_table names colnames rows] converts a list to a table.
+ * regard the first row in list as the most recent one
  * [name] - table name
  * [colnames] - colnames
  * [rows] - a list of node
  *)
 let list_to_table (name :string) (colnames: (colname * t) list)
-	(rows: node list) : table =
+	(rows: node list) : status * table =
 	let t = empty_table name colnames in
-	List.iter (fun n -> insert n t) rows;
-	t
+	(List.fold_right
+		(fun n a ->
+			match a with
+			 	| Success -> insert n t
+			  | DBError e -> a
+		) rows Success,
+	t)
 
 
+(* [node_equal n1 n2] compare two nodes and return true if they are equal
+ * structrually
+ *)
+let node_equal (n1: node) (n2 :node) : bool =
+  List.fold_left2
+  (fun a v1 v2-> if !v1 = !v2 then a else false)
+  true n1.value n2.value
 
+(* [node_list_equal node lst] compare the value of a node with a list and
+ * return true if they are equal structrually
+ *)
+let node_list_equal node lst =
+  let nl = List.map (fun x -> !x) node.value in
+  nl = lst

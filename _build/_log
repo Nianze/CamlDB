@@ -1,12 +1,26 @@
 ### Starting build.
-# Target: table.ml.depends, tags: { extension:ml, file:table.ml, ocaml, ocamldep, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
-ocamlfind ocamldep -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -modules table.ml > table.ml.depends
+# Target: test_data_processor.ml.depends, tags: { extension:ml, file:test_data_processor.ml, ocaml, ocamldep, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
+ocamlfind ocamldep -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -modules test_data_processor.ml > test_data_processor.ml.depends
+# Target: data_processor.mli.depends, tags: { extension:mli, file:data_processor.mli, ocaml, ocamldep, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
+ocamlfind ocamldep -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -modules data_processor.mli > data_processor.mli.depends # cached
 # Target: table.mli.depends, tags: { extension:mli, file:table.mli, ocaml, ocamldep, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
-ocamlfind ocamldep -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -modules table.mli > table.mli.depends
+ocamlfind ocamldep -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -modules table.mli > table.mli.depends # cached
 # Target: table.cmi, tags: { byte, compile, extension:mli, file:table.mli, interf, ocaml, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
-ocamlfind ocamlc -c -warn-error +a-4-33-34-40-41-42-43-44 -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -o table.cmi table.mli
+ocamlfind ocamlc -c -warn-error +a-4-33-34-40-41-42-43-44 -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -o table.cmi table.mli # cached
+# Target: data_processor.cmi, tags: { byte, compile, extension:mli, file:data_processor.mli, interf, ocaml, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
+ocamlfind ocamlc -c -warn-error +a-4-33-34-40-41-42-43-44 -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -o data_processor.cmi data_processor.mli # cached
+# Target: test_data_processor.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:test_data_processor.cmo, file:test_data_processor.ml, implem, ocaml, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
+ocamlfind ocamlc -c -warn-error +a-4-33-34-40-41-42-43-44 -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -o test_data_processor.cmo test_data_processor.ml
+# Target: test_data_processor.d.cmo, tags: { byte, compile, debug, extension:cmo, extension:ml, file:test_data_processor.d.cmo, file:test_data_processor.ml, implem, ocaml, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
+ocamlfind ocamlc -c -warn-error +a-4-33-34-40-41-42-43-44 -g -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -o test_data_processor.d.cmo test_data_processor.ml
+# Target: data_processor.ml.depends, tags: { extension:ml, file:data_processor.ml, ocaml, ocamldep, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
+ocamlfind ocamldep -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -modules data_processor.ml > data_processor.ml.depends # cached
+# Target: data_processor.d.cmo, tags: { byte, compile, debug, extension:cmo, extension:ml, file:data_processor.d.cmo, file:data_processor.ml, implem, ocaml, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
+ocamlfind ocamlc -c -warn-error +a-4-33-34-40-41-42-43-44 -g -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -o data_processor.d.cmo data_processor.ml # cached
+# Target: table.ml.depends, tags: { extension:ml, file:table.ml, ocaml, ocamldep, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
+ocamlfind ocamldep -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -modules table.ml > table.ml.depends # cached
 # Target: table.d.cmo, tags: { byte, compile, debug, extension:cmo, extension:ml, file:table.d.cmo, file:table.ml, implem, ocaml, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
-ocamlfind ocamlc -c -warn-error +a-4-33-34-40-41-42-43-44 -g -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -o table.d.cmo table.ml
-# Target: table.d.byte, tags: { byte, debug, dont_link_with, extension:byte, file:table.d.byte, link, ocaml, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), program, quiet }
-ocamlfind ocamlc assertions.cma -linkpkg -g -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck table.d.cmo -o table.d.byte
+ocamlfind ocamlc -c -warn-error +a-4-33-34-40-41-42-43-44 -g -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -o table.d.cmo table.ml # cached
+# Target: test_data_processor.d.byte, tags: { byte, debug, dont_link_with, extension:byte, file:test_data_processor.d.byte, link, ocaml, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), program, quiet }
+ocamlfind ocamlc assertions.cma -linkpkg -g -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck table.d.cmo data_processor.d.cmo test_data_processor.d.cmo -o test_data_processor.d.byte
 # Compilation successful.

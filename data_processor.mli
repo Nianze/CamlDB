@@ -1,11 +1,13 @@
+open Table
 (* type of value *)
 (* type t
 type operator
 type table
 type condition
-type condition lst *)
+type condition lst
 type order
 type top_t
+*)
 
 (*
 SQL:
@@ -14,7 +16,7 @@ SELECT column_name, column_name FROM table_name;
 select some particular columns in a list of colunms [col_list]
 from table [t] and return a subtable
 *)
-val select_col: colname list -> table -> (status * table)
+val select_col: colname list -> table -> status * table
 
 (*
 SELECT TOP number|percent column_name(s)
@@ -23,7 +25,7 @@ FROM table_name;
 select some particular columns in a list of colunms [col_list]
 from table [t] and return a subtable
 *)
-val select_top: top_t -> table -> table
+val select_top: top_t -> table -> status * table
 
 (*
 SQL:
@@ -32,7 +34,7 @@ SELECT DISTINCT column_name FROM table_name;
 get all the distinct values of a column with the name of [col_name]
 from table t and return a subtable
 *)
-val distinct: colname -> table -> table
+val distinct: colname -> table -> status * table
 
 (*
 SQL:
@@ -43,7 +45,7 @@ WHERE column_name operator value;
 filter the table [t] according to the conditions in [cond_list]
 and return a subtable
 *)
-val where: condition list -> table -> table
+val where: cond_tree -> table -> status * table
 
 (*
 SQL:
@@ -54,7 +56,7 @@ ORDER BY column_name ASC|DESC;
 sort the table [t] in the ascending or descending order of [o]
 of column [col_name] and return a subtable
 *)
-val sort: colname -> order -> table -> table
+val sort: colname -> order -> table -> status * table
 
 (*
 SQL:
@@ -64,7 +66,7 @@ VALUES (value1,value2,value3,...);
 insert a new row with values [val_list] in the order of columns
 into table [t]
 *)
-val insert: t list -> table -> unit
+val insert_values: t list -> table -> status
 
 (*
 SQL:
@@ -74,7 +76,7 @@ VALUES (value1,value2,value3,...);
 insert a new row, both the column names and the values to be
 inserted [val_list] are speicified in [col_list]
 *)
-val insert_col: (colname * t) list -> table -> unit
+val insert_col_values: (colname * t) list -> table -> status
 
 
 (*
@@ -97,16 +99,16 @@ update all the rows that satisfy the conditions in [cond_list]
 in the table [t] according to the column and value specified
 by [pair_list]
 *)
-val update: condition lst -> colname * t list -> table -> status
+val update: cond_tree -> (colname * t) list -> table -> status
 
 
 (*
 SQL:
 DELETE FROM table_name;
 
-delete all rows in the table [t], disable the row under the hood
+delete all rows in the table [t]
 *)
-val delete_all: table -> unit
+val delete_all: table -> status
 
 
 (*
@@ -115,9 +117,9 @@ DELETE FROM table_name
 WHERE condition list;
 
 delete all rows in the table [t] that satisfies the conditions in
-[cond_list], disable the row under the hood
+[cond_list]
 *)
-val delete: condition lst -> table -> status
+val delete: cond_tree -> table -> status
 
 
 (*

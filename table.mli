@@ -15,6 +15,9 @@ val match_type: t -> t -> bool
  *)
 val type_string: t -> string
 
+type order = DESC | ASC
+type top_t = TopNum of int | TopPercent of int
+
 
 (******************* Status of operations *******************)
 
@@ -112,7 +115,7 @@ val empty_table: string -> (colname * t) list -> table
 
 (* [insert r t] inserts a row [r] to the top of a
  * table [t]. *)
-val insert: node -> table -> unit
+val insert: node -> table -> status
 
 (* [cond_row cond_list r] checks if row [n] satisfies condions in
  * [cond_list] and returns true or false and the status
@@ -125,10 +128,10 @@ val cond_row: cond_tree -> (colname * t) list ->  node -> bool * status
 val find: cond_tree -> table -> (node list) * status
 
 (* [delete r t] deletes a row [r] to from table [t]. *)
-val delete: node -> table -> unit
+val delete: node -> table -> status
 
 (* [delete_list n_list t] deletes a list of rows [n_list] from table [t]. *)
-val delete_list: node list -> table -> unit
+val delete_list: node list -> table -> status
 
 (* [delete_find cond_list t] delete all the rows that satisfy [cond_list]
  * in table [t]
@@ -139,16 +142,33 @@ val delete_find: cond_tree -> table -> status
  *)
 val iter: (node -> unit) -> table -> unit
 
+(* [fold_left f a t] iterate through table [t], apply [f] on every row
+ * return: [a] accumulator
+ *)
+val fold_left: ('a -> node -> 'a) -> 'a -> table -> 'a
+
 (* [table_to_list t] iterate the table [t] return a list of nodes
+ * the most recent node is the first
  *)
 val table_to_list: table -> node list
 
 (* [list_to_table names colnames rows] converts a list to a table.
+ * regard the first row in list as the most recent one
  * [name] - table name
  * [colnames] - colnames
  * [rows] - a list of node
  *)
-val list_to_table: string -> ((colname * t) list) -> (node list) -> table
+val list_to_table: string -> (colname * t) list -> node list -> status * table
 
 
 val in_some: 'a option -> 'a
+
+(* [node_equal n1 n2] compare two nodes and return true if they are equal
+ * structrually
+ *)
+val node_equal: node -> node -> bool
+
+(* [node_list_equal node lst] compare the value of a node with a list and
+ * return true if they are equal structrually
+ *)
+val node_list_equal: node -> t list -> bool
