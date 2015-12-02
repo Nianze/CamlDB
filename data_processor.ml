@@ -15,11 +15,14 @@ SELECT column_name, column_name FROM table_name;
 select some particular columns in a list of colunms [col_list]
 from table [t] and return a subtable
 *)
+
 let select_col (col_list :colname list) (t: table): status * table =
   let colnames = get_colnames t in
-  let n = get_first t in
-  let t' = empty_table (get_tablename t) ()
-  let rec helper
+  let out_cols = List.filter (fun (x,_)-> List.mem x col_list) colnames in
+  let t' = empty_table (get_tablename t) out_cols in
+  match col_list with
+    | [] -> t'
+    | h::t -> insert_col_values (get_col h t)
 
 
 (*
