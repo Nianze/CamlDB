@@ -124,6 +124,28 @@ let get_tablename (t:table) : string = t.name
 (* [get_colnames t] gets a list of column name of table [t] *)
 let get_colnames (t:table) : (colname * t) list = t.colnames
 
+(* [col_in_table t col_name] checks if col [col_name] is in table [t]  *)
+let col_in_table (t: table) (col_name: colname): bool = true
+
+(* [get_col_i t col_name] gets the index of col [col_name] *)
+let get_col_i (t: table) (col_name: colname): int =
+(* 	let colnames = t.colnames in
+ *)
+	failwith "TODO"
+(* [get_col_i t col_name] gets the col [col_name] as a t list *)
+let get_col (t: table) (col_name: colname): t list =
+	failwith "TODO"
+
+(* get_col "c1" t
+
+[Int 1; Int 2; Int 3; Int 4]
+
+c1 c2 c3
+1   -  -
+2
+3
+4 *)
+
 (* [get_first t] gets the first node in table [t] *)
 let get_first (t:table) : node option = t.first
 
@@ -443,4 +465,12 @@ let node_list_equal node lst =
   let nl = List.map (fun x -> !x) node.value in
   nl = lst
 
+(* [table_equal t1 t2] returns true if each node in two table equals
+ * structurally
+ *)
+let table_equal t1 t2 =
+  let l1 = table_to_list t1 in
+  let l2 = table_to_list t2 in
+  List.fold_left2
+  (fun a n1 n2 -> if node_equal n1 n2 then a else false) true l1 l2
 

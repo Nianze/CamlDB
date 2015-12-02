@@ -16,7 +16,9 @@ type token =
   | SET
   | SEMICOLON
   | SEL
+  | SCATT
   | RPAREN
+  | PLOT
   | PERCENT
   | ORDER
   | OR
@@ -24,12 +26,14 @@ type token =
   | NE
   | LT
   | LPAREN
+  | LINE
   | LE
   | JOIN
   | INTO
   | INT of (int)
   | INSERT
   | ID of (string)
+  | HISTOG
   | GT
   | GE
   | FROM
@@ -43,6 +47,7 @@ type token =
   | CREATE
   | COMMA
   | BY
+  | BAR
   | ASC
   | ANY
   | AND

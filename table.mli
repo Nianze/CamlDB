@@ -101,6 +101,15 @@ val get_tablename: table -> string
 of table [t] *)
 val get_colnames: table -> (colname * t) list
 
+(* [col_in_table t col_name] checks if col [col_name] is in table [t]  *)
+val col_in_table: table -> colname -> bool
+
+(* [get_col_i t col_name] gets the index of col [col_name] *)
+val get_col_i: table -> colname -> int
+
+(* [get_col_i t col_name] gets the col [col_name] as a t list *)
+val get_col: table -> colname -> t list
+
 (* [get_first t] gets the first node in table [t] *)
 val get_first: table -> node option
 
@@ -172,3 +181,8 @@ val node_equal: node -> node -> bool
  * return true if they are equal structrually
  *)
 val node_list_equal: node -> t list -> bool
+
+(* [table_equal t1 t2] returns true if each node in two table equals
+ * structurally
+ *)
+val table_equal: table -> table -> bool

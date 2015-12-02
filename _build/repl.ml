@@ -8,15 +8,15 @@ let parse s =
 
 let rec repl () =
   print_string "> ";
-  (try
+  (
     let input = read_line () in
     if String.lowercase input = "exit" then (
       shutdown_interp ();
       exit 0
     );
-    let _ = input |> parse |> eval in ()
+    let _ = input |> parse |> eval in ());(*
   with
-    _ -> print_endline "Syntax error.");
+    (*_ -> print_endline "Syntax error."*));*)
   repl ()
 
 let _ = repl ()    

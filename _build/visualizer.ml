@@ -1,6 +1,6 @@
 open Table
   
-type vis_method = Scatter2d | Hist2d | BarGraph | LineGraph
+type vis_method = VisNone | Scatter2d | Hist2d | BarGraph | LineGraph
 
 let string_of_elt = function
   | Int x -> string_of_int x
@@ -146,4 +146,4 @@ let visualize t = function
 (* legal_vis_methods [t] returns the legal visualization methods for *)
 (* the table [t] *)
 let legal_vis_methods t =
-  failwith "TODO"    
+  [VisNone] (* TODO *)  

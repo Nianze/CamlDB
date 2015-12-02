@@ -1,2 +1,2 @@
-parser.ml: Ast Lexing Table
+parser.ml: Ast Lexing Table Visualizer
 parser.mli: Ast Lexing

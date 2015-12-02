@@ -99,7 +99,7 @@ update all the rows that satisfy the conditions in [cond_list]
 in the table [t] according to the column and value specified
 by [pair_list]
 *)
-val update: cond_tree -> (colname * t) list -> table -> status
+val update_where: cond_tree -> (colname * t) list -> table -> status
 
 
 (*
@@ -119,7 +119,7 @@ WHERE condition list;
 delete all rows in the table [t] that satisfies the conditions in
 [cond_list]
 *)
-val delete: cond_tree -> table -> status
+val delete_where: cond_tree -> table -> status
 
 
 (*
