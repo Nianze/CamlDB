@@ -1,7 +1,7 @@
 open Table
 
 (* represents supported visualization methods *)
-type vis_method = VisNone | Scatter2d | Hist2d | BarGraph | LineGraph
+type vis_method = Scatter2d | Hist2d | BarGraph | LineGraph
 
 (* print_tabular [t] prints the table [t] to the console in tabular form *)
 val print_tabular: table -> unit
