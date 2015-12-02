@@ -97,7 +97,7 @@ let plot t plot_type =
   if List.mem plot_type (legal_vis_methods t) then
     visualize t plot_type
   else
-    print_endline "Error: invalid visualization method."
+    print_endline "That visualization method doesn't apply here."
   
 let rec eval = function
   | TbName n ->
