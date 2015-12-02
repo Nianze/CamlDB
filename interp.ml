@@ -144,7 +144,7 @@ let rec eval = function
      proc_singleton_status (delete_all (eval e));
      (eval e)
   | Delete (cond_lst, e) ->
-     proc_singleton_status (delete cond_lst (eval e));
+     proc_singleton_status (delete_where cond_lst (eval e));
      (eval e)
   | Create (n, lst) ->
      let (es, typs) = List.split lst in
