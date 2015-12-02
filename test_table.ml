@@ -195,3 +195,19 @@ TEST "fold_left" =
       | Success -> delete n t4
       | DBError e -> a
   ) Success t4 = Success && t4.numrow = 0
+
+TEST "col_in_table" =
+  let (_, t) = new_table () in
+  (col_in_table t "c1" = true) && (col_in_table t "c2" = true) &&
+  (col_in_table t "error" = false)
+
+TEST "get_col_i" =
+  let (_, t) = new_table () in
+  (get_col_i t "c1" = 0) && (get_col_i t "c2" = 1) &&
+  (get_col_i t "error" = -1)
+
+TEST "get_col" =
+  let (_, t) = new_table () in
+  (get_col t "c1" = [Int 3; Int 2; Int 1; Int 0]) &&
+  (get_col t "c2" = [String "3"; String "2"; String "1"; String "0"]) &&
+  (get_col t "error" = [])
