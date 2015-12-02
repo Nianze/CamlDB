@@ -26,6 +26,9 @@ let select_col (col_list :colname list) (t: table): status * table =
                        (List.map  (fun value -> [(h,value)]) (get_col t h))
 
 
+
+
+
 (*
 SELECT TOP number|percent column_name(s)
 FROM table_name;
