@@ -4,7 +4,7 @@ open Data_processor
 let is_error = function DBError _ -> true | _ -> false
 
 
-(******************* Create, insert, update, delete *******************)
+(******** Create, insert, update, delete, union rows ********)
 let t =
   create_table "name" [("c1", Int 0); ("c2", String ""); ("c3", Bool true)]
 
@@ -116,45 +116,57 @@ let new_table n =
 let t9 = new_table 9
 let t5 = new_table 5
 let s1 =
-delete (Or (Cond ("c1", LE, Int 2), Cond ("c2", GT, String "5"))) t9
+  delete_where (Or (Cond ("c1", LE, Int 2), Cond ("c2", GT, String "5"))) t9
 let s2 =
-delete (And (Cond ("c1", LE, Int 2), Cond ("c2", LT, String "6"))) t5
-let l1 = table_to_list t9
-let l2 = table_to_list t5
+  delete_where (And (Cond ("c1", LE, Int 2), Cond ("c2", LT, String "6"))) t5
+let s3 =
+  delete_where
+  (And (Cond ("error", LE, Int 2), Cond ("error", LT, String "6")))
+  t5
 
-TEST "delete" =
-  s1 = Success && s2 = Success &&
-  List.fold_left2
-  (fun a n1 n2 -> if node_equal n1 n2 then a else false)
-  true l1 l2
+
+TEST "delete_where" =
+  s1 = Success && s2 = Success && (is_error s3)
+  && (table_equal t9 t5)
+
 
 let t9' = new_table 9
 let t5' = new_table 5
 let s1 =
-update (Or (Cond ("c1", LE, Int 2), Cond ("c2", GT, String "5")))
-[("t3", Bool false)]
-t9'
+  update (Or (Cond ("c1", LE, Int 2), Cond ("c2", GT, String "5")))
+  [("c3", Bool true)]
+  t9'
 let s2 =
-update (Or (Cond ("c1", LE, Int 2), Cond ("c2", GT, String "5")))
-[("t3", Bool false)]
-let s3 = delete (Cond ("c3", EQ, Bool false)) t9'
-let s4 = delete (Cond ("c3", EQ, Bool false)) t5'
-let l1' = table_to_list t9'
-let l2' = table_to_list t5'
-TEST "delete" =
+  update (Or (Cond ("c1", LE, Int 2), Cond ("c2", GT, String "5")))
+  [("c3", Bool true)]
+  t5'
+
+let s3 = delete_where (Cond ("c3", EQ, Bool true)) t9'
+let s4 = delete_where (Cond ("c3", EQ, Bool true)) t5'
+let s5 =
+  update (Or (Cond ("error", LE, Int 2), Cond ("c2", GT, String "5")))
+  [("c3", Bool true)]
+  t9'
+
+
+
+
+TEST "update_where" =
   s1 = Success && s2 = Success && s3 = Success && s4 = Success &&
-  List.fold_left2
-  (fun a n1 n2 -> if node_equal n1 n2 then a else false)
-  true l1' l2' &&
-  List.fold_left2
-  (fun a n1 n2 -> if node_equal n1 n2 then a else false)
-  true l1' l1 &&
-  List.fold_left2
-  (fun a n1 n2 -> if node_equal n1 n2 then a else false)
-  true l2' l2
+  (is_error s5) && (table_equal t9 t9') && (table_equal t5 t5')
+  && (table_equal t9' t5')
+
+
+let t3 = create_table 3
+let t9 = create_table 9
+let t9' = create_table 9
+let s = delete_where (Cond ("c1", LE, Int 3)) t9
+TEST "union_rows" =
+  let (s1, t_u) =  union_rows t3 t9 ["c1"; "c2"; "c3"] in
+  (table_equal t_u t9') && (s1 = Success) && (s = Success)
 
 
 
 
-
+val union_rows: table -> table -> colname list -> status * table
 

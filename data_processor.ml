@@ -1,5 +1,5 @@
-(* open Table
- *)
+open Table
+
 (* type of value *)
 (* type t = Table.t
 type operator = Table.operator
