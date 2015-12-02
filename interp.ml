@@ -1,6 +1,7 @@
 open Ast
 open Table
 open Storage
+open Data_processor
 (*
 (** (OCaml) values of type expr represent SQL expressions.
     Here are some examples of how expressions are represented:
@@ -67,7 +68,7 @@ let table_named n =
     List.assoc n !open_tables
   else
     let t = load_table n in
-    open_tables := (n, t)::open_tables;
+    open_tables := (n, t)::!open_tables;
     t
 
 let name_of_expr = function

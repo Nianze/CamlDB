@@ -17,8 +17,6 @@ type c_tree = Table.cond_tree
 (** SELECT TOP int (PERCENT) *)
 type top_t = TopNum of int | TopPercent of int
 
-type datatype = TString | TInt
-
 type order = DESC | ASC
 
 (** (OCaml) values of type expr represent SQL expressions.
