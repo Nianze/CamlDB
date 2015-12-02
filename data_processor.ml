@@ -16,10 +16,7 @@ select some particular columns in a list of colunms [col_list]
 from table [t] and return a subtable
 *)
 let select_col (col_list :colname list) (t: table): status * table =
-  let colnames = get_colnames t in
-  let n = get_first t in
-  let t' = empty_table (get_tablename t) ()
-  let rec helper
+  failwith "TODO"
 
 
 (*

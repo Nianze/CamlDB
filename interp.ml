@@ -2,6 +2,7 @@ open Ast
 open Table
 open Storage
 open Data_processor
+open Visualizer
 (*
 (** (OCaml) values of type expr represent SQL expressions.
     Here are some examples of how expressions are represented:
@@ -66,9 +67,12 @@ let open_tables = ref []
 let add_table n t =
   open_tables := (n, t)::!open_tables
 let table_named n =
-  if List.mem_assoc n !open_tables then
+  print_endline n;
+  if List.mem_assoc n !open_tables then (
+    List.iter (fun (n, _) -> print_endline n) !open_tables;
     List.assoc n !open_tables
-  else (
+  ) else (
+    print_endline "LOADING TABLE";
     let t = load_table n in
     add_table n t;
     t
@@ -77,7 +81,7 @@ let table_named n =
 let name_of_expr = function
   | ColName n -> n
   | TbName n -> n
-  | _ -> failwith "Syntax error"
+  | _ -> print_endline "Interp: Syntax error."; ""
 
 let error_table = empty_table "" []
 
@@ -88,16 +92,30 @@ let proc_singleton_status = function
 let proc_status (s, t) = match s with
   | Success -> t
   | DBError x -> print_endline ("Database Error: " ^ x); error_table
-     
+
+let plot t plot_type =
+  if List.mem plot_type (legal_vis_methods t) then
+    visualize t plot_type
+  else
+    print_endline "Error: invalid visualization method."
+  
 let rec eval = function
   | TbName n ->
      table_named n
-  | SelCol (lst, n) ->
-     proc_status (select_col (List.map name_of_expr lst) (eval n))
-  | SelTop (top, n) ->
-     proc_status (select_top top (eval n))
-  | Distin (colname, n) ->
-     proc_status (distinct (name_of_expr colname) (eval n))
+  | SelCol (lst, n, pt) ->
+     let t = proc_status (select_col (List.map name_of_expr lst) (eval n)) in
+     print_endline "MADE IT 1";
+     plot t pt;
+     print_endline "MADE IT 2";
+     t
+  | SelTop (top, n, pt) ->
+     let t = proc_status (select_top top (eval n)) in
+     plot t pt;
+     t
+  | Distin (colname, n, pt) ->
+     let t = proc_status (distinct (name_of_expr colname) (eval n)) in
+     plot t pt;
+     t
   | Where (cond_lst, expr) ->
      proc_status (where cond_lst (eval expr))
   | Sort (colname, order, expr) ->
@@ -139,7 +157,7 @@ let rec eval = function
      let t1 = (eval e1) in
      proc_status (union_rows t1 (eval e2) (fst (List.split (get_colnames t1))))
   | Joins _ -> failwith "unimplemented"
-  | _ -> failwith "TODO"
+  | _ -> failwith "Syntax error."
 
 let shutdown_interp () =
   List.iter (fun (n, t) -> save_table t n) !open_tables

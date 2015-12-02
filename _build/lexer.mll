@@ -61,4 +61,9 @@ rule read =
   | ident    { ID (Lexing.lexeme lexbuf) }
   | int   { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | '"' ([^'"']* as str) '"' { STRING str }
+  | "#"       { PLOT }
+  | "SCATTER" { SCATT }
+  | "LINE"    { LINE }
+  | "BAR"     { BAR }
+  | "HISTOGRAM" { HISTOG }
   | eof   { EOF }

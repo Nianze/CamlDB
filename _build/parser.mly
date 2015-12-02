@@ -3,6 +3,7 @@
 open Ast
 open Lexing
 open Table
+open Visualizer
 %}
 
 (* *declarations* *)
@@ -50,6 +51,11 @@ open Table
 %token ON
 %token DOT
 %token SEMICOLON
+%token PLOT
+%token SCATT
+%token LINE
+%token BAR
+%token HISTOG
 %token EOF
 
 (* info about precedence & associativity *)
@@ -74,10 +80,14 @@ expr:
   ;
 
 statement:
-  | SEL; cols = col_list; FROM; f_tb = filtered_table { SelCol (cols, f_tb)}
-  | SEL; TOP; i = INT; PERCENT; FROM; f_tb = filtered_table  { SelTop(TopPercent i, f_tb) }
-  | SEL; TOP; i = INT; FROM; f_tb = filtered_table { SelTop(TopNum i, f_tb) }
-  | SEL; DISTINCT; col = ID; FROM; f_tb = filtered_table { Distin(ColName col, f_tb) }
+  | SEL; cols = col_list; FROM; f_tb = filtered_table { SelCol (cols, f_tb, VisNone)}
+  | SEL; cols = col_list; FROM; f_tb = filtered_table; plot=vis_method { SelCol (cols, f_tb, plot)}
+  | SEL; TOP; i = INT; PERCENT; FROM; f_tb = filtered_table { SelTop(TopPercent i, f_tb, VisNone) }
+  | SEL; TOP; i = INT; PERCENT; FROM; f_tb = filtered_table; plot=vis_method  { SelTop(TopPercent i, f_tb, plot) }
+  | SEL; TOP; i = INT; FROM; f_tb = filtered_table  { SelTop(TopNum i, f_tb, VisNone) }
+  | SEL; TOP; i = INT; FROM; f_tb = filtered_table; plot=vis_method { SelTop(TopNum i, f_tb, plot) }
+  | SEL; DISTINCT; col = ID; FROM; f_tb = filtered_table { Distin(ColName col, f_tb, VisNone) }
+  | SEL; DISTINCT; col = ID; FROM; f_tb = filtered_table; plot=vis_method { Distin(ColName col, f_tb, plot) }
   | INSERT; INTO; tb = ID; VALUES; LPAREN; vals = val_list;RPAREN {InsRow (vals,TbName tb)}
   | INSERT; INTO; tb = ID; LPAREN; cols = col_list; RPAREN; VALUES; LPAREN; vals = val_list;RPAREN {InsCol (cols,vals,TbName(tb))}
   | UPDATE; tb = ID; SET; pairs = pair_list {UpdAll (pairs,TbName tb) }
@@ -96,6 +106,13 @@ filtered_table:
   | tb = ID; WHERE; conds = cond_list; ORDER; BY; col = ID; DESC { Where (conds, Sort (ColName col, DESC, TbName tb) ) }
   | tb = ID; ORDER; BY; col = ID; ASC  { Sort (ColName col, ASC, TbName tb) }
   | tb = ID; ORDER; BY; col = ID; DESC { Sort (ColName col, DESC,TbName tb) }
+  ;
+
+vis_method:
+  | PLOT; SCATT  { Scatter2d }
+  | PLOT; LINE   { LineGraph }
+  | PLOT; BAR    { BarGraph }
+  | PLOT; HISTOG { Hist2d }
   ;
 
 col_list:

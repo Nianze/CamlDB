@@ -442,3 +442,5 @@ let node_equal (n1: node) (n2 :node) : bool =
 let node_list_equal node lst =
   let nl = List.map (fun x -> !x) node.value in
   nl = lst
+
+
