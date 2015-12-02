@@ -172,3 +172,8 @@ val node_equal: node -> node -> bool
  * return true if they are equal structrually
  *)
 val node_list_equal: node -> t list -> bool
+
+(* [table_equal t1 t2] returns true if each node in two table equals
+ * structurally
+ *)
+val table_equal: table -> table -> bool

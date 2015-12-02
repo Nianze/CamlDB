@@ -119,7 +119,7 @@ WHERE condition list;
 delete all rows in the table [t] that satisfies the conditions in
 [cond_list]
 *)
-val delete: cond_tree -> table -> status
+val delete_where: cond_tree -> table -> status
 
 
 (*
