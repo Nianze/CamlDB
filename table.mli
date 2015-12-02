@@ -104,7 +104,9 @@ val get_colnames: table -> (colname * t) list
 (* [col_in_table t col_name] checks if col [col_name] is in table [t]  *)
 val col_in_table: table -> colname -> bool
 
-(* [get_col_i t col_name] gets the index of col [col_name] *)
+(* [get_col_i t col_name] gets the index of col [col_name]
+ * return -1 if col [col_name] not in table [t]
+ *)
 val get_col_i: table -> colname -> int
 
 (* [get_col_i t col_name] gets the col [col_name] as a t list *)
