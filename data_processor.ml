@@ -9,6 +9,23 @@ type condition = Table.condition *)
 type top_t = TopNum of int | TopPercent of int *)
 
 (*
+(* helper function:
+   [ins_sel_val cols tb node] returns Success if such an operation is done:
+   a new one row table, in which
+   the columns names are [cols], correpsonding column types are taken
+   from table [tb], and values are taken from [node]
+*)
+let ins_sel_val col_list t node =
+  let colnames = get_colnames t in
+  let out_cols = List.filter (fun (x,_)-> List.mem x col_list) colnames in
+  let out_tb = empty_table (get_tablename t) out_cols in
+  let out_index = List.map (get_col_i t) col_list in
+  let get_vals val_list = List.map (List.nth val_list) out_index in
+  let pairs = List.combine (col_list) (get_vals node.value) in
+  insert_col_values pairs out_tb
+*)
+
+(*
 SQL:
 SELECT column_name, column_name FROM table_name;
 
@@ -18,11 +35,20 @@ from table [t] and return a subtable
 let select_col (col_list :colname list) (t: table): status * table =
   let colnames = get_colnames t in
   let out_cols = List.filter (fun (x,_)-> List.mem x col_list) colnames in
-  let t' = empty_table (get_tablename t) out_cols in
-  match col_list with
-    | [] -> t'
-    | h::t -> List.map (fun pair -> insert_col_values pair t')
-                       (List.map  (fun value -> [(h,value)]) (get_col t h))
+  let out_tb = empty_table (get_tablename t) out_cols in
+  let out_index = List.map (get_col_i t) col_list in
+  let get_vals val_list = List.map (List.nth val_list) out_index in
+  let out node = ins_sel_val
+    let pairs = List.combine (col_list) (get_vals node.value) in
+    insert_col_values pairs out_tb in
+  let rec helper orig_n stat =
+    match stat with
+      | DBError e -> (DBError e, out_tb)
+      | Success -> match orig_n with
+        | Some node -> let next = node.next in
+          helper f nxt (out node)
+        | None -> (Success, out_tb) in
+   helper t.first Success
 
 (*
 SELECT TOP number|percent column_name(s)
@@ -31,8 +57,28 @@ FROM table_name;
 select some particular columns in a list of colunms [col_list]
 from table [t] and return a subtable
 *)
-let select_top (top: top_t) (t: table): status * table =
-        failwith "unimplemented"
+let select_top (top:top_t) (col_list:colname list) (t: table): status * table =
+  let colnames = get_colnames t in
+  let out_cols = List.filter (fun (x,_)-> List.mem x col_list) colnames in
+  let out_tb = empty_table (get_tablename t) out_cols in
+  let out_index = List.map (get_col_i t) col_list in
+  let get_vals val_list = List.map (List.nth val_list) out_index in
+  let out node =
+    let pairs = List.combine (col_list) (get_vals node.value) in
+    insert_col_values pairs out_tb in
+  let rec helper orig_n stat count_down =
+    if count_down = 0 then (Success, out_tb) else
+      match stat with
+        | DBError e -> (DBError e, out_tb)
+        | Success -> match orig_n with
+          | Some node -> let next = node.next in
+            helper f nxt (out node) (count_down-1)
+          | None -> (Success, out_tb) in
+  match top with
+    | TopNum num -> helper t.first Success num
+    | TopPercent p -> if p>100 || p<0
+      then (DBError "Percentage out of range", out_tb)
+      else helper t.first Success (t.numcol*p/100)
 
 (*
 SQL:
@@ -42,7 +88,7 @@ get all the distinct values of a column with the name of [col_name]
 from table t and return a subtable
 *)
 let distinct (col_name :colname) (t :table) : status * table =
-        failwith "unimplemented"
+
 
 
 (*
