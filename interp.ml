@@ -63,19 +63,16 @@ type expr =
 
 let open_tables = ref []
 
-(* Parse a string into an ast *)
-let parse s =
-  let lexbuf = Lexing.from_string s in
-  let ast = Parser.prog Lexer.read lexbuf in
-  ast
-
+let add_table n t =
+  open_tables := (n, t)::!open_tables
 let table_named n =
   if List.mem_assoc n !open_tables then
     List.assoc n !open_tables
-  else
+  else (
     let t = load_table n in
-    open_tables := (n, t)::!open_tables;
+    add_table n t;
     t
+  )
 
 let name_of_expr = function
   | ColName n -> n
@@ -134,9 +131,15 @@ let rec eval = function
   | Create (n, lst) ->
      let (es, typs) = List.split lst in
      let colnames = List.map name_of_expr es in
-     create_table (name_of_expr n) (List.combine colnames typs)
+     let name = (name_of_expr n) in
+     let t = create_table name (List.combine colnames typs) in
+     add_table name t;
+     t
   | Union (e1, e2) ->
      let t1 = (eval e1) in
      proc_status (union_rows t1 (eval e2) (fst (List.split (get_colnames t1))))
   | Joins _ -> failwith "unimplemented"
   | _ -> failwith "TODO"
+
+let shutdown_interp () =
+  List.iter (fun (n, t) -> save_table t n) !open_tables
