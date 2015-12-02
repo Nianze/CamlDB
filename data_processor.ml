@@ -1,5 +1,5 @@
-open Table
-
+(* open Table
+ *)
 (* type of value *)
 (* type t = Table.t
 type operator = Table.operator
@@ -124,6 +124,7 @@ let insert_col_values (col_list : (colname * t) list)
 	let row = create_node col in
 	insert row t
 
+
 let update_node (n: node) (colnames: (colname * t) list)
 (pair_list : (colname * t) list): unit =
 	List.(iter2
@@ -144,6 +145,7 @@ let colname_check (pair_list : (colname * t) list)
 	List.(fold_left
 		(fun s (c, _) ->
 			if mem_assoc c colnames then s
+			else if s = "" then c
 			else s ^ ", " ^ c )
 	"" pair_list)
 
@@ -158,6 +160,7 @@ let type_check (pair_list : (colname * t) list)
 	List.(fold_left
 		(fun s (c, t) ->
 			if match_type t (assoc c colnames) then s
+			else if s = "" then c
 			else s ^ ", " ^ c)
 	"" pair_list)
 (*
@@ -229,7 +232,7 @@ WHERE some_column=some_value;
 delete all rows in the table [t] that satisfies the conditions in
 [cond_list], disable the row under the hood
 *)
-let delete (cond_list: cond_tree) (t:table) : status =
+let delete_where (cond_list: cond_tree) (t:table) : status =
 	match find cond_list t with
 	| (nl, Success) -> List.iter (fun n -> ignore (delete n t)) nl; Success
 	| (_, DBError e) -> DBError e
