@@ -1,0 +1,14 @@
+{
+  "name": "test",
+  "rows": 0,
+  "cols": 2,
+  "header": [
+    [
+      "col1",
+      "Int",
+      "col2",
+      "String"
+    ]
+  ],
+  "elements": []
+}
