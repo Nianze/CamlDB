@@ -46,7 +46,7 @@ let select_col (col_list :colname list) (t: table): status * table =
       | DBError e -> (DBError e, out_tb)
       | Success -> match orig_n with
         | Some node -> let next = node.next in
-          helper f nxt (out node)
+          helper f next (out node)
         | None -> (Success, out_tb) in
    helper t.first Success
 
@@ -72,7 +72,7 @@ let select_top (top:top_t) (col_list:colname list) (t: table): status * table =
         | DBError e -> (DBError e, out_tb)
         | Success -> match orig_n with
           | Some node -> let next = node.next in
-            helper f nxt (out node) (count_down-1)
+            helper f next (out node) (count_down-1)
           | None -> (Success, out_tb) in
   match top with
     | TopNum num -> helper t.first Success num
@@ -88,7 +88,28 @@ get all the distinct values of a column with the name of [col_name]
 from table t and return a subtable
 *)
 let distinct (col_name :colname) (t :table) : status * table =
-
+  if not col_in_table col_name
+    then (DBError "column names not found.", empty_table (get_tablename t) [])
+    else
+      let colnames = get_colnames t in
+      let out_cols = List.find (fun (x,_)-> List.mem x col_name) colnames in
+      let out_tb = empty_table (get_tablename t) out_cols in
+      let out_index = get_col_i t col_name in
+      let get_vals val_list = List.nth val_list out_index in
+      let out node = ins_sel_val
+        let pairs = List.combine (col_name) (get_vals node.value) in
+        insert_col_values pairs out_tb in
+      let rec helper orig_n stat val_buffer =
+        match stat with
+          | DBError e -> (DBError e, out_tb)
+          | Success -> match orig_n with
+            | Some node -> let next = node.next in
+              let node_val = get_vals node.value in
+              if List.mem node_val val_buffer
+                then helper f next Success val_buffer
+                else helper f next (out node) (node_val::val_buffer)
+            | None -> (Success, out_tb) in
+       helper t.first Success []
 
 
 (*
