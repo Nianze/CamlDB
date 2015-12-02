@@ -133,18 +133,18 @@ TEST "delete_where" =
 let t9' = new_table 9
 let t5' = new_table 5
 let s1 =
-  update (Or (Cond ("c1", LE, Int 2), Cond ("c2", GT, String "5")))
+  update_where (Or (Cond ("c1", LE, Int 2), Cond ("c2", GT, String "5")))
   [("c3", Bool true)]
   t9'
 let s2 =
-  update (Or (Cond ("c1", LE, Int 2), Cond ("c2", GT, String "5")))
+  update_where (Or (Cond ("c1", LE, Int 2), Cond ("c2", GT, String "5")))
   [("c3", Bool true)]
   t5'
 
 let s3 = delete_where (Cond ("c3", EQ, Bool true)) t9'
 let s4 = delete_where (Cond ("c3", EQ, Bool true)) t5'
 let s5 =
-  update (Or (Cond ("error", LE, Int 2), Cond ("c2", GT, String "5")))
+  update_where (Or (Cond ("error", LE, Int 2), Cond ("c2", GT, String "5")))
   [("c3", Bool true)]
   t9'
 
@@ -161,6 +161,7 @@ let t3 = new_table 3
 let t9 = new_table 9
 let t9' = new_table 9
 let s = delete_where (Cond ("c1", LE, Int 3)) t9
+
 TEST "union_rows" =
   let (s1, t_u) =  union_rows t3 t9 ["c1"; "c2"; "c3"] in
   (table_equal t_u t9') && (s1 = Success) && (s = Success)
@@ -168,5 +169,5 @@ TEST "union_rows" =
 
 
 
-val union_rows: table -> table -> colname list -> status * table
-
+(* val union_rows: table -> table -> colname list -> status * table
+ *)

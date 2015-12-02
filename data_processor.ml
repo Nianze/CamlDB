@@ -50,7 +50,13 @@ filter the table [t] according to the conditions in [cond_list]
 and return a subtable
 *)
 let where (cond_list: cond_tree) (t :table) :status * table =
-        failwith "unimplemented"
+  match find cond_list t with
+  | (nl, Success) -> (
+  	let new_t = create_table (get_tablename table) (get_colnames table) in
+  	List.iter (fun n -> ignore (insert n new_t)) nl;
+  	(new_t, Success)
+  | (_, DBError e) -> DBError e
+
 
 
 let get_cmp (o: order) (i: int) =
@@ -116,13 +122,13 @@ inserted [val_list] are speicified in [col_list]
 *)
 let insert_col_values (col_list : (colname * t) list)
 (t:table) : status =
-        let colnames = List.map (fun (x, y) -> (x, ref y)) (get_colnames t) in
-        List.(iter
-                (fun (x, y) -> if mem_assoc x col_list then y:=assoc x col_list) colnames
-        );
-        let col = List.map (fun (x,y) -> y) colnames in
-        let row = create_node col in
-        insert row t
+  let colnames = List.map (fun (x, y) -> (x, ref y)) (get_colnames t) in
+  List.(iter
+    (fun (x, y) -> if mem_assoc x col_list then y:=assoc x col_list) colnames
+  );
+  let col = List.map (fun (x,y) -> y) colnames in
+  let row = create_node col in
+  insert row t
 
 
 let update_node (n: node) (colnames: (colname * t) list)
@@ -193,7 +199,7 @@ update all the rows that satisfy the conditions in [cond_list]
 in the table [t] according to the column and value specified
 by [pair_list]
 *)
-let update (cond_list: cond_tree) (pair_list :(colname * t) list)
+let update_where (cond_list: cond_tree) (pair_list :(colname * t) list)
 (t:table) : status =
   match find cond_list t with
   | (nl, Success) -> (
