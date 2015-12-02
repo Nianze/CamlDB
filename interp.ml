@@ -63,6 +63,12 @@ type expr =
 
 let open_tables = ref []
 
+(* Parse a string into an ast *)
+let parse s =
+  let lexbuf = Lexing.from_string s in
+  let ast = Parser.prog Lexer.read lexbuf in
+  ast
+
 let table_named n =
   if List.mem_assoc n !open_tables then
     List.assoc n !open_tables
