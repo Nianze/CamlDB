@@ -165,10 +165,10 @@ TEST "least recently used" =
   List.length l = 1 &&
   List.fold_left2 (fun a n1 n2 -> if n1 == n2 then a else false) true nl1 nl2
 
-let node_equal n1 n2 =
+(* let node_equal n1 n2 =
   List.fold_left2
   (fun a v1 v2-> if !v1 = !v2 then a else false)
-  true n1.value n2.value
+  true n1.value n2.value *)
 
 TEST "list_to_table" =
   let nl1 = table_to_list t3 in

@@ -157,9 +157,9 @@ TEST "update_where" =
   && (table_equal t9' t5')
 
 
-let t3 = create_table 3
-let t9 = create_table 9
-let t9' = create_table 9
+let t3 = new_table 3
+let t9 = new_table 9
+let t9' = new_table 9
 let s = delete_where (Cond ("c1", LE, Int 3)) t9
 TEST "union_rows" =
   let (s1, t_u) =  union_rows t3 t9 ["c1"; "c2"; "c3"] in

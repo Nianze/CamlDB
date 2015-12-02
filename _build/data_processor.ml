@@ -54,21 +54,21 @@ let where (cond_list: cond_tree) (t :table) :status * table =
 
 
 let get_cmp (o: order) (i: int) =
-  match o with
-  | ASC -> (
-    fun n1 n2 ->
-      let v1 = List.nth n1 i in
-      let v2 = List.nth n2 i in
-      if v1 > v2 then 1
-      else if v1 = v2 then 0
-      else -1)
-  | DESC -> (
-    fun n1 n2 ->
-      let v1 = List.nth n1 i in
-      let v2 = List.nth n2 i in
-      if v1 < v2 then 1
-      else if v1 = v2 then 0
-      else -1)
+        match o with
+        | ASC -> (
+                        fun n1 n2 ->
+                                let v1 = List.nth n1 i in
+                                let v2 = List.nth n2 i in
+                                if v1 > v2 then 1
+                                else if v1 = v2 then 0
+                                else -1)
+        | DESC -> (
+                        fun n1 n2 ->
+                                let v1 = List.nth n1 i in
+                                let v2 = List.nth n2 i in
+                                if v1 < v2 then 1
+                                else if v1 = v2 then 0
+                                else -1)
 (*
 SQL:
 SELECT *
@@ -124,7 +124,6 @@ let insert_col_values (col_list : (colname * t) list)
         let row = create_node col in
         insert row t
 
-
 let update_node (n: node) (colnames: (colname * t) list)
 (pair_list : (colname * t) list): unit =
         List.(iter2
@@ -142,12 +141,11 @@ let update_node (n: node) (colnames: (colname * t) list)
  *)
 let colname_check (pair_list : (colname * t) list)
 (colnames : (colname * t) list): string =
-	List.(fold_left
-		(fun s (c, _) ->
-			if mem_assoc c colnames then s
-			else if s = "" then c
-			else s ^ ", " ^ c )
-	"" pair_list)
+        List.(fold_left
+                (fun s (c, _) ->
+                        if mem_assoc c colnames then s
+                        else s ^ ", " ^ c )
+        "" pair_list)
 
 (* check if each columns in pair_list has the same type as originally
          defined by table in colnames
@@ -157,13 +155,11 @@ let colname_check (pair_list : (colname * t) list)
  *)
 let type_check (pair_list : (colname * t) list)
 (colnames : (colname * t) list): string =
-	List.(fold_left
-		(fun s (c, t) ->
-			if match_type t (assoc c colnames) then s
-			else if s = "" then c
-			else s ^ ", " ^ c)
-	"" pair_list)
-
+        List.(fold_left
+                (fun s (c, t) ->
+                        if match_type t (assoc c colnames) then s
+                        else s ^ ", " ^ c)
+        "" pair_list)
 (*
 SQL:
 UPDATE table_name
@@ -173,14 +169,14 @@ update all the rows in the table [t] according to the column
 and value specified by [pair_list]
 *)
 let update_all (pair_list : (colname * t) list) (t:table) : status =
-  let colnames = get_colnames t in
-  let e_find = colname_check pair_list colnames in
-  let e_type = type_check pair_list colnames in
-  match (e_find, e_type) with
-    | ("", "") -> iter (fun n -> update_node n colnames pair_list) t; Success
-    | ("", _) ->
-            DBError ("update_all: type of column "^e_type^" cannot be modified")
-    | _ -> DBError ("update_all: can't find columns: " ^ e_find)
+        let colnames = get_colnames t in
+        let e_find = colname_check pair_list colnames in
+        let e_type = type_check pair_list colnames in
+        match (e_find, e_type) with
+                | ("", "") -> iter (fun n -> update_node n colnames pair_list) t; Success
+                | ("", _) ->
+                        DBError ("update_all: type of column "^e_type^" cannot be modified")
+                | _ -> DBError ("update_all: can't find columns: " ^ e_find)
 
 
 (*
@@ -195,19 +191,19 @@ by [pair_list]
 *)
 let update (cond_list: cond_tree) (pair_list :(colname * t) list)
 (t:table) : status =
-  match find cond_list t with
-  | (nl, Success) -> (
-    let colnames = get_colnames t in
-    let e_find = colname_check pair_list colnames in
-    let e_type = type_check pair_list colnames in
-    match (e_find, e_type) with
-      | ("", "") ->
-              List.iter (fun n -> update_node n colnames pair_list) nl; Success
-      | ("", _) ->
-        DBError ("update_all: type of column "^e_type^" cannot be modified")
-      | _ -> DBError ("update_all: can't find columns: " ^ e_find)
-    )
-  | (_, DBError e) -> DBError e
+        match find cond_list t with
+        | (nl, Success) -> (
+                let colnames = get_colnames t in
+                let e_find = colname_check pair_list colnames in
+                let e_type = type_check pair_list colnames in
+                match (e_find, e_type) with
+                        | ("", "") ->
+                                List.iter (fun n -> update_node n colnames pair_list) nl; Success
+                        | ("", _) ->
+                                DBError ("update_all: type of column "^e_type^" cannot be modified")
+                        | _ -> DBError ("update_all: can't find columns: " ^ e_find)
+                )
+        | (_, DBError e) -> DBError e
 
 
 (*
@@ -217,12 +213,12 @@ DELETE FROM table_name;
 delete all rows in the table [t]
 *)
 let delete_all (t:table) : status =
-  fold_left
-  (fun a n ->
-    match a with
-      | Success -> delete n t
-      | DBError e -> a
-  ) Success t
+        fold_left
+        (fun a n ->
+                match a with
+                        | Success -> delete n t
+                        | DBError e -> a
+        ) Success t
 
 
 (*
@@ -233,10 +229,10 @@ WHERE some_column=some_value;
 delete all rows in the table [t] that satisfies the conditions in
 [cond_list], disable the row under the hood
 *)
-let delete_where (cond_list: cond_tree) (t:table) : status =
-	match find cond_list t with
-	| (nl, Success) -> List.iter (fun n -> ignore (delete n t)) nl; Success
-	| (_, DBError e) -> DBError e
+let delete (cond_list: cond_tree) (t:table) : status =
+        match find cond_list t with
+        | (nl, Success) -> List.iter (fun n -> ignore (delete n t)) nl; Success
+        | (_, DBError e) -> DBError e
 
 (*
 SQL:
