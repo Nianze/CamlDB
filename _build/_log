@@ -1,15 +1,18 @@
 ### Starting build.
-# Target: table.ml.depends, tags: { extension:ml, file:table.ml, ocaml, ocamldep, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
-ocamlfind ocamldep -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -modules table.ml > table.ml.depends
+# Target: test_table.ml.depends, tags: { extension:ml, file:test_table.ml, ocaml, ocamldep, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
+ocamlfind ocamldep -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -modules test_table.ml > test_table.ml.depends
 # Target: table.mli.depends, tags: { extension:mli, file:table.mli, ocaml, ocamldep, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
 ocamlfind ocamldep -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -modules table.mli > table.mli.depends # cached
 # Target: table.cmi, tags: { byte, compile, extension:mli, file:table.mli, interf, ocaml, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
 ocamlfind ocamlc -c -warn-error +a-4-33-34-40-41-42-43-44 -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -o table.cmi table.mli # cached
+# Target: test_table.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:test_table.cmo, file:test_table.ml, implem, ocaml, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
+ocamlfind ocamlc -c -warn-error +a-4-33-34-40-41-42-43-44 -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -o test_table.cmo test_table.ml
+# Target: test_table.d.cmo, tags: { byte, compile, debug, extension:cmo, extension:ml, file:test_table.d.cmo, file:test_table.ml, implem, ocaml, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
+ocamlfind ocamlc -c -warn-error +a-4-33-34-40-41-42-43-44 -g -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -o test_table.d.cmo test_table.ml
+# Target: table.ml.depends, tags: { extension:ml, file:table.ml, ocaml, ocamldep, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
+ocamlfind ocamldep -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -modules table.ml > table.ml.depends # cached
 # Target: table.d.cmo, tags: { byte, compile, debug, extension:cmo, extension:ml, file:table.d.cmo, file:table.ml, implem, ocaml, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
-ocamlfind ocamlc -c -warn-error +a-4-33-34-40-41-42-43-44 -g -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -o table.d.cmo table.ml
-+ ocamlfind ocamlc -c -warn-error +a-4-33-34-40-41-42-43-44 -g -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -o table.d.cmo table.ml
-File "table.ml", line 448, characters 25-43:
-Error: This expression has type int -> t ref
-       but an expression was expected of type 'a ref
-Command exited with code 2.
-# Compilation unsuccessful.
+ocamlfind ocamlc -c -warn-error +a-4-33-34-40-41-42-43-44 -g -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -o table.d.cmo table.ml # cached
+# Target: test_table.d.byte, tags: { byte, debug, dont_link_with, extension:byte, file:test_table.d.byte, link, ocaml, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), program, quiet }
+ocamlfind ocamlc assertions.cma -linkpkg -g -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck table.d.cmo test_table.d.cmo -o test_table.d.byte
+# Compilation successful.

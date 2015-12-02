@@ -445,7 +445,9 @@ let list_to_table (name :string) (colnames: (colname * t) list)
 (* [get_col_i t col_name] gets the col [col_name] as a t list *)
 let get_col (t: table) (col_name: colname): t list =
 	let index = get_col_i t col_name in
-	fold_left (fun a n -> !(List.nth (n.value))::a) [] t
+	if index = -1 then []
+	else
+	fold_left (fun a n -> a @ [!(List.nth (n.value) index)]) [] t
 
 
 (* [node_equal n1 n2] compare two nodes and return true if they are equal
