@@ -124,6 +124,20 @@ let get_tablename (t:table) : string = t.name
 (* [get_colnames t] gets a list of column name of table [t] *)
 let get_colnames (t:table) : (colname * t) list = t.colnames
 
+(* [col_in_table t col_name] checks if col [col_name] is in table [t]  *)
+let col_in_table (t: table) (col_name: colname): bool =
+	let colnames = t.colnames in
+	List.mem_assoc col_name colnames
+
+(* [get_col_i t col_name] gets the index of col [col_name]
+ * return -1 if col [col_name] not in table [t]
+ *)
+let get_col_i (t: table) (col_name: colname): int =
+	let colnames = t.colnames in
+	let index = ref (-1) in
+	List.iteri (fun i (c, _) -> if col_name = c then index := i else ()) colnames;
+	!index
+
 (* [get_first t] gets the first node in table [t] *)
 let get_first (t:table) : node option = t.first
 
@@ -426,6 +440,12 @@ let list_to_table (name :string) (colnames: (colname * t) list)
 			  | DBError e -> a
 		) rows Success,
 	t)
+
+
+(* [get_col_i t col_name] gets the col [col_name] as a t list *)
+let get_col (t: table) (col_name: colname): t list =
+	let index = get_col_i t col_name in
+	fold_left (fun a n -> !(List.nth (n.value))::a) [] t
 
 
 (* [node_equal n1 n2] compare two nodes and return true if they are equal
