@@ -64,7 +64,7 @@ type expr =
   | ColName  of name
   | Path     of expr * expr
   | SelCol   of expr list * expr * plot
-  | SelTop   of top_t * expr * plot
+  | SelTop   of top_t * expr list * expr * plot
   | Distin   of expr * expr * plot
   | Where    of c_tree * expr
   | Sort     of expr * order * expr
