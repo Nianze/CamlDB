@@ -93,7 +93,7 @@ statement:
   | DELETE; FROM; tb = ID { DelAll (TbName tb) }
   | DELETE; FROM; tb = ID; WHERE; conds = cond_list { Delete (conds,TbName tb) }
   | CREATE; TABLE; tb = ID; LPAREN; colsets = col_typ_list; RPAREN { Create (TbName tb, colsets) }
-  | SEL; ANY; FROM; tb1 = ID; UNION; ALL; SEL; ANY; FROM; tb2 = ID { Union (TbName tb1,TbName tb2) }
+  | SEL; cols1 = col_list; FROM; tb1 = ID; UNION; ALL; SEL; cols2 = col_list; FROM; tb2 = ID { Union (TbName tb1,TbName tb2) }
   | SEL; cols = col_list;FROM; tb1 = ID; JOIN; tb2 = ID;ON; j_cond = join_cond { Joins (TbName tb1,TbName tb2, cols, j_cond) }
   ;
 
@@ -120,10 +120,10 @@ vis_method:
 
 col_list:
   | cols = separated_list(COMMA, col_field) { cols }
-  | ANY { [ColName "*"] }
   ;
 
 col_field:
+  | ANY { ColName "*" }
   | col = ID { ColName col }
   | tb = ID; DOT; col = ID { Path(TbName tb, ColName col) }
   ;
