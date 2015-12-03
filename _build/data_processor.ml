@@ -25,6 +25,63 @@ let ins_sel_val col_list t node =
   insert_col_values pairs out_tb
 *)
 
+  
+(*
+SQL:
+CREATE TABLE table_name
+(
+column_name1 data_type(size),
+column_name2 data_type(size),
+column_name3 data_type(size),
+....
+);
+
+create a table with name [table_name], specify the type and
+column name of each column by [col_name_list]
+*)
+let create_table (table_name: string) (col_name_list: (colname * t) list)
+: table = empty_table table_name col_name_list
+
+  
+(*
+SQL:
+INSERT INTO table_name
+VALUES (value1,value2,value3,...);
+
+insert a new row with values [val_list] in the order of columns
+into table [t] and return a subtable
+*)
+let insert_values (val_list: t list) (t: table) : status =
+        let row = create_node (List.map (fun x -> ref x) val_list) in
+        insert row t
+
+(*
+SQL:
+INSERT INTO table_name (column1,column2,column3,...)
+VALUES (value1,value2,value3,...);
+
+insert a new row, both the column names and the values to be
+inserted [val_list] are speicified in [col_list]
+*)
+let insert_col_values (col_list : (colname * t) list)
+(t:table) : status =
+  let colnames = List.map (fun (x, y) -> (x, ref y)) (get_colnames t) in
+  List.(iter
+    (fun (x, y) -> if mem_assoc x col_list then y:=assoc x col_list) colnames
+  );
+  let col = List.map (fun (x,y) -> y) colnames in
+  let row = create_node col in
+  insert row t
+
+let update_node (n: node) (colnames: (colname * t) list)
+(pair_list : (colname * t) list): unit =
+        List.(iter2
+                (fun (c, ts) t ->
+                if mem_assoc c pair_list
+                then (t := (assoc c pair_list))
+                else () )
+        colnames n.value)
+
 (*
 SQL:
 SELECT column_name, column_name FROM table_name;
@@ -39,14 +96,14 @@ let select_col (col_list :colname list) (t: table): status * table =
   let out_index = List.map (get_col_i t) col_list in
   let get_vals val_list = List.map (List.nth val_list) out_index in
   let out node =
-    let pairs = List.combine (col_list) (get_vals node.value) in
+    let pairs = List.combine (col_list) (List.map (!) (get_vals node.value)) in
     insert_col_values pairs out_tb in
   let rec helper orig_n stat =
     match stat with
       | DBError e -> (DBError e, out_tb)
       | Success -> match orig_n with
         | Some node -> let next = node.next in
-          helper f next (out node)
+          helper next (out node)
         | None -> (Success, out_tb) in
    helper t.first Success
 
@@ -62,7 +119,8 @@ let select_top (top:top_t) (col_list:colname list) (t: table): status * table =
   let out_cols = List.filter (fun (x,_)-> List.mem x col_list) colnames in
   let out_tb = empty_table (get_tablename t) out_cols in
   let out_index = List.map (get_col_i t) col_list in
-  let get_vals val_list = List.map (List.nth val_list) out_index in
+  let get_vals val_list =
+    List.map (fun n -> !(List.nth val_list n)) out_index in
   let out node =
     let pairs = List.combine (col_list) (get_vals node.value) in
     insert_col_values pairs out_tb in
@@ -72,7 +130,7 @@ let select_top (top:top_t) (col_list:colname list) (t: table): status * table =
         | DBError e -> (DBError e, out_tb)
         | Success -> match orig_n with
           | Some node -> let next = node.next in
-            helper f next (out node) (count_down-1)
+            helper next (out node) (count_down-1)
           | None -> (Success, out_tb) in
   match top with
     | TopNum num -> helper t.first Success num
@@ -88,17 +146,17 @@ get all the distinct values of a column with the name of [col_name]
 from table t and return a subtable
 *)
 let distinct (col_name :colname) (t :table) : status * table =
-  if not col_in_table col_name
+  if not (col_in_table t col_name)
     then (DBError "column names not found.", empty_table (get_tablename t) [])
     else
       let colnames = get_colnames t in
-      let out_cols = List.find (fun (x,_)-> List.mem x col_name) colnames in
-      let out_tb = empty_table (get_tablename t) out_cols in
+      let out_cols = List.find (fun (x,_)-> x = col_name) colnames in
+      let out_tb = empty_table (get_tablename t) [out_cols] in
       let out_index = get_col_i t col_name in
-      let get_vals val_list = List.nth val_list out_index in
+      let get_vals val_list = !(List.nth val_list out_index) in
       let out node =
-        let pairs = List.combine (col_name) (get_vals node.value) in
-        insert_col_values pairs out_tb in
+        let pairs = (col_name,get_vals node.value) in
+        insert_col_values [pairs] out_tb in
       let rec helper orig_n stat val_buffer =
         match stat with
           | DBError e -> (DBError e, out_tb)
@@ -106,8 +164,8 @@ let distinct (col_name :colname) (t :table) : status * table =
             | Some node -> let next = node.next in
               let node_val = get_vals node.value in
               if List.mem node_val val_buffer
-                then helper f next Success val_buffer
-                else helper f next (out node) (node_val::val_buffer)
+                then helper next Success val_buffer
+                else helper next (out node) (node_val::val_buffer)
             | None -> (Success, out_tb) in
        helper t.first Success []
 
@@ -124,10 +182,10 @@ and return a subtable
 let where (cond_list: cond_tree) (t :table) :status * table =
   match find cond_list t with
   | (nl, Success) -> (
-  	let new_t = create_table (get_tablename table) (get_colnames table) in
+  	let new_t = create_table (get_tablename t) (get_colnames t) in
   	List.iter (fun n -> ignore (insert n new_t)) nl;
-  	(new_t, Success)
-  | (_, DBError e) -> DBError e
+  	(Success,new_t) )
+  | (_, DBError e) -> (DBError e,empty_table "" [])
 
 
 
@@ -173,44 +231,7 @@ let sort (col_name: colname) (o: order) (t: table) : status * table =
                 list_to_table (get_tablename t) (get_colnames t) node_list
 
 
-(*
-SQL:
-INSERT INTO table_name
-VALUES (value1,value2,value3,...);
 
-insert a new row with values [val_list] in the order of columns
-into table [t] and return a subtable
-*)
-let insert_values (val_list: t list) (t: table) : status =
-        let row = create_node (List.map (fun x -> ref x) val_list) in
-        insert row t
-
-(*
-SQL:
-INSERT INTO table_name (column1,column2,column3,...)
-VALUES (value1,value2,value3,...);
-
-insert a new row, both the column names and the values to be
-inserted [val_list] are speicified in [col_list]
-*)
-let insert_col_values (col_list : (colname * t) list)
-(t:table) : status =
-  let colnames = List.map (fun (x, y) -> (x, ref y)) (get_colnames t) in
-  List.(iter
-    (fun (x, y) -> if mem_assoc x col_list then y:=assoc x col_list) colnames
-  );
-  let col = List.map (fun (x,y) -> y) colnames in
-  let row = create_node col in
-  insert row t
-
-let update_node (n: node) (colnames: (colname * t) list)
-(pair_list : (colname * t) list): unit =
-        List.(iter2
-                (fun (c, ts) t ->
-                if mem_assoc c pair_list
-                then (t := (assoc c pair_list))
-                else () )
-        colnames n.value)
 
 
 (* check if each columns in pair_list can be found in colnames
@@ -312,22 +333,6 @@ let delete_where (cond_list: cond_tree) (t:table) : status =
 	match find cond_list t with
 	| (nl, Success) -> List.iter (fun n -> ignore (delete n t)) nl; Success
 	| (_, DBError e) -> DBError e
-
-(*
-SQL:
-CREATE TABLE table_name
-(
-column_name1 data_type(size),
-column_name2 data_type(size),
-column_name3 data_type(size),
-....
-);
-
-create a table with name [table_name], specify the type and
-column name of each column by [col_name_list]
-*)
-let create_table (table_name: string) (col_name_list: (colname * t) list)
-: table = empty_table table_name col_name_list
 
 
 
