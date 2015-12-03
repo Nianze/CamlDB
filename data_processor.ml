@@ -38,7 +38,7 @@ let select_col (col_list :colname list) (t: table): status * table =
   let out_tb = empty_table (get_tablename t) out_cols in
   let out_index = List.map (get_col_i t) col_list in
   let get_vals val_list = List.map (List.nth val_list) out_index in
-  let out node = ins_sel_val
+  let out node =
     let pairs = List.combine (col_list) (get_vals node.value) in
     insert_col_values pairs out_tb in
   let rec helper orig_n stat =
@@ -96,7 +96,7 @@ let distinct (col_name :colname) (t :table) : status * table =
       let out_tb = empty_table (get_tablename t) out_cols in
       let out_index = get_col_i t col_name in
       let get_vals val_list = List.nth val_list out_index in
-      let out node = ins_sel_val
+      let out node =
         let pairs = List.combine (col_name) (get_vals node.value) in
         insert_col_values pairs out_tb in
       let rec helper orig_n stat val_buffer =
