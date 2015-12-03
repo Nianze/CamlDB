@@ -25,7 +25,7 @@ let ins_sel_val col_list t node =
   insert_col_values pairs out_tb
 *)
 
-
+  
 (*
 SQL:
 CREATE TABLE table_name
@@ -42,7 +42,7 @@ column name of each column by [col_name_list]
 let create_table (table_name: string) (col_name_list: (colname * t) list)
 : table = empty_table table_name col_name_list
 
-
+  
 (*
 SQL:
 INSERT INTO table_name
@@ -184,9 +184,8 @@ let where (cond_list: cond_tree) (t :table) :status * table =
   | (nl, Success) -> (
   	let new_t = create_table (get_tablename t) (get_colnames t) in
   	List.iter (fun n -> ignore (insert n new_t)) nl;
-  	(Success, new_t) )
-  | (_, DBError e) -> (DBError e, t)
-
+  	(Success,new_t) )
+  | (_, DBError e) -> (DBError e,empty_table "" [])
 
 
 

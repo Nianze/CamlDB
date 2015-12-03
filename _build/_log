@@ -1,0 +1,48 @@
+### Starting build.
+# Target: interp.mli.depends, tags: { extension:mli, file:interp.mli, ocaml, ocamldep, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules interp.mli > interp.mli.depends # cached
+# Target: ast.mli.depends, tags: { extension:mli, file:ast.mli, ocaml, ocamldep, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules ast.mli > ast.mli.depends # cached
+# Target: table.mli.depends, tags: { extension:mli, file:table.mli, ocaml, ocamldep, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules table.mli > table.mli.depends # cached
+# Target: table.cmi, tags: { byte, compile, extension:mli, file:table.mli, interf, ocaml, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -o table.cmi table.mli # cached
+# Target: visualizer.mli.depends, tags: { extension:mli, file:visualizer.mli, ocaml, ocamldep, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules visualizer.mli > visualizer.mli.depends # cached
+# Target: visualizer.cmi, tags: { byte, compile, extension:mli, file:visualizer.mli, interf, ocaml, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -o visualizer.cmi visualizer.mli # cached
+# Target: ast.cmi, tags: { byte, compile, extension:mli, file:ast.mli, interf, ocaml, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -o ast.cmi ast.mli # cached
+# Target: interp.cmi, tags: { byte, compile, extension:mli, file:interp.mli, interf, ocaml, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -o interp.cmi interp.mli # cached
+# Target: interp.ml.depends, tags: { extension:ml, file:interp.ml, ocaml, ocamldep, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules interp.ml > interp.ml.depends # cached
+# Target: data_processor.mli.depends, tags: { extension:mli, file:data_processor.mli, ocaml, ocamldep, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules data_processor.mli > data_processor.mli.depends # cached
+# Target: data_processor.cmi, tags: { byte, compile, extension:mli, file:data_processor.mli, interf, ocaml, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -o data_processor.cmi data_processor.mli # cached
+# Target: storage.mli.depends, tags: { extension:mli, file:storage.mli, ocaml, ocamldep, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules storage.mli > storage.mli.depends # cached
+# Target: storage.cmi, tags: { byte, compile, extension:mli, file:storage.mli, interf, ocaml, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -o storage.cmi storage.mli # cached
+# Target: interp.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:interp.cmo, file:interp.ml, implem, ocaml, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -o interp.cmo interp.ml # cached
+# Target: data_processor.ml.depends, tags: { extension:ml, file:data_processor.ml, ocaml, ocamldep, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules data_processor.ml > data_processor.ml.depends
+# Target: storage.ml.depends, tags: { extension:ml, file:storage.ml, ocaml, ocamldep, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules storage.ml > storage.ml.depends # cached
+# Target: storage.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:storage.cmo, file:storage.ml, implem, ocaml, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -o storage.cmo storage.ml # cached
+# Target: table.ml.depends, tags: { extension:ml, file:table.ml, ocaml, ocamldep, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules table.ml > table.ml.depends # cached
+# Target: table.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:table.cmo, file:table.ml, implem, ocaml, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -o table.cmo table.ml # cached
+# Target: visualizer.ml.depends, tags: { extension:ml, file:visualizer.ml, ocaml, ocamldep, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules visualizer.ml > visualizer.ml.depends # cached
+# Target: visualizer.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:visualizer.cmo, file:visualizer.ml, implem, ocaml, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -o visualizer.cmo visualizer.ml # cached
+# Target: data_processor.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:data_processor.cmo, file:data_processor.ml, implem, ocaml, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -o data_processor.cmo data_processor.ml
+# Target: interp.byte, tags: { byte, dont_link_with, extension:byte, file:interp.byte, link, ocaml, program, quiet }
+/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf uutf.cma jsonm.cma table.cmo data_processor.cmo storage.cmo visualizer.cmo interp.cmo -o interp.byte # cached
+# Compilation successful.
