@@ -135,7 +135,9 @@ let col_in_table (t: table) (col_name: colname): bool =
 let get_col_i (t: table) (col_name: colname): int =
 	let colnames = t.colnames in
 	let index = ref (-1) in
-	List.iteri (fun i (c, _) -> if col_name = c then index := i else ()) colnames;
+	List.iteri
+	(fun i (c, _) -> if col_name = c then index := i else ())
+	colnames;
 	!index
 
 (* [get_first t] gets the first node in table [t] *)
@@ -230,33 +232,6 @@ let delete (r: node) (t:table) : status =
 		t.numrow <- t.numrow - 1;
 		Success
 
-
-
-(* let delete (r: node) (t:table) : status =
-	match (t.first, t.last) with
-	| (None, None) -> DBError ("delete: table " ^ t.name ^ " is empty")
-	| (Some x, Some y) when x == r && y == r ->
-			(t.first <- None);
-			(t.last <- None);
-			t.numrow <- 0;
-			Success
-	| (Some x, Some _) when x == r ->
-			t.first <- r.next;
-			(in_some r.next).prev <- None;
-			t.numrow <- t.numrow - 1;
-			Success
-	| (Some _, Some y) when y == r ->
-			t.last <- r.prev;
-			(in_some r.prev).next <- None;
-			t.numrow <- t.numrow - 1;
-			Success
-	| (Some _, Some _) ->
-			(in_some r.prev).next <- r.next;
-			(in_some r.next).prev <- r.prev;
-			t.numrow <- t.numrow - 1;
-			Success
-	| _ -> DBError "delete: row not found" *)
-
 (* [cond_row cond_list r] checks if row [n] satisfies condions in
  * [cond_list] and returns true or false and the status
  * requires: [n] to be non-empty
@@ -300,39 +275,6 @@ let rec cond_row (cond_list: cond_tree) (colnames: (colname * t) list)
 			| _ -> (true, Success)
 		)
 
-
-
-(* let rec cond_row (cond_list: condition list) (colnames: (colname * t) list)
-(n: node) : bool * status =
-	match cond_list with
-	| [] -> (true, Success)
-	| (col, op, v)::cond_list' ->
-		let num_found = List.(length (filter (fun (n,t) -> n = col) colnames)) in
-
-		if num_found < 1
-		then (false, DBError ("Column name " ^ col ^ " is not found.") )
-
-		else if num_found > 1
-		then (false, DBError ("Duplicate columns " ^ col ^ " found.") )
-
-		else if List.(length colnames <> length n.value)
-		then (false, DBError
-		"cond_row: Number of columns mismatch between colname and row content.")
-
-		else if
-		List.(length
-			(filter (fun (n,t) -> (n = col) && (match_type t v)) colnames)
-		) <> 1
-		then (false, DBError ("Column " ^ col ^ " has the wrong type") )
-
-		else
-		let pair_list = List.combine colnames n.value in
-		let (_, content) = List.find (fun ((cn, _), _) -> cn = col) pair_list in
-		let res = compare op !content v in
-		match res with
-		| (true, Success) -> cond_row cond_list' colnames n
-		| _ -> res
- *)
 
 (* [find cond_list t] finds rows satisfies condions in
  * [cond_list] in table [t].

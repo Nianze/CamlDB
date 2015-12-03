@@ -156,6 +156,7 @@ TEST "update_where" =
   (is_error s5) && (table_equal t9 t9') && (table_equal t5 t5')
   && (table_equal t9' t5')
 
+(******** Sort, Union rows ********)
 
 let t100 = new_table 100
 let t100' = new_table 100

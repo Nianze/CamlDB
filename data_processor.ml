@@ -1,12 +1,5 @@
 open Table
 
-(* type of value *)
-(* type t = Table.t
-type operator = Table.operator
-type table = Table.table
-type condition = Table.condition *)
-(* type order = DESC | ASC
-type top_t = TopNum of int | TopPercent of int *)
 
 (*
 (* helper function:
@@ -52,8 +45,8 @@ insert a new row with values [val_list] in the order of columns
 into table [t] and return a subtable
 *)
 let insert_values (val_list: t list) (t: table) : status =
-        let row = create_node (List.map (fun x -> ref x) val_list) in
-        insert row t
+  let row = create_node (List.map (fun x -> ref x) val_list) in
+  insert row t
 
 (*
 SQL:
@@ -75,12 +68,12 @@ let insert_col_values (col_list : (colname * t) list)
 
 let update_node (n: node) (colnames: (colname * t) list)
 (pair_list : (colname * t) list): unit =
-        List.(iter2
-                (fun (c, ts) t ->
-                if mem_assoc c pair_list
-                then (t := (assoc c pair_list))
-                else () )
-        colnames n.value)
+  List.(iter2
+    (fun (c, ts) t ->
+    if mem_assoc c pair_list
+    then (t := (assoc c pair_list))
+    else () )
+  colnames n.value)
 
 (*
 SQL:
@@ -217,19 +210,19 @@ sort the table [t] in the ascending or descending order of [o]
 of column [col_name] and return a subtable
 *)
 let sort (col_name: colname) (o: order) (t: table) : status * table =
-        let colnames = get_colnames t in
-        if (List.mem_assoc col_name colnames) = false then
-                (DBError "sort: col_name not found", t)
-        else
-                let l_node = table_to_list t in
-                let l = List.map (fun n -> n.value) l_node in
-                let index = ref 0 in
-                List.iteri
-                (fun i (c, _) -> if c = col_name then index:= i else ())
-                colnames;
-                let sorted = List.sort (get_cmp o !index) l in
-                let node_list = List.map (fun v -> create_node v) sorted in
-                list_to_table (get_tablename t) (get_colnames t) node_list
+  let colnames = get_colnames t in
+  if (List.mem_assoc col_name colnames) = false then
+    (DBError "sort: col_name not found", t)
+  else
+    let l_node = table_to_list t in
+    let l = List.map (fun n -> n.value) l_node in
+    let index = ref 0 in
+    List.iteri
+    (fun i (c, _) -> if c = col_name then index:= i else ())
+    colnames;
+    let sorted = List.sort (get_cmp o !index) l in
+    let node_list = List.map (fun v -> create_node v) sorted in
+    list_to_table (get_tablename t) (get_colnames t) node_list
 
 
 
