@@ -27,6 +27,45 @@ let ins_sel_val col_list t node =
 
 (*
 SQL:
+INSERT INTO table_name
+VALUES (value1,value2,value3,...);
+
+insert a new row with values [val_list] in the order of columns
+into table [t] and return a subtable
+*)
+let insert_values (val_list: t list) (t: table) : status =
+        let row = create_node (List.map (fun x -> ref x) val_list) in
+        insert row t
+
+(*
+SQL:
+INSERT INTO table_name (column1,column2,column3,...)
+VALUES (value1,value2,value3,...);
+
+insert a new row, both the column names and the values to be
+inserted [val_list] are speicified in [col_list]
+*)
+let insert_col_values (col_list : (colname * t) list)
+(t:table) : status =
+  let colnames = List.map (fun (x, y) -> (x, ref y)) (get_colnames t) in
+  List.(iter
+    (fun (x, y) -> if mem_assoc x col_list then y:=assoc x col_list) colnames
+  );
+  let col = List.map (fun (x,y) -> y) colnames in
+  let row = create_node col in
+  insert row t
+
+let update_node (n: node) (colnames: (colname * t) list)
+(pair_list : (colname * t) list): unit =
+        List.(iter2
+                (fun (c, ts) t ->
+                if mem_assoc c pair_list
+                then (t := (assoc c pair_list))
+                else () )
+        colnames n.value)
+
+(*
+SQL:
 SELECT column_name, column_name FROM table_name;
 
 select some particular columns in a list of colunms [col_list]
@@ -173,44 +212,7 @@ let sort (col_name: colname) (o: order) (t: table) : status * table =
                 list_to_table (get_tablename t) (get_colnames t) node_list
 
 
-(*
-SQL:
-INSERT INTO table_name
-VALUES (value1,value2,value3,...);
 
-insert a new row with values [val_list] in the order of columns
-into table [t] and return a subtable
-*)
-let insert_values (val_list: t list) (t: table) : status =
-        let row = create_node (List.map (fun x -> ref x) val_list) in
-        insert row t
-
-(*
-SQL:
-INSERT INTO table_name (column1,column2,column3,...)
-VALUES (value1,value2,value3,...);
-
-insert a new row, both the column names and the values to be
-inserted [val_list] are speicified in [col_list]
-*)
-let insert_col_values (col_list : (colname * t) list)
-(t:table) : status =
-  let colnames = List.map (fun (x, y) -> (x, ref y)) (get_colnames t) in
-  List.(iter
-    (fun (x, y) -> if mem_assoc x col_list then y:=assoc x col_list) colnames
-  );
-  let col = List.map (fun (x,y) -> y) colnames in
-  let row = create_node col in
-  insert row t
-
-let update_node (n: node) (colnames: (colname * t) list)
-(pair_list : (colname * t) list): unit =
-        List.(iter2
-                (fun (c, ts) t ->
-                if mem_assoc c pair_list
-                then (t := (assoc c pair_list))
-                else () )
-        colnames n.value)
 
 
 (* check if each columns in pair_list can be found in colnames
