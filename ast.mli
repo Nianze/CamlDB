@@ -1,3 +1,5 @@
+(*** Abstract syntax of CamlDB ***)
+
 open Table
 
 (** store column names, table names *)

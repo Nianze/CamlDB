@@ -1,9 +1,5 @@
 open Ast
 
-(***********************************************************************)
-(* Everything above this is essentially the same as we saw in lecture. *)
-(***********************************************************************)
-
 (* Parse a string into an ast *)
 let parse s =
   let lexbuf = Lexing.from_string s in
@@ -14,11 +10,11 @@ let parse s =
 let run_tests () =
   parse "SELECT col1,col2 FROM tb;";
   parse "SELECT col1,col2 FROM tb #BAR;";
-  parse "SELECT TOP 10 FROM tb;";
-  parse "SELECT TOP 10 FROM tb #LINE;";
-  parse "SELECT TOP 50 PERCENT FROM tb;";
-  parse "SELECT TOP 13 PERCENT FROM tb #HISTOGRAM;";
-  parse "SELECT TOP 20 PERCENT FROM tb WHERE col1 = 2 OR col2 = 4;";
+  parse "SELECT TOP 10 col1 FROM tb;";
+  parse "SELECT TOP 10 * FROM tb #LINE;";
+  parse "SELECT TOP 50 PERCENT co1,col2 FROM tb;";
+  parse "SELECT TOP 13 PERCENT col1 FROM tb #HISTOGRAM;";
+  parse "SELECT TOP 20 PERCENT * FROM tb WHERE col1 = 2 OR col2 = 4;";
   parse "SELECT DISTINCT col1 FROM tb #SCATTER;";
   parse "SELECT DISTINCT col1 FROM tb WHERE col1 = 2 OR col2 = 4;";
   parse "SELECT col1,col2 FROM a WHERE col1 = 2 AND col2 < 3 OR col3 > 1 AND col4 = 5;";
@@ -35,4 +31,5 @@ let run_tests () =
   parse "DELETE FROM tb1 WHERE col1=1 AND col2<4;";
   parse "CREATE TABLE tb1 (col1_name INT, col2_name STRING, col3 BOOL);";
   parse "SELECT tb1.col1, tb2.col2 FROM tb1 JOIN tb2 ON tb1.col3=tb2.col2;"
+
 

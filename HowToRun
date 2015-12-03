@@ -1,0 +1,3 @@
+TO run the database, type in terminal:
+ocamlbuild -use-menhir -pkg jsonm repl.byte
+ocamlrun repl.byte
