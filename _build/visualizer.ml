@@ -78,7 +78,28 @@ let draw_vert_line canvas x =
     for y = 0 to (Array.length canvas.(x)) - 1 do
       draw canvas x y '|'
     done
-  
+(* Source: Bresenham's line algorithm.    https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm *)      
+let draw_line canvas x0 y0 x1 y1 =
+  let (x0, x1) = (min x0 x1, max x0 x1) in
+  let (y0, y1) = (min y0 y1, max y0 y1) in
+  if x0 = x1 then
+    for y = y0 to y1 do
+      draw canvas x0 y '*'
+    done
+  else
+    let error = ref 0.0 in
+    let deltaerr = ref (float_of_int (y1 - y0) /. (float_of_int (x1 - x0))) in
+    let y = ref y0 in
+    for x = x0 to x1 do
+      draw canvas x !y '*';
+      error := !error +. !deltaerr;
+      while !error >= 0.5 do
+	draw canvas x !y '*';
+	y := !y + (int_of_float(copysign 1.0 (float_of_int(y1 - y0))));
+	error := !error -. 1.0
+      done
+    done
+    
 let print_canvas c xlab ylab =
   if Array.length c > 0 then
     for y = (Array.length c.(0)) - 1 downto 0 do
@@ -108,10 +129,10 @@ let interpolate x a1 a2 b1 b2 =
   ((x -. a1) /. (a2 -. a1) *. (b2 -. b1) +. b1)
 
 (* precondition: t has 2 columns, each of type int or float *)    
-let vis_scatter2d t =
+let vis_points2d t connect =
 (* TODO: actually get xcol, ycol *)
-  let xcol = [-1.; 2.; 3.; 4.] in
-  let ycol = [-1.; 4.; 9.; 16.] in
+  let xcol = [2.; 2.; 3.; 4.; 2.] in
+  let ycol = [-1.; 4.; 9.; 16.; 8.] in
   let canvas = new_canvas canvas_width canvas_height in
   let ((x1, y1), (x2, y2)) = bounds xcol ycol in
   let w = float_of_int (canvas_width - 1) in
@@ -125,9 +146,19 @@ let vis_scatter2d t =
   draw_vert_line canvas (int_of_float (interpolate origin_x x1 x2 0. w));
   
   (* draw points *)
+  let last = ref (0, 0) in
+  let first_line = ref true in
   List.iter2 (fun x y ->
-    draw canvas (int_of_float (interpolate x x1 x2 0. w))
-                (int_of_float (interpolate y y1 y2 0. h)) '*')
+    let scrx = int_of_float (interpolate x x1 x2 0. w) in
+    let scry = int_of_float (interpolate y y1 y2 0. h) in
+    if connect then (
+      if not !first_line then (
+        draw_line canvas (fst !last) (snd !last) scrx scry;
+      );
+      first_line := false;
+      last := (scrx, scry)
+    ) else
+      draw canvas scrx scry '*')
     xcol ycol;
   print_canvas canvas
     [(int_of_float (interpolate 0. x1 x2 0. w), "0.0");
@@ -140,10 +171,20 @@ let vis_scatter2d t =
 (* Throws an exception if the method is not compatible with *)
 (* the table contents. *)
 let visualize t = function
-  | Scatter2d -> vis_scatter2d t
+  | Scatter2d -> vis_points2d t false
+  | LineGraph -> vis_points2d t true
   | _ -> failwith "TODO"
 
 (* legal_vis_methods [t] returns the legal visualization methods for *)
 (* the table [t] *)
 let legal_vis_methods t =
-  [VisNone] (* TODO *)  
+  match get_colnames t with
+  | [(_, Int _)] | [(_, Float _)] ->
+     [VisNone; Hist2d]
+  | [(_, Int _); (_, Int _)] | [(_, Int _); (_, Float _)]
+  | [(_, Float _); (_, Int _)] | [(_, Float _); (_, Float _)] ->
+     [VisNone; Scatter2d; BarGraph; LineGraph]
+  | [(_, String _); (_, Int _)] | [(_, String _); (_, Float _)] ->
+     [VisNone; BarGraph]
+  | _ -> [VisNone]
+

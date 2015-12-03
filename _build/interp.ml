@@ -103,13 +103,15 @@ let rec eval = function
   | TbName n ->
      table_named n
   | SelCol (lst, n, pt) ->
-     let t = proc_status (select_col (List.map name_of_expr lst) (eval n)) in
+     let t =
+       proc_status (select_col (List.map name_of_expr lst) (eval n)) in
      print_endline "MADE IT 1";
      plot t pt;
      print_endline "MADE IT 2";
      t
-  | SelTop (top, n, pt) ->
-     let t = proc_status (select_top top (eval n)) in
+  | SelTop (top, lst, n, pt) ->
+     let t =
+       proc_status (select_top top (List.map name_of_expr lst) (eval n)) in
      plot t pt;
      t
   | Distin (colname, n, pt) ->

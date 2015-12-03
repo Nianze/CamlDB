@@ -9,6 +9,23 @@ type condition = Table.condition *)
 type top_t = TopNum of int | TopPercent of int *)
 
 (*
+(* helper function:
+   [ins_sel_val cols tb node] returns Success if such an operation is done:
+   a new one row table, in which
+   the columns names are [cols], correpsonding column types are taken
+   from table [tb], and values are taken from [node]
+*)
+let ins_sel_val col_list t node =
+  let colnames = get_colnames t in
+  let out_cols = List.filter (fun (x,_)-> List.mem x col_list) colnames in
+  let out_tb = empty_table (get_tablename t) out_cols in
+  let out_index = List.map (get_col_i t) col_list in
+  let get_vals val_list = List.map (List.nth val_list) out_index in
+  let pairs = List.combine (col_list) (get_vals node.value) in
+  insert_col_values pairs out_tb
+*)
+
+(*
 SQL:
 SELECT column_name, column_name FROM table_name;
 
@@ -16,8 +33,22 @@ select some particular columns in a list of colunms [col_list]
 from table [t] and return a subtable
 *)
 let select_col (col_list :colname list) (t: table): status * table =
-  failwith "TODO"
-
+  let colnames = get_colnames t in
+  let out_cols = List.filter (fun (x,_)-> List.mem x col_list) colnames in
+  let out_tb = empty_table (get_tablename t) out_cols in
+  let out_index = List.map (get_col_i t) col_list in
+  let get_vals val_list = List.map (List.nth val_list) out_index in
+  let out node =
+    let pairs = List.combine (col_list) (get_vals node.value) in
+    insert_col_values pairs out_tb in
+  let rec helper orig_n stat =
+    match stat with
+      | DBError e -> (DBError e, out_tb)
+      | Success -> match orig_n with
+        | Some node -> let next = node.next in
+          helper f next (out node)
+        | None -> (Success, out_tb) in
+   helper t.first Success
 
 (*
 SELECT TOP number|percent column_name(s)
@@ -26,8 +57,28 @@ FROM table_name;
 select some particular columns in a list of colunms [col_list]
 from table [t] and return a subtable
 *)
-let select_top (top: top_t) (t: table): status * table =
-        failwith "unimplemented"
+let select_top (top:top_t) (col_list:colname list) (t: table): status * table =
+  let colnames = get_colnames t in
+  let out_cols = List.filter (fun (x,_)-> List.mem x col_list) colnames in
+  let out_tb = empty_table (get_tablename t) out_cols in
+  let out_index = List.map (get_col_i t) col_list in
+  let get_vals val_list = List.map (List.nth val_list) out_index in
+  let out node =
+    let pairs = List.combine (col_list) (get_vals node.value) in
+    insert_col_values pairs out_tb in
+  let rec helper orig_n stat count_down =
+    if count_down = 0 then (Success, out_tb) else
+      match stat with
+        | DBError e -> (DBError e, out_tb)
+        | Success -> match orig_n with
+          | Some node -> let next = node.next in
+            helper f next (out node) (count_down-1)
+          | None -> (Success, out_tb) in
+  match top with
+    | TopNum num -> helper t.first Success num
+    | TopPercent p -> if p>100 || p<0
+      then (DBError "Percentage out of range", out_tb)
+      else helper t.first Success (t.numcol*p/100)
 
 (*
 SQL:
@@ -37,7 +88,28 @@ get all the distinct values of a column with the name of [col_name]
 from table t and return a subtable
 *)
 let distinct (col_name :colname) (t :table) : status * table =
-        failwith "unimplemented"
+  if not col_in_table col_name
+    then (DBError "column names not found.", empty_table (get_tablename t) [])
+    else
+      let colnames = get_colnames t in
+      let out_cols = List.find (fun (x,_)-> List.mem x col_name) colnames in
+      let out_tb = empty_table (get_tablename t) out_cols in
+      let out_index = get_col_i t col_name in
+      let get_vals val_list = List.nth val_list out_index in
+      let out node =
+        let pairs = List.combine (col_name) (get_vals node.value) in
+        insert_col_values pairs out_tb in
+      let rec helper orig_n stat val_buffer =
+        match stat with
+          | DBError e -> (DBError e, out_tb)
+          | Success -> match orig_n with
+            | Some node -> let next = node.next in
+              let node_val = get_vals node.value in
+              if List.mem node_val val_buffer
+                then helper f next Success val_buffer
+                else helper f next (out node) (node_val::val_buffer)
+            | None -> (Success, out_tb) in
+       helper t.first Success []
 
 
 (*
@@ -50,7 +122,13 @@ filter the table [t] according to the conditions in [cond_list]
 and return a subtable
 *)
 let where (cond_list: cond_tree) (t :table) :status * table =
-        failwith "unimplemented"
+  match find cond_list t with
+  | (nl, Success) -> (
+  	let new_t = create_table (get_tablename table) (get_colnames table) in
+  	List.iter (fun n -> ignore (insert n new_t)) nl;
+  	(new_t, Success)
+  | (_, DBError e) -> DBError e
+
 
 
 let get_cmp (o: order) (i: int) =
@@ -69,6 +147,7 @@ let get_cmp (o: order) (i: int) =
       if v1 < v2 then 1
       else if v1 = v2 then 0
       else -1)
+
 (*
 SQL:
 SELECT *
@@ -116,14 +195,13 @@ inserted [val_list] are speicified in [col_list]
 *)
 let insert_col_values (col_list : (colname * t) list)
 (t:table) : status =
-        let colnames = List.map (fun (x, y) -> (x, ref y)) (get_colnames t) in
-        List.(iter
-                (fun (x, y) -> if mem_assoc x col_list then y:=assoc x col_list) colnames
-        );
-        let col = List.map (fun (x,y) -> y) colnames in
-        let row = create_node col in
-        insert row t
-
+  let colnames = List.map (fun (x, y) -> (x, ref y)) (get_colnames t) in
+  List.(iter
+    (fun (x, y) -> if mem_assoc x col_list then y:=assoc x col_list) colnames
+  );
+  let col = List.map (fun (x,y) -> y) colnames in
+  let row = create_node col in
+  insert row t
 
 let update_node (n: node) (colnames: (colname * t) list)
 (pair_list : (colname * t) list): unit =
@@ -182,7 +260,6 @@ let update_all (pair_list : (colname * t) list) (t:table) : status =
             DBError ("update_all: type of column "^e_type^" cannot be modified")
     | _ -> DBError ("update_all: can't find columns: " ^ e_find)
 
-
 (*
 SQL:
 UPDATE Customers
@@ -193,7 +270,7 @@ update all the rows that satisfy the conditions in [cond_list]
 in the table [t] according to the column and value specified
 by [pair_list]
 *)
-let update (cond_list: cond_tree) (pair_list :(colname * t) list)
+let update_where (cond_list: cond_tree) (pair_list :(colname * t) list)
 (t:table) : status =
   match find cond_list t with
   | (nl, Success) -> (
@@ -209,7 +286,6 @@ let update (cond_list: cond_tree) (pair_list :(colname * t) list)
     )
   | (_, DBError e) -> DBError e
 
-
 (*
 SQL:
 DELETE FROM table_name;
@@ -223,7 +299,6 @@ let delete_all (t:table) : status =
       | Success -> delete n t
       | DBError e -> a
   ) Success t
-
 
 (*
 SQL:
