@@ -126,8 +126,8 @@ let where (cond_list: cond_tree) (t :table) :status * table =
   | (nl, Success) -> (
   	let new_t = create_table (get_tablename table) (get_colnames table) in
   	List.iter (fun n -> ignore (insert n new_t)) nl;
-  	(new_t, Success)
-  | (_, DBError e) -> DBError e
+  	(new_t, Success) )
+  | (_, DBError e) -> (DBError e,[])
 
 
 
