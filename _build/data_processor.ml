@@ -27,6 +27,45 @@ let ins_sel_val col_list t node =
 
 (*
 SQL:
+INSERT INTO table_name
+VALUES (value1,value2,value3,...);
+
+insert a new row with values [val_list] in the order of columns
+into table [t] and return a subtable
+*)
+let insert_values (val_list: t list) (t: table) : status =
+        let row = create_node (List.map (fun x -> ref x) val_list) in
+        insert row t
+
+(*
+SQL:
+INSERT INTO table_name (column1,column2,column3,...)
+VALUES (value1,value2,value3,...);
+
+insert a new row, both the column names and the values to be
+inserted [val_list] are speicified in [col_list]
+*)
+let insert_col_values (col_list : (colname * t) list)
+(t:table) : status =
+  let colnames = List.map (fun (x, y) -> (x, ref y)) (get_colnames t) in
+  List.(iter
+    (fun (x, y) -> if mem_assoc x col_list then y:=assoc x col_list) colnames
+  );
+  let col = List.map (fun (x,y) -> y) colnames in
+  let row = create_node col in
+  insert row t
+
+let update_node (n: node) (colnames: (colname * t) list)
+(pair_list : (colname * t) list): unit =
+        List.(iter2
+                (fun (c, ts) t ->
+                if mem_assoc c pair_list
+                then (t := (assoc c pair_list))
+                else () )
+        colnames n.value)
+
+(*
+SQL:
 SELECT column_name, column_name FROM table_name;
 
 select some particular columns in a list of colunms [col_list]
@@ -126,8 +165,8 @@ let where (cond_list: cond_tree) (t :table) :status * table =
   | (nl, Success) -> (
   	let new_t = create_table (get_tablename table) (get_colnames table) in
   	List.iter (fun n -> ignore (insert n new_t)) nl;
-  	(new_t, Success)
-  | (_, DBError e) -> DBError e
+  	(Success, new_t) )
+  | (_, DBError e) -> (DBError e, t)
 
 
 
@@ -158,59 +197,22 @@ sort the table [t] in the ascending or descending order of [o]
 of column [col_name] and return a subtable
 *)
 let sort (col_name: colname) (o: order) (t: table) : status * table =
-        let colnames = get_colnames t in
-        if (List.mem_assoc col_name colnames) = false then
-                (DBError "sort: col_name not found", t)
-        else
-                let l_node = table_to_list t in
-                let l = List.map (fun n -> n.value) l_node in
-                let index = ref 0 in
-                List.iteri
-                (fun i (c, _) -> if c = col_name then index:= i else ())
-                colnames;
-                let sorted = List.sort (get_cmp o !index) l in
-                let node_list = List.map (fun v -> create_node v) sorted in
-                list_to_table (get_tablename t) (get_colnames t) node_list
+  let colnames = get_colnames t in
+  if (List.mem_assoc col_name colnames) = false then
+    (DBError "sort: col_name not found", t)
+  else
+    let l_node = table_to_list t in
+    let l = List.map (fun n -> n.value) l_node in
+    let index = ref 0 in
+    List.iteri
+    (fun i (c, _) -> if c = col_name then index:= i else ())
+    colnames;
+    let sorted = List.sort (get_cmp o !index) l in
+    let node_list = List.map (fun v -> create_node v) sorted in
+    list_to_table (get_tablename t) (get_colnames t) node_list
 
 
-(*
-SQL:
-INSERT INTO table_name
-VALUES (value1,value2,value3,...);
 
-insert a new row with values [val_list] in the order of columns
-into table [t] and return a subtable
-*)
-let insert_values (val_list: t list) (t: table) : status =
-        let row = create_node (List.map (fun x -> ref x) val_list) in
-        insert row t
-
-(*
-SQL:
-INSERT INTO table_name (column1,column2,column3,...)
-VALUES (value1,value2,value3,...);
-
-insert a new row, both the column names and the values to be
-inserted [val_list] are speicified in [col_list]
-*)
-let insert_col_values (col_list : (colname * t) list)
-(t:table) : status =
-  let colnames = List.map (fun (x, y) -> (x, ref y)) (get_colnames t) in
-  List.(iter
-    (fun (x, y) -> if mem_assoc x col_list then y:=assoc x col_list) colnames
-  );
-  let col = List.map (fun (x,y) -> y) colnames in
-  let row = create_node col in
-  insert row t
-
-let update_node (n: node) (colnames: (colname * t) list)
-(pair_list : (colname * t) list): unit =
-        List.(iter2
-                (fun (c, ts) t ->
-                if mem_assoc c pair_list
-                then (t := (assoc c pair_list))
-                else () )
-        colnames n.value)
 
 
 (* check if each columns in pair_list can be found in colnames
@@ -343,11 +345,11 @@ specified in [col_name_list]
 *)
 let union_rows (t1: table) (t2: table) (col_name_list: colname list)
 : status * table =
-        (* check colnames in both table, throw error if not exist *)
-        let (s1, t1_cols) = select_col col_name_list t1 in
-        let (s2, t2_cols) = select_col col_name_list t2 in
-        match (s1, s2) with
-                | (DBError e, _) | (_, DBError e) -> (DBError e, t1)
-                | (Success, Success) ->
-                                iter (fun x -> ignore (insert x t1)) t2;
-                                (Success, t1)
+  (* check colnames in both table, throw error if not exist *)
+  let (s1, t1_cols) = select_col col_name_list t1 in
+  let (s2, t2_cols) = select_col col_name_list t2 in
+  match (s1, s2) with
+    | (DBError e, _) | (_, DBError e) -> (DBError e, t1)
+    | (Success, Success) ->
+      iter (fun x -> ignore (insert x t1)) t2;
+      (Success, t1)

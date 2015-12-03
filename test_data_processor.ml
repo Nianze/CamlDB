@@ -166,8 +166,12 @@ TEST "union_rows" =
   let (s1, t_u) =  union_rows t3 t9 ["c1"; "c2"; "c3"] in
   (table_equal t_u t9') && (s1 = Success) && (s = Success)
 
-
-
-
-(* val union_rows: table -> table -> colname list -> status * table
- *)
+TEST "sort" =
+  let t9 = new_table 9 in
+  let t9' = new_table 9 in
+  let _ = find ("c1", EQ, Int 3) t9' in
+  let _ = find ("c1", EQ, Int 2) t9' in
+  let _ = find ("c1", EQ, Int 6) t9' in
+  let _ = find ("c1", EQ, Int 8) t9' in
+  table_equal t9 t9' = false &&
+  (ignore (sort "c1" DESC t9'));table_equal t9 t9' = true

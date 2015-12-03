@@ -1,28 +1,20 @@
 ### Starting build.
-# Target: interp.mli.depends, tags: { extension:mli, file:interp.mli, ocaml, ocamldep, quiet }
-/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules interp.mli > interp.mli.depends # cached
-# Target: ast.mli.depends, tags: { extension:mli, file:ast.mli, ocaml, ocamldep, quiet }
-/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules ast.mli > ast.mli.depends # cached
-# Target: table.mli.depends, tags: { extension:mli, file:table.mli, ocaml, ocamldep, quiet }
-/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules table.mli > table.mli.depends # cached
-# Target: table.cmi, tags: { byte, compile, extension:mli, file:table.mli, interf, ocaml, quiet }
-/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -o table.cmi table.mli # cached
-# Target: visualizer.mli.depends, tags: { extension:mli, file:visualizer.mli, ocaml, ocamldep, quiet }
-/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules visualizer.mli > visualizer.mli.depends # cached
-# Target: visualizer.cmi, tags: { byte, compile, extension:mli, file:visualizer.mli, interf, ocaml, quiet }
-/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -o visualizer.cmi visualizer.mli # cached
-# Target: ast.cmi, tags: { byte, compile, extension:mli, file:ast.mli, interf, ocaml, quiet }
-/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -o ast.cmi ast.mli # cached
-# Target: interp.cmi, tags: { byte, compile, extension:mli, file:interp.mli, interf, ocaml, quiet }
-/Users/andrew/.opam/4.02.1/bin/ocamlc.opt -c -I /Users/andrew/.opam/4.02.1/lib/jsonm -I /Users/andrew/.opam/4.02.1/lib/uutf -o interp.cmi interp.mli # cached
-# Target: interp.ml.depends, tags: { extension:ml, file:interp.ml, ocaml, ocamldep, quiet }
-/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules interp.ml > interp.ml.depends # cached
-# Target: data_processor.ml.depends, tags: { extension:ml, file:data_processor.ml, ocaml, ocamldep, quiet }
-/Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules data_processor.ml > data_processor.ml.depends
-+ /Users/andrew/.opam/4.02.1/bin/ocamldep.opt -modules data_processor.ml > data_processor.ml.depends
-File "data_processor.ml", line 130, characters 2-3:
-Error: Syntax error: ')' expected
-File "data_processor.ml", line 126, characters 21-22:
-Error: This '(' might be unmatched
+# Target: data_processor.ml.depends, tags: { extension:ml, file:data_processor.ml, ocaml, ocamldep, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
+ocamlfind ocamldep -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -modules data_processor.ml > data_processor.ml.depends
+# Target: data_processor.mli.depends, tags: { extension:mli, file:data_processor.mli, ocaml, ocamldep, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
+ocamlfind ocamldep -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -modules data_processor.mli > data_processor.mli.depends
+# Target: table.mli.depends, tags: { extension:mli, file:table.mli, ocaml, ocamldep, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
+ocamlfind ocamldep -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -modules table.mli > table.mli.depends # cached
+# Target: table.cmi, tags: { byte, compile, extension:mli, file:table.mli, interf, ocaml, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
+ocamlfind ocamlc -c -warn-error +a-4-33-34-40-41-42-43-44 -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -o table.cmi table.mli # cached
+# Target: data_processor.cmi, tags: { byte, compile, extension:mli, file:data_processor.mli, interf, ocaml, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
+ocamlfind ocamlc -c -warn-error +a-4-33-34-40-41-42-43-44 -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -o data_processor.cmi data_processor.mli
+# Target: data_processor.d.cmo, tags: { byte, compile, debug, extension:cmo, extension:ml, file:data_processor.d.cmo, file:data_processor.ml, implem, ocaml, package(oUnit), package(pa_ounit), package(pa_ounit.syntax), package(qcheck), quiet, syntax(camlp4o) }
+ocamlfind ocamlc -c -warn-error +a-4-33-34-40-41-42-43-44 -g -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -o data_processor.d.cmo data_processor.ml
++ ocamlfind ocamlc -c -warn-error +a-4-33-34-40-41-42-43-44 -g -package oUnit -package pa_ounit -package pa_ounit.syntax -package qcheck -syntax camlp4o -o data_processor.d.cmo data_processor.ml
+File "data_processor.ml", line 82, characters 22-27:
+Error: This expression has type (Table.colname * Table.t ref) list
+       but an expression was expected of type (Table.colname * Table.t) list
+       Type Table.t ref is not compatible with type Table.t 
 Command exited with code 2.
 # Compilation unsuccessful.
