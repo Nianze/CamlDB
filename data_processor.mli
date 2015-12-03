@@ -150,3 +150,17 @@ number of columns. Assign the concatenated table column names
 specified in [col_name_list]
 *)
 val union_rows: table -> table -> colname list -> status * table
+
+
+
+(*
+SQL:
+SELECT tb1.col1, tb2.col2 FROM tb1
+JOIN tb2
+ON tb1.col3=tb2.col2;
+
+perform an inner join on tables [tb1] and [tb2], selecting all rows
+from both tables as long as there is a match between the columns.
+*)
+val inner_join: table -> table -> colname list ->
+  (colname * colname) -> status * table

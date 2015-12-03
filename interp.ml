@@ -67,12 +67,10 @@ let open_tables = ref []
 let add_table n t =
   open_tables := (n, t)::!open_tables
 let table_named n =
-  print_endline n;
   if List.mem_assoc n !open_tables then (
     List.iter (fun (n, _) -> print_endline n) !open_tables;
     List.assoc n !open_tables
   ) else (
-    print_endline "LOADING TABLE";
     let t = load_table n in
     add_table n t;
     t
@@ -105,9 +103,7 @@ let rec eval = function
   | SelCol (lst, n, pt) ->
      let t =
        proc_status (select_col (List.map name_of_expr lst) (eval n)) in
-     print_endline "MADE IT 1";
      plot t pt;
-     print_endline "MADE IT 2";
      t
   | SelTop (top, lst, n, pt) ->
      let t =
@@ -158,7 +154,10 @@ let rec eval = function
   | Union (e1, e2) ->
      let t1 = (eval e1) in
      proc_status (union_rows t1 (eval e2) (fst (List.split (get_colnames t1))))
-  | Joins _ -> failwith "unimplemented"
+  | Joins (t1, t2, lst, (c1,c2)) ->
+     proc_status (inner_join (eval t1) (eval t2)
+		    (List.map name_of_expr lst)
+		    ((name_of_expr c1), (name_of_expr c2)))
   | _ -> failwith "Syntax error."
 
 let shutdown_interp () =

@@ -9,7 +9,7 @@ let exec s =
 let _ =
   let db = empty_table "db" [("a", Int 0); ("b", String "")] in
   assert (exec "CREATE TABLE db (a INT, b STRING);" = db)
-(*
+
   parse "SELECT col1,col2 FROM tb;";
   parse "SELECT col1,col2 FROM tb #BAR;";
   parse "SELECT TOP 10 FROM tb;";
@@ -34,4 +34,3 @@ let _ =
   parse "CREATE TABLE tb1 (col1_name INT, col2_name STRING, col3 BOOL);";
   parse "SELECT tb1.col1, tb2.col2 FROM tb1 JOIN tb2 ON tb1.col3=tb2.col2;"
 
-*)

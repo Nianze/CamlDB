@@ -356,3 +356,33 @@ let union_rows (t1: table) (t2: table) (col_name_list: colname list)
                 | (Success, Success) ->
                                 iter (fun x -> ignore (insert x t1)) t2;
                                 (Success, t1)
+
+let inner_join t1 t2 colnames (c1, c2) =
+  let t = create_table "join" (get_colnames t1 @ (get_colnames t2)) in
+
+  let c1_index = List.fold_left
+    (fun i v ->
+      if i > (List.length (get_colnames t1)) then -1
+      else if fst v = c1 then i
+      else i + 1) 0 (get_colnames t1) in
+
+  if c1_index > 0 then
+    let status = ref Success in
+    iter (fun t1elt ->
+      let c1_entry = !(List.nth t1elt.value c1_index) in
+      match where (Cond (c2, EQ, c1_entry)) t2 with
+      | (Success, matches) ->
+	 iter (fun mtch ->
+	   let node =
+	     {prev = None; next = None; value = t1elt.value @ mtch.value} in
+	   (match insert node t with
+	   | Success -> ()
+	   | DBError _ -> status := DBError "Could not join tables"
+	   )
+	 ) matches
+      | (DBError _, _) -> status := DBError "Could not join tables"
+    ) t1;
+    match select_col colnames t with
+    | (Success, t') -> (!status, t')
+    | (DBError _, sel_t) -> (!status, sel_t)
+  else (DBError "Join: column name not found", empty_table "" [])

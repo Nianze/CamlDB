@@ -173,6 +173,7 @@ let vis_points2d t connect =
 let visualize t = function
   | Scatter2d -> vis_points2d t false
   | LineGraph -> vis_points2d t true
+  | VisNone -> print_tabular t
   | _ -> failwith "TODO"
 
 (* legal_vis_methods [t] returns the legal visualization methods for *)

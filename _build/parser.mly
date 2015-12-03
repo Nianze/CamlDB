@@ -82,10 +82,8 @@ expr:
 statement:
   | SEL; cols = col_list; FROM; f_tb = filtered_table { SelCol (cols, f_tb, VisNone)}
   | SEL; cols = col_list; FROM; f_tb = filtered_table; plot=vis_method { SelCol (cols, f_tb, plot)}
-  | SEL; TOP; i = INT; PERCENT; FROM; f_tb = filtered_table { SelTop(TopPercent i, f_tb, VisNone) }
-  | SEL; TOP; i = INT; PERCENT; FROM; f_tb = filtered_table; plot=vis_method  { SelTop(TopPercent i, f_tb, plot) }
-  | SEL; TOP; i = INT; FROM; f_tb = filtered_table  { SelTop(TopNum i, f_tb, VisNone) }
-  | SEL; TOP; i = INT; FROM; f_tb = filtered_table; plot=vis_method { SelTop(TopNum i, f_tb, plot) }
+  | SEL; TOP; top = top_field; cols = col_list; FROM; f_tb = filtered_table { SelTop(top, cols, f_tb, VisNone) }
+  | SEL; TOP; top = top_field; cols = col_list; FROM; f_tb = filtered_table; plot=vis_method  { SelTop(top, cols, f_tb, plot) }
   | SEL; DISTINCT; col = ID; FROM; f_tb = filtered_table { Distin(ColName col, f_tb, VisNone) }
   | SEL; DISTINCT; col = ID; FROM; f_tb = filtered_table; plot=vis_method { Distin(ColName col, f_tb, plot) }
   | INSERT; INTO; tb = ID; VALUES; LPAREN; vals = val_list;RPAREN {InsRow (vals,TbName tb)}
@@ -97,6 +95,11 @@ statement:
   | CREATE; TABLE; tb = ID; LPAREN; colsets = col_typ_list; RPAREN { Create (TbName tb, colsets) }
   | SEL; ANY; FROM; tb1 = ID; UNION; ALL; SEL; ANY; FROM; tb2 = ID { Union (TbName tb1,TbName tb2) }
   | SEL; cols = col_list;FROM; tb1 = ID; JOIN; tb2 = ID;ON; j_cond = join_cond { Joins (TbName tb1,TbName tb2, cols, j_cond) }
+  ;
+
+top_field:
+  | i = INT; { TopNum i }
+  | i = INT; PERCENT { TopPercent i}
   ;
 
 filtered_table:
@@ -116,7 +119,9 @@ vis_method:
   ;
 
 col_list:
-  cols = separated_list(COMMA, col_field) { cols };
+  | cols = separated_list(COMMA, col_field) { cols }
+  | ANY { [ColName "*"] }
+  ;
 
 col_field:
   | col = ID { ColName col }
