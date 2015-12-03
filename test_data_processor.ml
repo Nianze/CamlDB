@@ -157,21 +157,33 @@ TEST "update_where" =
   && (table_equal t9' t5')
 
 
+let t100 = new_table 100
+let t100' = new_table 100
+let _ = find (Cond ("c1", EQ, Int 3)) t100'
+let _ = find (Cond ("c1", LT, Int 2)) t100'
+let _ = find (Cond ("c2", LE, String "5")) t100'
+let _ = find (Cond ("c3", GT, Bool false)) t100'
+TEST "sort" =
+  table_equal t100 t100' = false
+TEST "sort" =
+  let s, t100'' = sort "c1" DESC t100' in
+  table_equal t100 t100'' = true && s = Success
+TEST "sort" =
+  let s, t100_a' = sort "c1" ASC t100' in
+  let s, t100_a  = sort "c1" ASC t100 in
+  table_equal t100_a t100_a' = true && s = Success
+
 let t3 = new_table 3
 let t9 = new_table 9
 let t9' = new_table 9
 let s = delete_where (Cond ("c1", LE, Int 3)) t9
 
 TEST "union_rows" =
-  let (s1, t_u) =  union_rows t3 t9 ["c1"; "c2"; "c3"] in
-  (table_equal t_u t9') && (s1 = Success) && (s = Success)
+  let (s1, t_u) =  union_rows t9 t3 ["c1"; "c2"; "c3"] in
+  let (s2, t2) = sort "c1" ASC t_u in
+  let (s3, t3) = sort "c1" ASC t9' in
+  let (s4, t4) = sort "c1" DESC t_u in
+  let (s5, t5) = sort "c1" DESC t9' in
+  (table_equal t2 t3) && (table_equal t4 t5) && (s1 = Success) && (s = Success)
+  && (s2 = Success) && (s3 = Success) && (s4 = Success) && (s5 = Success)
 
-TEST "sort" =
-  let t9 = new_table 9 in
-  let t9' = new_table 9 in
-  let _ = find ("c1", EQ, Int 3) t9' in
-  let _ = find ("c1", EQ, Int 2) t9' in
-  let _ = find ("c1", EQ, Int 6) t9' in
-  let _ = find ("c1", EQ, Int 8) t9' in
-  table_equal t9 t9' = false &&
-  (ignore (sort "c1" DESC t9'));table_equal t9 t9' = true

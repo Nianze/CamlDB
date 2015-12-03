@@ -25,7 +25,7 @@ let ins_sel_val col_list t node =
   insert_col_values pairs out_tb
 *)
 
-  
+
 (*
 SQL:
 CREATE TABLE table_name
@@ -42,7 +42,7 @@ column name of each column by [col_name_list]
 let create_table (table_name: string) (col_name_list: (colname * t) list)
 : table = empty_table table_name col_name_list
 
-  
+
 (*
 SQL:
 INSERT INTO table_name
@@ -184,8 +184,9 @@ let where (cond_list: cond_tree) (t :table) :status * table =
   | (nl, Success) -> (
   	let new_t = create_table (get_tablename t) (get_colnames t) in
   	List.iter (fun n -> ignore (insert n new_t)) nl;
-  	(Success,new_t) )
-  | (_, DBError e) -> (DBError e,empty_table "" [])
+  	(Success, new_t) )
+  | (_, DBError e) -> (DBError e, t)
+
 
 
 
@@ -348,11 +349,11 @@ specified in [col_name_list]
 *)
 let union_rows (t1: table) (t2: table) (col_name_list: colname list)
 : status * table =
-        (* check colnames in both table, throw error if not exist *)
-        let (s1, t1_cols) = select_col col_name_list t1 in
-        let (s2, t2_cols) = select_col col_name_list t2 in
-        match (s1, s2) with
-                | (DBError e, _) | (_, DBError e) -> (DBError e, t1)
-                | (Success, Success) ->
-                                iter (fun x -> ignore (insert x t1)) t2;
-                                (Success, t1)
+  (* check colnames in both table, throw error if not exist *)
+  let (s1, t1_cols) = select_col col_name_list t1 in
+  let (s2, t2_cols) = select_col col_name_list t2 in
+  match (s1, s2) with
+    | (DBError e, _) | (_, DBError e) -> (DBError e, t1)
+    | (Success, Success) ->
+      iter (fun x -> ignore (insert x t1)) t2;
+      (Success, t1)
