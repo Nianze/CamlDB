@@ -25,7 +25,7 @@ FROM table_name;
 select some particular columns in a list of colunms [col_list]
 from table [t] and return a subtable
 *)
-val select_top: top_t -> table -> status * table
+val select_top: top_t -> colname list -> table -> status * table
 
 (*
 SQL:

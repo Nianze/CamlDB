@@ -139,7 +139,7 @@ let rec eval = function
   | Update (conds, lst, expr) ->
      let (es, typs) = List.split lst in
      let colnames = List.map name_of_expr es in
-     proc_singleton_status (update conds (List.combine colnames typs)
+     proc_singleton_status (update_where conds (List.combine colnames typs)
 			      (eval expr));
      (eval expr)
   | DelAll e ->
