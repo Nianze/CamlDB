@@ -184,8 +184,13 @@ let where (cond_list: cond_tree) (t :table) :status * table =
   | (nl, Success) -> (
   	let new_t = create_table (get_tablename t) (get_colnames t) in
   	List.iter (fun n -> ignore (insert n new_t)) nl;
+<<<<<<< HEAD
   	(Success,new_t) )
   | (_, DBError e) -> (DBError e,empty_table "" [])
+=======
+  	(Success, new_t) )
+  | (_, DBError e) -> (DBError e, t)
+>>>>>>> d4edf8fac518392d3c81fa42aa05e19643d32248
 
 
 
@@ -216,19 +221,19 @@ sort the table [t] in the ascending or descending order of [o]
 of column [col_name] and return a subtable
 *)
 let sort (col_name: colname) (o: order) (t: table) : status * table =
-        let colnames = get_colnames t in
-        if (List.mem_assoc col_name colnames) = false then
-                (DBError "sort: col_name not found", t)
-        else
-                let l_node = table_to_list t in
-                let l = List.map (fun n -> n.value) l_node in
-                let index = ref 0 in
-                List.iteri
-                (fun i (c, _) -> if c = col_name then index:= i else ())
-                colnames;
-                let sorted = List.sort (get_cmp o !index) l in
-                let node_list = List.map (fun v -> create_node v) sorted in
-                list_to_table (get_tablename t) (get_colnames t) node_list
+  let colnames = get_colnames t in
+  if (List.mem_assoc col_name colnames) = false then
+    (DBError "sort: col_name not found", t)
+  else
+    let l_node = table_to_list t in
+    let l = List.map (fun n -> n.value) l_node in
+    let index = ref 0 in
+    List.iteri
+    (fun i (c, _) -> if c = col_name then index:= i else ())
+    colnames;
+    let sorted = List.sort (get_cmp o !index) l in
+    let node_list = List.map (fun v -> create_node v) sorted in
+    list_to_table (get_tablename t) (get_colnames t) node_list
 
 
 
@@ -348,11 +353,11 @@ specified in [col_name_list]
 *)
 let union_rows (t1: table) (t2: table) (col_name_list: colname list)
 : status * table =
-        (* check colnames in both table, throw error if not exist *)
-        let (s1, t1_cols) = select_col col_name_list t1 in
-        let (s2, t2_cols) = select_col col_name_list t2 in
-        match (s1, s2) with
-                | (DBError e, _) | (_, DBError e) -> (DBError e, t1)
-                | (Success, Success) ->
-                                iter (fun x -> ignore (insert x t1)) t2;
-                                (Success, t1)
+  (* check colnames in both table, throw error if not exist *)
+  let (s1, t1_cols) = select_col col_name_list t1 in
+  let (s2, t2_cols) = select_col col_name_list t2 in
+  match (s1, s2) with
+    | (DBError e, _) | (_, DBError e) -> (DBError e, t1)
+    | (Success, Success) ->
+      iter (fun x -> ignore (insert x t1)) t2;
+      (Success, t1)
