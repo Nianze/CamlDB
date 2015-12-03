@@ -188,3 +188,4 @@ TEST "union_rows" =
   (table_equal t2 t3) && (table_equal t4 t5) && (s1 = Success) && (s = Success)
   && (s2 = Success) && (s3 = Success) && (s4 = Success) && (s5 = Success)
 
+(******** Select, Select Top, Select Distinct, Where ********)

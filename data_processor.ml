@@ -1,24 +1,5 @@
 open Table
 
-
-(*
-(* helper function:
-   [ins_sel_val cols tb node] returns Success if such an operation is done:
-   a new one row table, i n which
-   the columns names are [cols], correpsonding column types are taken
-   from table [tb], and values are taken from [node]
-*)
-let ins_sel_val col_list t node =
-  let colnames = get_colnames t in
-  let out_cols = List.filter (fun (x,_)-> List.mem x col_list) colnames in
-  let out_tb = empty_table (get_tablename t) out_cols in
-  let out_index = List.map (get_col_i t) col_list in
-  let get_vals val_list = List.map (List.nth val_list) out_index in
-  let pairs = List.combine (col_list) (get_vals node.value) in
-  insert_col_values pairs out_tb
-*)
-
-
 (*
 SQL:
 CREATE TABLE table_name
@@ -181,8 +162,6 @@ let where (cond_list: cond_tree) (t :table) :status * table =
   | (_, DBError e) -> (DBError e, t)
 
 
-
-
 let get_cmp (o: order) (i: int) =
   match o with
   | ASC -> (
@@ -223,10 +202,6 @@ let sort (col_name: colname) (o: order) (t: table) : status * table =
     let sorted = List.sort (get_cmp o !index) l in
     let node_list = List.map (fun v -> create_node v) sorted in
     list_to_table (get_tablename t) (get_colnames t) node_list
-
-
-
-
 
 (* check if each columns in pair_list can be found in colnames
          return:
@@ -327,8 +302,6 @@ let delete_where (cond_list: cond_tree) (t:table) : status =
 	match find cond_list t with
 	| (nl, Success) -> List.iter (fun n -> ignore (delete n t)) nl; Success
 	| (_, DBError e) -> DBError e
-
-
 
 (*
 SQL:
