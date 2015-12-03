@@ -8,7 +8,7 @@ let parse s =
 
 (* A few test cases *)
 let run_tests () =
-  parse "SELECT col1,col2 FROM tb;";
+  parse "SELECT * FROM tb;";
   parse "SELECT col1,col2 FROM tb #BAR;";
   parse "SELECT TOP 10 col1 FROM tb;";
   parse "SELECT TOP 10 * FROM tb #LINE;";
@@ -30,6 +30,5 @@ let run_tests () =
   parse "DELETE FROM tb1;";
   parse "DELETE FROM tb1 WHERE col1=1 AND col2<4;";
   parse "CREATE TABLE tb1 (col1_name INT, col2_name STRING, col3 BOOL);";
+  parse "SELECT col1,col3 FROM tb1 UNION ALL SELECT * FROM tb2;"
   parse "SELECT tb1.col1, tb2.col2 FROM tb1 JOIN tb2 ON tb1.col3=tb2.col2;"
-
-

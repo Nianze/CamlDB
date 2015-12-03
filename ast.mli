@@ -14,13 +14,16 @@ type operator = Table.operator
 (* ex. ("column1", Eq, 3) *)
 type cond = Table.condition
 
+(* condition tree type *)
 type c_tree = Table.cond_tree
 
 (** SELECT TOP int (PERCENT) *)
 type top_t = Table.top_t
 
+(* ASC|DESC indicate how to sort the output data *)
 type order = Table.order
 
+(* plot method *)
 type plot = Visualizer.vis_method
 
 (** (OCaml) values of type expr represent SQL expressions.
