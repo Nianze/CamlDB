@@ -80,33 +80,41 @@ let name_of_expr = function
   | TbName n -> n
   | _ -> failwith "Interp: Syntax error."
 
+let pp_colnames t lst =
+  if lst = [ColName "*"] then fst (List.split (get_colnames t))
+  else List.map name_of_expr lst
+
 let error_table = empty_table "" []
 
 let proc_singleton_status = function
   | Success -> ()
-  | DBError x -> print_endline ("Database Error: " ^ x); ()
+  | DBError x -> failwith ("Database Error: " ^ x)
 
 let proc_status (s, t) = match s with
   | Success -> t
-  | DBError x -> print_endline ("Database Error: " ^ x); error_table
+  | DBError x -> failwith ("Database Error: " ^ x)
 
 let plot t plot_type =
   if List.mem plot_type (legal_vis_methods t) then
     visualize t plot_type
   else
-    print_endline "Error: invalid visualization method."
+    failwith "Error: invalid visualization method."
   
 let rec eval = function
   | TbName n ->
      table_named n
   | SelCol (lst, n, pt) ->
+     let tbl = (eval n) in
      let t =
-       proc_status (select_col (List.map name_of_expr lst) (eval n)) in
+       proc_status (select_col (pp_colnames tbl lst) tbl) in
      plot t pt;
      t
   | SelTop (top, lst, n, pt) ->
+     let input_t = eval n in
+     let lst' = if lst = [] then fst (List.split (get_colnames input_t))
+       else pp_colnames input_t lst in
      let t =
-       proc_status (select_top top (List.map name_of_expr lst) (eval n)) in
+       proc_status (select_top top lst' input_t) in
      plot t pt;
      t
   | Distin (colname, n, pt) ->

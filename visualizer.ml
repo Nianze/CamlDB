@@ -31,8 +31,9 @@ let make_content_row entries widths =
     if (String.length e) <= w then
       e ^ (String.make (w - (String.length e)) ' ')
     else
-      String.sub e 0 w in (* TODO *)
-  List.fold_left2 (fun s e w -> s ^ " " ^ (fit e w) ^ " |") "|" entries widths
+      String.sub e 0 w in (* chop string if it doesn't fit in the cell *)
+  List.fold_left2 (fun s e w -> s ^ " " ^ (fit e w) ^ " |")
+      "|" entries widths
   
 let print_tabular t =
   let titles = List.map (fun (n, _) -> n) t.colnames in
