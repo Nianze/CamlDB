@@ -1,3 +1,10 @@
+(*How to test parser:
+  1.ocamlbuild -use-menhir test_parser.byte
+  2.In utop, #use "run_test_parser.ml"
+  3.To test "SELECT * FROM tb;", type in utop:
+    parse "SELECT * FROM tb;";;
+*)
+
 open Ast
 
 (* Parse a string into an ast *)
@@ -36,7 +43,9 @@ let run_tests () =
   parse "CREATE TABLE tb1
         (col1_name INT,
          col2_name STRING,
-         col3 BOOL);";
+         col3_name BOOL
+         col4_name FLOAT
+       );";
   parse "SELECT col1,col3 FROM tb1 UNION ALL SELECT * FROM tb2;";
   parse "SELECT tb1.col1, tb2.col2 FROM tb1
          JOIN tb2 ON tb1.col3=tb2.col2;"
