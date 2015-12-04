@@ -9,6 +9,7 @@ open Visualizer
 (* *declarations* *)
 
 %token <int> INT
+%token <float> FLOAT
 %token TRUE
 %token FALSE
 %token <string> ID
@@ -41,6 +42,7 @@ open Visualizer
 %token DELETE
 %token CREATE
 %token TINT
+%token TFLOAT
 %token TSTRING
 %token TBOOL
 %token TABLE
@@ -151,6 +153,7 @@ cond_field:
 
 value_field:
   | i = INT { Int i }
+  | f = FLOAT { Float f }
   | s = STRING { String s }
   | b = TRUE { Bool true }
   | b = FALSE { Bool false }
@@ -170,6 +173,7 @@ col_typ_list:
 
 typ_field:
   | col = ID; TINT { (ColName col, Int 0) }
+  | col = ID; TFLOAT { (ColName col, Float 0.0) }
   | col = ID; TSTRING { (ColName col, String "") }
   | col = ID; TBOOL  { (ColName col, Bool false) }
   ;
