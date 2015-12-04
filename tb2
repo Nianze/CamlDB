@@ -1,19 +1,19 @@
 {
-  "name": "tb",
+  "name": "tb2",
   "rows": 2,
   "cols": 2,
   "header": [
     [
-      "a",
+      "c",
       "Int",
-      "b",
+      "d",
       "Int"
     ]
   ],
   "elements": [
-    4,
-    5,
     3,
-    4
+    7,
+    3,
+    6
   ]
 }
