@@ -15,8 +15,6 @@ let rec read_input s =
     read_input (s ^ input ^ " ")
       
 let rec repl () =
-  print_endline "-- CamlDB --";
-  print_endline "Loaded tables. Ready.";
    (try (
     let input = read_input "" in
     if String.lowercase input = "exit" then (

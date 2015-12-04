@@ -134,9 +134,7 @@ let interpolate x a1 a2 b1 b2 =
 let get_cols t =
   let colnames = fst (List.split (get_colnames t)) in
   let fst_t = snd (select_col [List.nth colnames 0] t) in
-  print_tabular fst_t;
   let snd_t = snd (select_col [List.nth colnames 1] t) in
-  print_int (List.length (table_to_list fst_t));
   let to_num x =
     match !(List.hd x.value) with
     | Float x -> x

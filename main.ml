@@ -1,3 +1,7 @@
 open Repl
 
-let _ = repl ()
+  
+let _ = 
+  print_endline "-- CamlDB --";
+  print_endline "Loaded tables. Ready.";
+  repl ()
