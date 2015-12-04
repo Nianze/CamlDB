@@ -16,6 +16,7 @@ let rec read_input s =
       
 let rec repl () =
   print_endline "-- CamlDB --";
+  print_endline "Loaded tables. Ready.";
    (try (
     let input = read_input "" in
     if String.lowercase input = "exit" then (
@@ -30,5 +31,4 @@ let rec repl () =
    | Invalid_argument _ -> print_endline "Invalid query."
    |  _ -> print_endline "Syntax error.");
   repl ()
-
-let _ = repl ()    
+   

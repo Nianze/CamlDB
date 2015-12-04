@@ -1,4 +1,5 @@
 open Table
+open Data_processor
   
 type vis_method = VisNone | Scatter2d | Hist2d | BarGraph | LineGraph
 
@@ -129,11 +130,24 @@ let print_canvas c xlab ylab =
 let interpolate x a1 a2 b1 b2 =
   ((x -. a1) /. (a2 -. a1) *. (b2 -. b1) +. b1)
 
+(* precondition: t has two columns, each of type Float or Int *)    
+let get_cols t =
+  let colnames = fst (List.split (get_colnames t)) in
+  let fst_t = snd (select_col [List.nth colnames 0] t) in
+  print_tabular fst_t;
+  let snd_t = snd (select_col [List.nth colnames 1] t) in
+  print_int (List.length (table_to_list fst_t));
+  let to_num x =
+    match !(List.hd x.value) with
+    | Float x -> x
+    | Int x -> float_of_int x
+    | _ -> failwith "Visualizer: invalid data type" in
+  (List.map to_num (table_to_list fst_t),
+   List.map to_num (table_to_list snd_t))
+  
 (* precondition: t has 2 columns, each of type int or float *)    
 let vis_points2d t connect =
-(* TODO: actually get xcol, ycol *)
-  let xcol = [2.; 2.; 3.; 4.; 2.] in
-  let ycol = [-1.; 4.; 9.; 16.; 8.] in
+  let (xcol, ycol) = get_cols t in
   let canvas = new_canvas canvas_width canvas_height in
   let ((x1, y1), (x2, y2)) = bounds xcol ycol in
   let w = float_of_int (canvas_width - 1) in
