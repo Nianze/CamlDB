@@ -145,3 +145,38 @@ To save your work, simply type EXIT; at the REPL, and CamlDB will save your tabl
 
 We've seen how CamlDB helps with data management through insert/delete, access and visualization features. We hope it can make data more accessible and fun to work with.
 
+* Example input:
+  SELECT * FROM tb;
+  SELECT col1,col2 FROM tb #BAR;
+  SELECT TOP 10 col1 FROM tb;
+  SELECT TOP 10 * FROM tb #LINE;
+  SELECT TOP 50 PERCENT co1,col2 FROM tb;
+  SELECT TOP 13 PERCENT col1 FROM tb #HISTOGRAM;
+  SELECT TOP 20 PERCENT * FROM tb WHERE col1 = 2.0 OR col2 = 4;
+  SELECT DISTINCT col1 FROM tb #SCATTER;
+  SELECT DISTINCT col1 FROM tb WHERE col1 = 2 OR col2 = 4;
+  SELECT col1,col2 FROM a
+   WHERE col1 = 2 AND col2 < 3.1e+10 OR col3 > 1E-2 AND col4 = 5;
+  SELECT col1,col2 FROM a
+   WHERE col1 = 2 OR col2 < 3 AND col3 > 1 OR col4 = 5;
+  SELECT col1,col2 FROM a
+   WHERE col1 = 2 AND (col2 < 3 OR col3 > 1) AND col4 = 5;
+  SELECT col1,col2 FROM a ORDER BY col2 ASC;
+  SELECT col1,col2 FROM a ORDER BY col4 DESC;
+  SELECT col1,col2 FROM a WHERE col1=10 ORDER BY col3 DESC;
+  INSERT INTO tb VALUES (\"val1\",2,true,false);
+  INSERT INTO tb (col1,col2,col3)
+   VALUES (\"val1\",2,true,false);
+  UPDATE tb SET col1=1, col2=2;
+  UPDATE tb SET col1=1, col2=2 WHERE col3<10;
+  DELETE FROM tb1;
+  DELETE FROM tb1 WHERE col1=1 AND col2<4;
+  CREATE TABLE tb1
+   (col1_name INT,
+    col2_name STRING,
+    col3_name BOOL
+    col4_name FLOAT
+   );
+  SELECT col1,col3 FROM tb1 UNION ALL SELECT * FROM tb2;
+  SELECT tb1.col1, tb2.col2 FROM tb1
+   JOIN tb2 ON tb1.col3=tb2.col2;
