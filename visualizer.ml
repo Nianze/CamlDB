@@ -83,14 +83,14 @@ let draw_vert_line canvas x =
 (* Source: Bresenham's line algorithm.    https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm *)      
 let draw_line canvas x0 y0 x1 y1 =
   let (x0, x1) = (min x0 x1, max x0 x1) in
-  let (y0, y1) = (min y0 y1, max y0 y1) in
+  let (y0, y1) = if x0 < x1 then (y0, y1) else (y1, y0) in
   if x0 = x1 then
     for y = y0 to y1 do
       draw canvas x0 y '*'
     done
   else
     let error = ref 0.0 in
-    let deltaerr = ref (float_of_int (y1 - y0) /. (float_of_int (x1 - x0))) in
+    let deltaerr = ref (float_of_int (abs(y1 - y0)) /. (float_of_int (x1 - x0))) in
     let y = ref y0 in
     for x = x0 to x1 do
       draw canvas x !y '*';
