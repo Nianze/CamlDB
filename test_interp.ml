@@ -1,4 +1,6 @@
 open Interp
+open Data_processor
+open Visualizer
 open Table
 
 let exec s =
@@ -7,31 +9,30 @@ let exec s =
   eval ast
     
 let _ =
-  let db = empty_table "db" [("a", Int 0); ("b", String "")] in
-  assert (exec "CREATE TABLE db (a INT, b STRING);" = db)
-(*
-  parse "SELECT col1,col2 FROM tb;";
-  parse "SELECT col1,col2 FROM tb #BAR;";
-  parse "SELECT TOP 10 FROM tb;";
-  parse "SELECT TOP 10 FROM tb #LINE;";
-  parse "SELECT TOP 50 PERCENT FROM tb;";
-  parse "SELECT TOP 13 PERCENT FROM tb #HISTOGRAM;";
-  parse "SELECT TOP 20 PERCENT FROM tb WHERE col1 = 2 OR col2 = 4;";
-  parse "SELECT DISTINCT col1 FROM tb #SCATTER;";
-  parse "SELECT DISTINCT col1 FROM tb WHERE col1 = 2 OR col2 = 4;";
-  parse "SELECT col1,col2 FROM a WHERE col1 = 2 AND col2 < 3 OR col3 > 1 AND col4 = 5;";
-  parse "SELECT col1,col2 FROM a WHERE col1 = 2 OR col2 < 3 AND col3 > 1 OR col4 = 5;";
-  parse "SELECT col1,col2 FROM a WHERE col1 = 2 AND (col2 < 3 OR col3 > 1) AND col4 = 5;";
-  parse "SELECT col1,col2 FROM a ORDER BY col2 ASC;";
-  parse "SELECT col1,col2 FROM a ORDER BY col4 DESC;";
-  parse "SELECT col1,col2 FROM a WHERE col1=10 ORDER BY col3 DESC;";
-  parse "INSERT INTO tb VALUES (\"val1\",2,true,false);";
-  parse "INSERT INTO tb (col1,col2,col3) VALUES (\"val1\",2,true,false);";
-  parse "UPDATE tb SET col1=1, col2=2;";
-  parse "UPDATE tb SET col1=1, col2=2 WHERE col3<10;";
-  parse "DELETE FROM tb1;";
-  parse "DELETE FROM tb1 WHERE col1=1 AND col2<4;";
-  parse "CREATE TABLE tb1 (col1_name INT, col2_name STRING, col3 BOOL);";
-  parse "SELECT tb1.col1, tb2.col2 FROM tb1 JOIN tb2 ON tb1.col3=tb2.col2;"
-
-*)
+  let t = empty_table "t" [("a", Int 0); ("b", String "")] in
+  assert (table_equal (exec "CREATE TABLE t (a INT, b STRING);") t);
+  ignore (insert_values [Int 3; String "hi"] t);
+  assert (table_equal (exec "INSERT INTO t VALUES (3, \"hi\");") t);
+  ignore (insert_values [Int 4; String "bye"] t);
+  assert (table_equal (exec "INSERT INTO t VALUES (4, \"bye\");") t);
+  ignore (insert_values [Int 4; String "asdf"] t);
+  assert (table_equal (exec "INSERT INTO t VALUES (4, \"asdf\");") t);
+  let t1 = snd (select_col ["a"] t) in
+  assert (table_equal (exec "SELECT a FROM t;") t1);
+  let t2 = snd (select_top (TopPercent 50) ["a"; "b"] t) in
+  assert (table_equal (exec "SELECT TOP 50 PERCENT a, b FROM t;") t2);
+  let t3 = snd (distinct "a" t) in
+  assert (table_equal (exec "SELECT DISTINCT a FROM t;") t3);
+  let t4 = snd (where (Cond ("a", EQ, Int 3)) t) in
+  assert (table_equal (exec "SELECT a, b FROM t WHERE a = 3;") t4);
+  assert (table_equal (exec "SELECT * FROM t WHERE a = 3;") t4);
+  let v = empty_table "v" [("a", Int 0); ("c", Int 0)] in
+  ignore (exec "CREATE TABLE v (a INT, c INT);");
+  ignore (insert_values [Int 3; Int 4] v);
+  ignore (exec "INSERT INTO v VALUES (3, 4);");
+  ignore (insert_values [Int 3; Int 5] v);
+  ignore (exec "INSERT INTO v VALUES (3, 5);");
+  let join = snd (inner_join t v [("t", "a"); ("v", "c")] (("t", "a"), ("v", "a"))) in
+  assert (table_equal (exec "SELECT t.a, v.c FROM t JOIN v ON t.a=v.a;") join);
+  ignore (delete_where (Cond ("a", EQ, Int 3)) t);
+  assert (table_equal (exec "DELETE FROM t WHERE a=3;") t)

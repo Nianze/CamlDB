@@ -1,4 +1,5 @@
 open Table
+open Data_processor
   
 type vis_method = VisNone | Scatter2d | Hist2d | BarGraph | LineGraph
 
@@ -31,8 +32,9 @@ let make_content_row entries widths =
     if (String.length e) <= w then
       e ^ (String.make (w - (String.length e)) ' ')
     else
-      String.sub e 0 w in (* TODO *)
-  List.fold_left2 (fun s e w -> s ^ " " ^ (fit e w) ^ " |") "|" entries widths
+      String.sub e 0 w in (* chop string if it doesn't fit in the cell *)
+  List.fold_left2 (fun s e w -> s ^ " " ^ (fit e w) ^ " |")
+      "|" entries widths
   
 let print_tabular t =
   let titles = List.map (fun (n, _) -> n) t.colnames in
@@ -81,14 +83,14 @@ let draw_vert_line canvas x =
 (* Source: Bresenham's line algorithm.    https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm *)      
 let draw_line canvas x0 y0 x1 y1 =
   let (x0, x1) = (min x0 x1, max x0 x1) in
-  let (y0, y1) = (min y0 y1, max y0 y1) in
+  let (y0, y1) = if x0 < x1 then (y0, y1) else (y1, y0) in
   if x0 = x1 then
     for y = y0 to y1 do
       draw canvas x0 y '*'
     done
   else
     let error = ref 0.0 in
-    let deltaerr = ref (float_of_int (y1 - y0) /. (float_of_int (x1 - x0))) in
+    let deltaerr = ref (float_of_int (abs(y1 - y0)) /. (float_of_int (x1 - x0))) in
     let y = ref y0 in
     for x = x0 to x1 do
       draw canvas x !y '*';
@@ -128,11 +130,22 @@ let print_canvas c xlab ylab =
 let interpolate x a1 a2 b1 b2 =
   ((x -. a1) /. (a2 -. a1) *. (b2 -. b1) +. b1)
 
+(* precondition: t has two columns, each of type Float or Int *)    
+let get_cols t =
+  let colnames = fst (List.split (get_colnames t)) in
+  let fst_t = snd (select_col [List.nth colnames 0] t) in
+  let snd_t = snd (select_col [List.nth colnames 1] t) in
+  let to_num x =
+    match !(List.hd x.value) with
+    | Float x -> x
+    | Int x -> float_of_int x
+    | _ -> failwith "Visualizer: invalid data type" in
+  (List.map to_num (table_to_list fst_t),
+   List.map to_num (table_to_list snd_t))
+  
 (* precondition: t has 2 columns, each of type int or float *)    
 let vis_points2d t connect =
-(* TODO: actually get xcol, ycol *)
-  let xcol = [2.; 2.; 3.; 4.; 2.] in
-  let ycol = [-1.; 4.; 9.; 16.; 8.] in
+  let (xcol, ycol) = get_cols t in
   let canvas = new_canvas canvas_width canvas_height in
   let ((x1, y1), (x2, y2)) = bounds xcol ycol in
   let w = float_of_int (canvas_width - 1) in

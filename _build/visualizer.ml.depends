@@ -1,1 +1,1 @@
-visualizer.ml: Array List Printf String Table
+visualizer.ml: Array Data_processor List Printf String Table

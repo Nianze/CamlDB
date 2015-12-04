@@ -21,7 +21,7 @@ let _ =
 
 let _ =
   print_endline "Drawing 2d scatter.";
-  let t1 = empty_table "test1" [("Temperature", Int 0);("Day", String "")] in
+  let t1 = empty_table "test1" [("Temperature", Int 0);("Number", Float 0.0)] in
 
   let n1 = create_node [ref (Int 45); ref (Float 20.)] in
   let n2 = create_node [ref (Int 12); ref (Float 15.)] in
