@@ -9,6 +9,7 @@ open Visualizer
 (* *declarations* *)
 
 %token <int> INT
+%token <float> FLOAT
 %token TRUE
 %token FALSE
 %token <string> ID
@@ -41,6 +42,7 @@ open Visualizer
 %token DELETE
 %token CREATE
 %token TINT
+%token TFLOAT
 %token TSTRING
 %token TBOOL
 %token TABLE
@@ -61,7 +63,6 @@ open Visualizer
 (* info about precedence & associativity *)
 %left OR
 %left AND
-%nonassoc INT STRING TRUE FALSE LPAREN
 
 (* declare the starting point *)
 %start <Ast.expr> prog
@@ -80,26 +81,24 @@ expr:
   ;
 
 statement:
-  | SEL; cols = col_list; FROM; f_tb = filtered_table { SelCol (cols, f_tb, VisNone)}
   | SEL; cols = col_list; FROM; f_tb = filtered_table; plot=vis_method { SelCol (cols, f_tb, plot)}
   | SEL; TOP; top = top_field; cols = col_list; FROM; f_tb = filtered_table { SelTop(top, cols, f_tb, VisNone) }
   | SEL; TOP; top = top_field; cols = col_list; FROM; f_tb = filtered_table; plot=vis_method  { SelTop(top, cols, f_tb, plot) }
   | SEL; DISTINCT; col = ID; FROM; f_tb = filtered_table { Distin(ColName col, f_tb, VisNone) }
   | SEL; DISTINCT; col = ID; FROM; f_tb = filtered_table; plot=vis_method { Distin(ColName col, f_tb, plot) }
-  | INSERT; INTO; tb = ID; VALUES; LPAREN; vals = val_list;RPAREN {InsRow (vals,TbName tb)}
   | INSERT; INTO; tb = ID; LPAREN; cols = col_list; RPAREN; VALUES; LPAREN; vals = val_list;RPAREN {InsCol (cols,vals,TbName(tb))}
   | UPDATE; tb = ID; SET; pairs = pair_list {UpdAll (pairs,TbName tb) }
   | UPDATE; tb = ID; SET; pairs = pair_list; WHERE; conds = cond_list {Update (conds,pairs,TbName tb) }
   | DELETE; FROM; tb = ID { DelAll (TbName tb) }
   | DELETE; FROM; tb = ID; WHERE; conds = cond_list { Delete (conds,TbName tb) }
   | CREATE; TABLE; tb = ID; LPAREN; colsets = col_typ_list; RPAREN { Create (TbName tb, colsets) }
-  | SEL; cols1 = col_list; FROM; tb1 = ID; UNION; ALL; SEL; cols2 = col_list; FROM; tb2 = ID { Union (SelCol (cols1,TbName tb1, VisNone), SelCol(cols2,TbName tb2, VisNone)) }
-  | SEL; cols = col_list;FROM; tb1 = ID; JOIN; tb2 = ID;ON; j_cond = join_cond { Joins (TbName tb1,TbName tb2, cols, j_cond) }
+  | SEL; cols1 = col_list; FROM; tb1 = filtered_table; UNION; ALL; SEL; cols2 = col_list; FROM; tb2 = filtered_table { Union (SelCol (cols1,tb1, VisNone), SelCol(cols2,tb2, VisNone)) }
+  | SEL; cols = col_list; FROM; tb1 = filtered_table; JOIN; tb2 = filtered_table; ON; j_cond = join_cond { Joins (tb1,tb2, cols, j_cond) }
   ;
 
 top_field:
-  | i = INT; { TopNum i }
   | i = INT; PERCENT { TopPercent i}
+  | i = INT; { TopNum i }
   ;
 
 filtered_table:
@@ -151,9 +150,10 @@ cond_field:
 
 value_field:
   | i = INT { Int i }
+  | f = FLOAT { Float f }
   | s = STRING { String s }
-  | b = TRUE { Bool true }
-  | b = FALSE { Bool false }
+  | TRUE { Bool true }
+  | FALSE { Bool false }
   ;
 
 val_list:
@@ -170,6 +170,7 @@ col_typ_list:
 
 typ_field:
   | col = ID; TINT { (ColName col, Int 0) }
+  | col = ID; TFLOAT { (ColName col, Float 0.0) }
   | col = ID; TSTRING { (ColName col, String "") }
   | col = ID; TBOOL  { (ColName col, Bool false) }
   ;

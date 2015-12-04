@@ -65,7 +65,7 @@ type plot = Visualizer.vis_method
      - Union (e1,e2) where e1= SelCol ([col1;col2], tb1, VisNone),
          e2= SelCol ([col3], tb2, VisNone),
          represents SELECT col1,col2 FROM tb1 UNION ALL SELECT col3 FROM tb2;
-     - Joins(tb1, tb2, [tb1.col1,tb2.col3], (tb1.col3,tb2.col4)) represents
+     - Joins(tb1, tb2, [tb1.col1;tb2.col3], (tb1.col3,tb2.col4)) represents
          SELECT tb1.col1,tb2.col3 FROM tb1 JOIN tb2 ON tb1.col3=tb2.col4;
      *)
 type expr =

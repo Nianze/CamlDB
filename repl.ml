@@ -17,7 +17,7 @@ let rec read_input s =
 let rec repl () =
    (try (
     let input = read_input "" in
-    if String.lowercase input = "exit" then (
+    if String.lowercase input = "exit;" then (
       print_endline "Saving all tables.";
       shutdown_interp ();
       print_endline "Exiting.";

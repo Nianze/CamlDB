@@ -189,3 +189,14 @@ TEST "union_rows" =
   && (s2 = Success) && (s3 = Success) && (s4 = Success) && (s5 = Success)
 
 (******** Select, Select Top, Select Distinct, Where ********)
+TEST "SELECT" =
+  failwith "TODO"
+
+TEST "SELECT TOP" =
+  failwith "TODO"
+
+TEST "SELECT DISTINCT" =
+  failwith "TODO"
+
+TEST "WHERE" =
+  failwith "TODP"
