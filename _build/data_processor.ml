@@ -25,7 +25,7 @@ let ins_sel_val col_list t node =
   insert_col_values pairs out_tb
 *)
 
-  
+
 (*
 SQL:
 CREATE TABLE table_name
@@ -42,7 +42,7 @@ column name of each column by [col_name_list]
 let create_table (table_name: string) (col_name_list: (colname * t) list)
 : table = empty_table table_name col_name_list
 
-  
+
 (*
 SQL:
 INSERT INTO table_name
@@ -183,7 +183,7 @@ let where (cond_list: cond_tree) (t :table) :status * table =
   match find cond_list t with
   | (nl, Success) -> (
   	let new_t = create_table (get_tablename t) (get_colnames t) in
-  	List.iter (fun n -> ignore (insert n new_t)) nl;
+  	List.iter (fun n -> ignore (insert (create_node n.value) new_t)) nl;
   	(Success,new_t) )
   | (_, DBError e) -> (DBError e,empty_table "" [])
 
@@ -360,16 +360,16 @@ let union_rows (t1: table) (t2: table) (col_name_list: colname list)
 let split_name n =
   let start = (String.index n '#') + 1 in
   String.sub n start ((String.length n) - start)
-  
+
 let inner_join t1 t2 pathnames (path1, path2) =
   let (c1, c2) =
     if fst path1 = get_tablename t1 then (snd path1, snd path2)
     else (snd path2, snd path1) in
-      
+
   let make_colnames t =
     List.map (fun (x, typ) ->
       (get_tablename t) ^ "#" ^ x, typ) (get_colnames t) in
-  
+
   let t = create_table "join" (make_colnames t1 @ (make_colnames t2)) in
 
   let c1_index = snd (List.fold_left
