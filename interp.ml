@@ -83,6 +83,14 @@ let table_named n =
     t
   )
 
+let warn_override name =
+  (try ignore (table_named name) with _ -> ());
+  (if List.mem_assoc name !open_tables then
+      if not (prompt_yn ("Warning: table already exists. Are you sure " ^
+		"you want to overwrite all of its contents?")) then
+	failwith "Did not create new table."
+  )
+     
 let name_of_expr = function
   | ColName n -> n
   | TbName n -> n
@@ -163,13 +171,8 @@ let rec eval = function
      let (es, typs) = List.split lst in
      let colnames = List.map name_of_expr es in
      let name = (name_of_expr n) in
+     warn_override name;
      let t = create_table name (List.combine colnames typs) in
-     (try ignore (table_named name) with _ -> ());
-     (if List.mem_assoc name !open_tables then
-	 if not (prompt_yn ("Warning: table already exists. Are you sure " ^
-		   "you want to overwrite all of its contents?")) then
-	   failwith "Did not create new table."
-     );
      add_table name t;
      t
   | Union (e1, e2) ->
