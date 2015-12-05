@@ -103,7 +103,7 @@ let select_top (top:top_t) (col_list:colname list) (t: table): status * table =
     let pairs = List.combine (col_list) (get_vals node.value) in
     insert_col_values pairs out_tb in
   let rec helper orig_n stat count_down =
-    if count_down = 0 then (Success, out_tb) else
+    if count_down <= 0 then (Success, out_tb) else
       match stat with
         | DBError e -> (DBError e, out_tb)
         | Success -> match orig_n with
