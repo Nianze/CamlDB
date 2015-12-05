@@ -4,4 +4,3 @@
 #load "test_parser.cmo";;
 open Ast
 open Test_parser
-let _ = run_tests();;

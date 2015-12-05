@@ -2,8 +2,19 @@
 %{
 open Ast
 open Lexing
+open Parsing
 open Table
 open Visualizer
+
+exception ParseErr of string
+
+let error msg start finish  =
+    Printf.sprintf "(line %d: char %d..%d): %s" start.pos_lnum
+          (start.pos_cnum -start.pos_bol) (finish.pos_cnum - finish.pos_bol) msg
+
+let parse_error msg nterm =
+    raise ( ParseErr (error msg (rhs_start_pos nterm) (Parsing.rhs_end_pos nterm)))
+
 %}
 
 (* *declarations* *)
@@ -96,6 +107,7 @@ statement:
   | CREATE; TABLE; tb = ID; LPAREN; colsets = col_typ_list; RPAREN { Create (TbName tb, colsets) }
   | SEL; cols1 = col_list; FROM; tb1 = filtered_table; UNION; ALL; SEL; cols2 = col_list; FROM; tb2 = filtered_table { Union (SelCol (cols1, tb1, VisNone), SelCol(cols2,tb2, VisNone)) }
   | SEL; cols = col_list; FROM; tb1 = filtered_table; JOIN; tb2 = filtered_table; ON; j_cond = join_cond { Joins (tb1,tb2, cols, j_cond) }
+  | error  { ignore(parse_error "parser_error" 1); Err}
   ;
 
 top_field:
@@ -130,15 +142,10 @@ col_field:
   ;
 
 cond_list:
-  | LPAREN; cond = cond_list; RPAREN { cond }
-  | c = cond_tree; { c }
-  ;
-
-cond_tree:
-  | LPAREN; c = cond_tree; RPAREN  { c }
+  | LPAREN; c = cond_list; RPAREN  { c }
   | single = cond_field  { (Cond single) }
-  | left = cond_tree; AND; right = cond_tree { (And (left,right)) }
-  | left = cond_tree; OR ; right = cond_tree { (Or  (left,right)) }
+  | left = cond_list; AND; right = cond_list { (And (left,right)) }
+  | left = cond_list; OR ; right = cond_list { (Or  (left,right)) }
   ;
 
 cond_field:

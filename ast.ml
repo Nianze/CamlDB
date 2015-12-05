@@ -37,3 +37,4 @@ type expr =
   | Create   of expr * (expr * typ) list
   | Union    of expr * expr
   | Joins    of expr * expr * expr list * (expr * expr)
+  | Err
