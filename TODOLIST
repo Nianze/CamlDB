@@ -8,14 +8,19 @@ Fixed
 7. visualizer?  show boolean values in lower case
 13. test_data_processor: test where, disctinct, select, select_col
 10. empty table issue
+14. add SAVE instruction and relevant specs
+11. table: throw error when same column names are passed in
+  val empty_table: string -> (colname * t) list -> status * table
+  val create_table: string -> (colname * t) list -> status * table
 
 
 6. parser: specify error message
 8. repl: .. issue when pasting multiple line instructions
 
 
-11. table: throw error when same column names are passed in
-  val empty_table: string -> (colname * t) list -> status * table
-  val create_table: string -> (colname * t) list -> status * table
 12. data_processor: select top percent
-14. add SAVE instruction and relevant specs
+
+15. weird float_of_string
+>   CREATE TABLE data (name STRING, hours FLOAT, score INT);
+  CREATE TABLE dataSet (name STRING, hours FLOAT, score INT);float_of_string
+
