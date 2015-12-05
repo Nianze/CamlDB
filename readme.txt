@@ -32,15 +32,18 @@ CREATE TABLE
   Syntax Rules:
     [table name]: case-sensitive; support use any string except for the
     built-in words reserved for instructions, such as INT, CREATE.
+    If creating a table with the same name as existing table, CamlDB will
+    warn the user and let the user to confirm whether he wants the old table
+    to be overwritten.
+
     [column name]: case-sensitive; support use any string except for the
     built-in words reserved for instructions, such as INT, CREATE.
     [column type]: support 4 types: INT, FLOAT, STRING, BOOL
 
+
   Example:
     CREATE TABLE data (name STRING, hours FLOAT, score INT);
 
-
-Note that queries are case-sensitive: keywords are all caps and identifiers start with a lowercase letter.
 
 Now let's add some data to the table. We give the survey to some people and record the results:
 

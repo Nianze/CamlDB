@@ -7,5 +7,9 @@
 7. visualizer?  show boolean values in lower case
 8. repl: .. issue when pasting multiple line instructions
 9. interp: warn the user when creating table with the same name
+10. empty table issue
+11. table: throw error when same column names are passed in
+  val empty_table: string -> (colname * t) list -> status * table
+  val create_table: string -> (colname * t) list -> status * table
 
 

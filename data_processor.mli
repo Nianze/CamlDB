@@ -135,7 +135,7 @@ column_name3 data_type(size),
 create a table with name [table_name], specify the type and
 column name of each column by [col_name_list]
 *)
-val create_table: string -> (colname * t) list -> table
+val create_table: string -> (colname * t) list -> status * table
 
 
 

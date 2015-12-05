@@ -5,11 +5,11 @@ let is_error = function DBError _ -> true | _ -> false
 
 
 (******** Create, insert, update, delete, union rows ********)
-let t =
+let (s, t) =
   create_table "name" [("c1", Int 0); ("c2", String ""); ("c3", Bool true)]
 
 TEST "create_table" =
-  t =
+  s = Success && t =
   {
     name = "name";
     colnames = [("c1", Int 0); ("c2", String ""); ("c3", Bool true)];
@@ -106,7 +106,7 @@ TEST "delete_all" =
   }
 
 let new_table n =
-  let t =
+  let (_, t) =
   create_table "name"
     [("c1", Int 0); ("c2", String ""); ("c3", Bool true);] in
   for i = 1 to n do
@@ -188,12 +188,14 @@ TEST "union_rows" =
 
 (******** Select, Select Top, Select Distinct, Where ********)
 let new_db n =
-  let t =
-  create_table "db"
-    [("c1", Int 0); ("c2", String ""); ("c3", Bool true);("c4",Float 0.)] in
+  let (_,t) =
+  (create_table "db"
+    [("c1", Int 0); ("c2", String ""); ("c3", Bool true);("c4", Float 0.)]) in
+
   for i = 1 to n do
     ignore (insert_values
-      [Int i; String (string_of_int i); Bool false; Float (int_of_float (i*2))] t)
+      [Int i; String (string_of_int i); Bool false; Float (float_of_int (i*2))]
+    t)
   done;
   t
 let tb = new_db 1
@@ -201,22 +203,18 @@ let tb = new_db 1
 TEST "SELECT" =
   let (s, t) = select_col ["c1";"c4"] tb in
   t =
-  {
-    name = "db";
-    colnames = [("c1",Int 0);("c4",Float 0.)];
-    numcol = 2;
-    numrow = 1;
-    first =
-      Some
-        {prev = None; next = None;
-         value =
-           [{contents = Int 1}; {contents = Float 1.}]};
-    last =
-      Some
-        {prev = None; next = None;
-      value =
-       [{contents = Int 1}; {contents = Float 1.}]}
-  }
+  {name = "db";
+  colnames = [("c1", Int 0); ("c4", Float 0.)];
+  numcol = 2;
+  numrow = 1;
+  first =
+  Some {prev = None;
+  next = None;
+  value = [{contents = Int 1}; {contents = Float 2.}]};
+  last =
+  Some {prev = None;
+  next = None;
+  value = [{contents = Int 1}; {contents = Float 2.}]}}
   &&
   s = Success
 
@@ -227,32 +225,32 @@ TEST "select" =
   let (s1,t1) = select_col ["c1";"c4"] tb1 in
   let (s2,t2) = select_col ["c2";"c4"] tb2 in
   s1 = Success && s2 = Success &&
-    node_list_equal (in_some t1.first) (in_some t2.first)
+    node_equal (in_some t1.first) (in_some t2.first)
 
 TEST "SELECT TOP" =
-  let (s1,t1) = select_top (TopNum 5) ["c1";"c4"] "db" in
-  let (s2,t2) = select_top (TopPercent 50) ["c1";"c4"] "db" in
+  let (s1,t1) = select_top (TopNum 5) ["c1";"c4"] tb1 in
+  let (s2,t2) = select_top (TopPercent 50) ["c1";"c4"] tb1 in
   s1 = Success && s2 = Success &&
-    node_list_equal (in_some t1.first) (in_some t2.first)
+    table_equal t1 t2
 
 let new_same_col n =
-  let t =
+  let (_, t) =
   create_table "db"
     [("c1", Int 0); ("c2", String ""); ("c3", Bool true);("c4",Float 0.)] in
   for i = 1 to n do
     ignore (insert_values
-      [Int 1; String "same"); Bool false; Float 1.] t)
+      [Int 1; String "same"; Bool false; Float 1.] t)
   done;
   t
 
 let sametb = new_same_col 10
 
-TEST "SELECT DISTINCT" =
-  let (s1,t1) = distinct ["c1";"c4"] sametb in
+(* TEST "SELECT DISTINCT" =
+  let (s1,t1) = distinct "c1" sametb in
   s1 = Success &&
     t1 =   {
     name = "db";
-    colnames = [("c1",Int 0);("c4",Float 0.)];
+    colnames = [("c1",Int 0)];
     numcol = 2;
     numrow = 1;
     first =
@@ -269,4 +267,4 @@ TEST "SELECT DISTINCT" =
 
 
 TEST "WHERE" =
-  failwith "TODP"
+  failwith "TODP" *)
