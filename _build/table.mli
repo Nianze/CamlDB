@@ -122,7 +122,7 @@ val get_last: table -> node option
 (******************* Table Helper *******************)
 
 (* [empty_table name colnames coltypes] is an empty table. *)
-val empty_table: string -> (colname * t) list -> table
+val empty_table: string -> (colname * t) list -> status * table
 
 (* [insert r t] inserts a row [r] to the top of a
  * table [t]. *)

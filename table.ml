@@ -438,8 +438,10 @@ let node_list_equal node lst =
  * structurally
  *)
 let table_equal t1 t2 =
-  let l1 = table_to_list t1 in
-  let l2 = table_to_list t2 in
-  List.fold_left2
-  (fun a n1 n2 -> if node_equal n1 n2 then a else false) true l1 l2
+  if t1.numrow = t2.numrow && t1.numcol = t2.numcol then
+    let l1 = table_to_list t1 in
+    let l2 = table_to_list t2 in
+    List.fold_left2
+    (fun a n1 n2 -> if node_equal n1 n2 then a else false) true l1 l2
+  else false
 
