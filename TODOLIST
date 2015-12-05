@@ -13,7 +13,7 @@ Fixed
   val empty_table: string -> (colname * t) list -> status * table
   val create_table: string -> (colname * t) list -> status * table
 12. data_processor: select top percent
-
+19. data_processor: handle wrong number of values inserted
 
 Ongoing:
 6. parser: specify error message
@@ -41,3 +41,19 @@ Ongoing:
   Invalid query.
   > INSERT INTO person VALUES (1, "Tang", "Yuyan", "NYC", 34, false, 341.34);
   Invalid query.
+
+19. integer longer than bound
+  INSERT INTO testType VALUES (143121515315, "'''", .6e+1, false);
+
+20. table overwriting
+>   CREATE TABLE testType
+  (int INT, string STRING, float FLOAT, bool BOOL);
+
+  INSERT INTO testType VALUES  (1, "ad", 3., true);
+  INSERT INTO testType VALUES (-1, "ad", -3., false);
+  INSERT INTO testType VALUES (-001, "Ad", 07E+2, false);Warning: table already exists. Are you sure you want to overwrite all of its contents? (y/n): Warning: table already exists. Are you sure you want to overwrite all of its contents? (y/n): Warning: table already exists. Are you sure you want to overwrite all of its contents? (y/n): Warning: table already exists. Are you sure you want to overwrite all of its contents? (y/n): y
+Warning: table already exists. Are you sure you want to overwrite all of its contents? (y/n): y
+> SELECT * FROM testType;
++-----+--------+-------+------+
+| int | string | float | bool |
++-----+--------+-------+------+
