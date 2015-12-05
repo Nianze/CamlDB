@@ -173,7 +173,7 @@ We get a merged table.
 | Alex | 76    | A     |
 +------+-------+-------+
 
-To save your work, simply type EXIT; at the REPL, and CamlDB will save your tables for the next time you start the REPL.
+To save your work, simply type SAVE; at the REPL. Or, type EXIT; to quit and CamlDB will save your tables for the next time you start the REPL.
 
 We've seen how CamlDB helps with data management through insert/delete, access and visualization features. We hope it can make data more accessible and fun to work with.
 
