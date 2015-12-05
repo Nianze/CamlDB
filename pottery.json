@@ -6,14 +6,14 @@
     [
       "name",
       "String",
-      "grade",
-      "String"
+      "score",
+      "Int"
     ]
   ],
   "elements": [
     "Bob",
-    "B",
+    1,
     "Alex",
-    "A"
+    2
   ]
 }

@@ -29,7 +29,7 @@ Fixed
     );
   > INSERT INTO person VALUES (0001, "Tang", "Yuyan", "NYC", 34, false, 341.34);
   Invalid query.
-  > INSERT INTO person VALUES (1, "Tang", "Yuyan", "NYC", 34, false, 341.34);
+  > INSERT INTO person VALUES (1, "Tang", "Yuyan", "55 West Blvd", "NYC", 34, false, 341.34);
   Invalid query.
 15. weird float_of_string
 >   CREATE TABLE data (name STRING, hours FLOAT, score INT);
