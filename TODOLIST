@@ -19,3 +19,6 @@ Fixed
   val create_table: string -> (colname * t) list -> status * table
 12. data_processor: select top percent
 14. add SAVE instruction and relevant specs
+15. weird float_of_string
+>   CREATE TABLE data (name STRING, hours FLOAT, score INT);
+  CREATE TABLE dataSet (name STRING, hours FLOAT, score INT);float_of_string
