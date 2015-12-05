@@ -21,7 +21,6 @@ let next_line lexbuf =
     { pos with pos_bol = lexbuf.lex_curr_pos;
                pos_lnum = pos.pos_lnum + 1
     }
-
 }
 
 (* identifiers *)
@@ -93,4 +92,6 @@ rule read =
   | "LINE"      { LINE }
   | "BAR"       { BAR }
   | "HISTOGRAM" { HISTOG }
+  | _ { raise (SyntaxError ("Unexpected char: " ^ Lexing.lexeme lexbuf)) }
   | eof         { EOF }
+

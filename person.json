@@ -1,0 +1,26 @@
+{
+  "name": "person",
+  "rows": 0,
+  "cols": 8,
+  "header": [
+    [
+      "personID",
+      "Int",
+      "lastName",
+      "String",
+      "firstName",
+      "String",
+      "address",
+      "String",
+      "city",
+      "String",
+      "age",
+      "Int",
+      "americanCitizen",
+      "Bool",
+      "salary",
+      "Float"
+    ]
+  ],
+  "elements": []
+}

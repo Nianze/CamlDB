@@ -1,4 +1,5 @@
 open Interp
+open Lexer
 
 (* Parse a string into an ast *)
 let parse s =
@@ -31,6 +32,7 @@ let rec repl () =
    ) with
    | Failure e -> print_endline e
    | Invalid_argument _ -> print_endline "Invalid query."
+   | SyntaxError e -> print_endline ("Syntax error. " ^ e)
    | Sys_error _ -> print_endline "Table does not exist."
    |  _ -> print_endline "Syntax error.");
   repl ()
