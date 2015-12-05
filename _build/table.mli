@@ -120,6 +120,8 @@ val get_last: table -> node option
 
 
 (******************* Table Helper *******************)
+(* [trivial_table ()] return an empty table with no column *)
+val trivial_table: unit -> table
 
 (* [empty_table name colnames coltypes] is an empty table. *)
 val empty_table: string -> (colname * t) list -> status * table

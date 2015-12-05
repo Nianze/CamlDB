@@ -7,11 +7,13 @@ Fixed
 9. interp: warn the user when creating table with the same name
 7. visualizer?  show boolean values in lower case
 13. test_data_processor: test where, disctinct, select, select_col
+10. empty table issue
+
 
 6. parser: specify error message
 8. repl: .. issue when pasting multiple line instructions
 
-10. empty table issue
+
 11. table: throw error when same column names are passed in
   val empty_table: string -> (colname * t) list -> status * table
   val create_table: string -> (colname * t) list -> status * table

@@ -153,34 +153,42 @@ let in_some (a: 'a option) : 'a =
 	| None -> failwith "in_some"
 	| Some b -> b
 
+(* [trivial_table ()] return an empty table with no column *)
+let trivial_table () : table =
+  {
+  name = "";
+  colnames = [];
+  numcol = 0;
+  numrow = 0;
+  first = None;
+  last = None
+  }
+
 (* [empty_table name colnames coltypes] is an empty table. *)
 let empty_table (name :string) (colnames: (colname * t) list): status *table =
 	let (names, _) = List.split colnames in
+  let not_empty () = List.length colnames <> 0 in
 	let no_duplicate_colnames names =
 		let (_, has_dup) =  List.(fold_left
 			(fun (l, b) n ->
 			if mem n l then (n::l, false)
 			else (n::l, b) )
 			([], true) names)
-		in has_dup
-	in if no_duplicate_colnames names = true then
-		(Success, {
-			name = name;
-			colnames = colnames;
-			numcol = List.length colnames;
-			numrow = 0;
-			first = None;
-			last = None
-		})
-	else
-		(DBError "create_table: duplicate column names", {
-			name = "";
-			colnames = [];
-			numcol = 0;
-			numrow = 0;
-			first = None;
-			last = None
-		})
+		in has_dup in
+  match (not_empty (), no_duplicate_colnames names) with
+    | (true, true) ->
+  		(Success, {
+  			name = name;
+  			colnames = colnames;
+  			numcol = List.length colnames;
+  			numrow = 0;
+  			first = None;
+  			last = None
+  		})
+    | (false, _ ) ->
+      (DBError "create_table: empty table is not allowed", trivial_table ())
+    | (_, false) ->
+		  (DBError "create_table: duplicate column names", trivial_table ())
 
 (* check if each columns in pair_list has the same type as originally
 	 defined by table in colnames

@@ -28,8 +28,8 @@ insert a new row with values [val_list] in the order of columns
 into table [t] and return a subtable
 *)
 let insert_values (val_list: t list) (t: table) : status =
-        let row = create_node (List.map (fun x -> ref x) val_list) in
-        insert row t
+  let row = create_node (List.map (fun x -> ref x) val_list) in
+  insert row t
 
 (*
 SQL:
@@ -51,12 +51,12 @@ let insert_col_values (col_list : (colname * t) list)
 
 let update_node (n: node) (colnames: (colname * t) list)
 (pair_list : (colname * t) list): unit =
-        List.(iter2
-                (fun (c, ts) t ->
-                if mem_assoc c pair_list
-                then (t := (assoc c pair_list))
-                else () )
-        colnames n.value)
+  List.(iter2
+    (fun (c, ts) t ->
+    if mem_assoc c pair_list
+    then (t := (assoc c pair_list))
+    else () )
+  colnames n.value)
 
 (*
 SQL:
@@ -123,9 +123,7 @@ from table t and return a subtable
 *)
 let distinct (col_name :colname) (t :table) : status * table =
   if not (col_in_table t col_name)
-    then (DBError "column names not found.",
-      snd (empty_table (get_tablename t) [])
-    )
+    then (DBError "column names not found.", trivial_table ())
     else
       let colnames = get_colnames t in
       let out_cols = List.find (fun (x,_)-> x = col_name) colnames in
@@ -163,7 +161,7 @@ let where (cond_list: cond_tree) (t :table) :status * table =
   	let (_, new_t) = create_table (get_tablename t) (get_colnames t) in
   	List.iter (fun n -> ignore (insert (create_node n.value) new_t)) nl;
   	(Success,new_t) )
-  | (_, DBError e) -> (DBError e, snd (empty_table "" []) )
+  | (_, DBError e) -> (DBError e, trivial_table () )
 
 
 
@@ -380,5 +378,5 @@ let inner_join t1 t2 pathnames (path1, path2) =
          let (_, t'') = list_to_table "join" cn (table_to_list t') in
          (!status, t'')
       | (DBError _, sel_t) -> (!status, sel_t)
-    else (DBError "Join: column name not found", snd  (empty_table "" []) )
+    else (DBError "Join: column name not found", trivial_table ())
   )
