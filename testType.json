@@ -1,0 +1,39 @@
+{
+  "name": "testType",
+  "rows": 5,
+  "cols": 4,
+  "header": [
+    [
+      "int",
+      "Int",
+      "string",
+      "String",
+      "float",
+      "Float",
+      "bool",
+      "Bool"
+    ]
+  ],
+  "elements": [
+    -1,
+    "'''",
+    -7,
+    false,
+    1,
+    "BSDFJ DFJS:L",
+    7,
+    false,
+    -1,
+    "Ad",
+    700,
+    false,
+    -1,
+    "ad",
+    -3,
+    false,
+    1,
+    "ad",
+    3,
+    true
+  ]
+}

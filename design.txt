@@ -71,7 +71,8 @@ INSERT INTO
 
 
 INSERT INTO COLUMNS
-  insert a row with some rows specified and the rest set as default value
+  insert a row with some columns specified and set the unspecified columns
+  to be default values
 
   Syntax:
     INSERT INTO [table name]

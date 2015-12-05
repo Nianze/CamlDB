@@ -59,9 +59,7 @@ TEST "insert_col_values" =
 
 TEST "insert_col_values" =
   let s1 = insert_col_values [] t in
-  s1 = Success &&
-  node_list_equal (in_some t.first) [Int 0; String ""; Bool true]
-
+  is_error s1
 
 TEST "insert_col_values" =
   let s1 = insert_col_values
@@ -86,6 +84,20 @@ TEST "update_all" =
   (fun a n ->
     if node_list_equal n [Int 0; String ""; Bool true] then a else false)
   true t
+
+TEST "update_all" =
+  let s = update_all [("c2", Int 0); ("c2", String ""); ("c3", Bool true)] t in
+  is_error s
+
+TEST "update_all" =
+  let s =
+  update_all [("c1", String "0"); ("c2", String ""); ("c3", Bool true)] t in
+  is_error s
+
+TEST "update_all" =
+  let s =
+  update_all [("error", String "0"); ("c2", String ""); ("c3", Bool true)] t in
+  is_error s
 
 TEST "update_all" =
   let s =

@@ -61,7 +61,8 @@ INSERT - normal     Pass
   (2, "Tang");
   INSERT INTO person VALUES
   (1, "Tang", "Yuyan", "add", "NYC", 34, false, 341.34);
-
+  INSERT INTO person (personID, lastName, firstName, city)
+  VALUES (2, "Andy", "Forest", "NYC");
 
 
 INSERT - wrong type     Pass
@@ -80,7 +81,21 @@ INSERT - nonexistent table  Pass
   INSERT INTO nonexistent VALUES
   (1, "Tang", "Yuyan", "add", "NYC", 34, false, 341.34);
 
+INSERT - nonexistent columns  Fixed
+  INSERT INTO person (personID, phone, firstName, city)
+  VALUES (2, "Andy", "Forest", "NYC");
 
+INSERT - empty columns  Fixed
+  INSERT INTO person ()
+  VALUES ();
+
+INSERT - unmatched number of columns and values   TODO22
+  INSERT INTO person (personID, firstName, city)
+  VALUES (2, "Andy", "Forest", "NYC");
+
+SAVE; - PASSED
+SAVE - multiple line      TODO23
+;
 ****** Test Type Support ******
   Should pass:
   CREATE TABLE testType

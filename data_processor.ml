@@ -43,13 +43,41 @@ inserted [val_list] are speicified in [col_list]
 *)
 let insert_col_values (col_list : (colname * t) list)
 (t:table) : status =
-  let colnames = List.map (fun (x, y) -> (x, ref y)) (get_colnames t) in
-  List.(iter
-    (fun (x, y) -> if mem_assoc x col_list then y:=assoc x col_list) colnames
-  );
-  let col = List.map (fun (x,y) -> y) colnames in
-  let row = create_node col in
-  insert row t
+  let (names, _) = List.split col_list in
+  let colnames = get_colnames t in
+  let not_empty = List.length col_list <> 0 in
+  let no_duplicate_colnames =
+    let (_, has_dup) =  List.(fold_left
+      (fun (l, b) n ->
+      if mem n l then (n::l, false)
+      else (n::l, b) )
+      ([], true) names)
+    in has_dup in
+  let cols_defined =
+    List.(length (filter (fun n -> mem_assoc n colnames) names) =
+      length names) in
+  match (not_empty, cols_defined, no_duplicate_colnames) with
+    | (false, _, _) -> DBError "Insert: empty insert list"
+    | (true, false, _) ->
+
+      let undefined_col =
+      List.(fold_left
+        (fun a n -> if a <> "" then a ^ ", " ^ n else n)
+        ""
+        (filter (fun n-> mem_assoc n colnames = false) names)
+      )
+      in DBError ("Insert: column(s) " ^ undefined_col ^ " not defined")
+    | (true, true, false) ->
+      DBError ("Insert: inserting to same column multiple times")
+    | (true, true, true) -> (
+      let colnames = List.map (fun (x, y) -> (x, ref y)) (get_colnames t) in
+      List.(iter
+        (fun (x, y) -> if mem_assoc x col_list then y:=assoc x col_list) colnames
+      );
+      let col = List.map (fun (x,y) -> y) colnames in
+      let row = create_node col in
+      insert row t
+    )
 
 let update_node (n: node) (colnames: (colname * t) list)
 (pair_list : (colname * t) list): unit =
@@ -103,7 +131,7 @@ let select_top (top:top_t) (col_list:colname list) (t: table): status * table =
     let pairs = List.combine (col_list) (get_vals node.value) in
     insert_col_values pairs out_tb in
   let rec helper orig_n stat count_down =
-    if count_down = 0 then (Success, out_tb) else
+    if count_down <= 0 then (Success, out_tb) else
       match stat with
         | DBError e -> (DBError e, out_tb)
         | Success -> match orig_n with
@@ -194,19 +222,19 @@ sort the table [t] in the ascending or descending order of [o]
 of column [col_name] and return a subtable
 *)
 let sort (col_name: colname) (o: order) (t: table) : status * table =
-        let colnames = get_colnames t in
-        if (List.mem_assoc col_name colnames) = false then
-                (DBError "sort: col_name not found", t)
-        else
-                let l_node = table_to_list t in
-                let l = List.map (fun n -> n.value) l_node in
-                let index = ref 0 in
-                List.iteri
-                (fun i (c, _) -> if c = col_name then index:= i else ())
-                colnames;
-                let sorted = List.sort (get_cmp o !index) l in
-                let node_list = List.map (fun v -> create_node v) sorted in
-                list_to_table (get_tablename t) (get_colnames t) node_list
+  let colnames = get_colnames t in
+  if (List.mem_assoc col_name colnames) = false then
+    (DBError "sort: col_name not found", t)
+  else
+    let l_node = table_to_list t in
+    let l = List.map (fun n -> n.value) l_node in
+    let index = ref 0 in
+    List.iteri
+    (fun i (c, _) -> if c = col_name then index:= i else ())
+    colnames;
+    let sorted = List.sort (get_cmp o !index) l in
+    let node_list = List.map (fun v -> create_node v) sorted in
+    list_to_table (get_tablename t) (get_colnames t) node_list
 
 
 
@@ -250,14 +278,39 @@ update all the rows in the table [t] according to the column
 and value specified by [pair_list]
 *)
 let update_all (pair_list : (colname * t) list) (t:table) : status =
+  let (names, _) = List.split pair_list in
   let colnames = get_colnames t in
-  let e_find = colname_check pair_list colnames in
-  let e_type = type_check pair_list colnames in
-  match (e_find, e_type) with
-    | ("", "") -> iter (fun n -> update_node n colnames pair_list) t; Success
-    | ("", _) ->
-            DBError ("update_all: type of column "^e_type^" cannot be modified")
-    | _ -> DBError ("update_all: can't find columns: " ^ e_find)
+  let not_empty = List.length pair_list <> 0 in
+  let no_duplicate_colnames =
+    let (_, has_dup) =  List.(fold_left
+      (fun (l, b) n ->
+      if mem n l then (n::l, false)
+      else (n::l, b) )
+      ([], true) names)
+    in has_dup in
+  let cols_defined =
+    List.(length (filter (fun n -> mem_assoc n colnames) names) =
+      length names) in
+  match (not_empty, cols_defined, no_duplicate_colnames) with
+    | (false, _, _) -> DBError "Update: empty insert list"
+    | (true, false, _) ->
+      let undefined_col =
+      List.(fold_left
+        (fun a n -> if a <> "" then a ^ ", " ^ n else n)
+        ""
+        (filter (fun n-> mem_assoc n colnames = false) names)
+      )
+      in DBError ("Update: column(s) " ^ undefined_col ^ " not defined")
+    | (true, true, false) ->
+      DBError ("Update: updating same column multiple times")
+    | (true, true, true) ->
+      let e_type = type_check pair_list colnames in
+      if e_type <> "" then
+        DBError
+        ("Update_all: type of column "^e_type^" not match defined types")
+      else
+        let _ = iter (fun n -> update_node n colnames pair_list) t in
+        Success
 
 (*
 SQL:
