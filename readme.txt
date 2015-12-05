@@ -15,7 +15,7 @@ To run, run main.byte:
 
     ocamlrun main.byte
 
--- Tutorial --
+---------------------------------------
 Let's use CamlDB to help with an experiment. We want to see how amount of sleep affects test scores. We'll ask people for their names, average hours slept and their score on the last exam. So run main.byte to start the REPL, and create a table:
 
     CREATE TABLE data (name STRING, hours FLOAT, score INT);
@@ -96,33 +96,35 @@ Oops, David isn't even in the class. Delete his entry:
 
     DELETE FROM data WHERE name="David";
 
-Now that our survey is complete, we'd like to have a better understanding of the data. One way CamlDB lets us do this is with visualizations, specifically scatterplots and line graphs. We can draw a scatterplot with this syntax:
+Now that our survey is complete, we'd like to have a better understanding of the data. One way CamlDB lets us do this is with visualizations, specifically scatterplots and line graphs. We can draw a scatterplot with a hashtag #SCATTER:
 
     SELECT hours, score FROM data #SCATTER;
 
 We get a graphical display:
 
-       89.8 |
-            |
-            |                                                     *
-            |
-            |
-            |
-            |
-            |
-            |
-            |                                        *
-            |
-            |
-            |
-            |   *                        *
-            |
-            |
-            |
-            |
-            |                *
+score
+       89.8 |                                                           
+            |                                                           
+            |                                                     *     
+            |                                                           
+            |                                                           
+            |                                                           
+            |                                                           
+       82.6 |                                                           
+            |                                                           
+            |                                        *                  
+            |                                                           
+            |                                                           
+            |                                                           
+       75.4 |   *                        *                              
+            |                                                           
+            |                                                           
+            |                                                           
+            |                                                           
+            |                *                                          
        68.2 |-----------------------------------------------------------
-            4.6                                                        9.4
+            4.6                6.2                 7.8                 9.4
+                                        hours
 
 Let's draw a line graph to get a sense for the overall trend. Let's sort our data and plot:
 
@@ -130,27 +132,29 @@ Let's draw a line graph to get a sense for the overall trend. Let's sort our dat
 
 We get this curve:
 
-       89.8 |
-            |
-            |                                                     *
-            |                                                   **
-            |                                                 **
-            |                                               **
-            |                                             **
-            |                                           **
-            |                                         **
-            |                                       **
-            |                                    ***
-            |                                 ***
-            |                              ***
-            |                           ***
-            |                         **
-            |                      ***
-            |   ****             **
-            |       ******     **
-            |             *****
+score
+       89.8 |                                                           
+            |                                                           
+            |                                                     *     
+            |                                                   ..      
+            |                                                 ..        
+            |                                               ..          
+            |                                             ..            
+       82.6 |                                           ..              
+            |                                         ..                
+            |                                       .*                  
+            |                                    ...                    
+            |                                 ...                       
+            |                              ...                          
+       75.4 |   *.                      .*.                             
+            |     ..                  ..                                
+            |       ...            ...                                  
+            |          ...       ..                                     
+            |             ..   ..                                       
+            |               .*.                                         
        68.2 |-----------------------------------------------------------
-            4.6                                                        9.4
+            4.6                6.2                 7.8                 9.4
+                                        hours
 
 Some of the students are in a different class as well (pottery), and we want to merge their grades from that class into this table. Create a table with data to represent this other class:
 
