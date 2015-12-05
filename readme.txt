@@ -17,18 +17,11 @@ To run, run main.byte:
 
 -- Guided Tour --
 
+Note: see design.txt for full commands specification.
+
 Let's use CamlDB to help with an experiment. We want to see how amount of sleep affects test scores. We'll ask people for their names, average hours slept and their score on the last exam. So run main.byte to start the REPL, and create a table:
 
     CREATE TABLE data (name STRING, hours FLOAT, score INT);
-
----------------------------------------
-CREATE TABLE Syntax:
-    CREATE TABLE [table name]
-    ([column name 1] [column type 1],
-    [column name 2] [column type 2],
-    ...
-    [column name n] [column type n]);
----------------------------------------
 
 Now let's add some data to the table. We give the survey to some people
 and record the results:
@@ -39,15 +32,6 @@ and record the results:
     INSERT INTO data VALUES ("David", 600.e-2, 75);
     INSERT INTO data VALUES ("Eve", 7.2, 76);
     INSERT INTO data VALUES ("Fiona", 8.8, 88);
-
----------------------------------------
-INSERT INTO Syntax:
-    INSERT INTO [table name]
-    ([column name 1] [column type 1],
-    [column name 2] [column type 2],
-    ...
-    [column name n] [column type n]);
----------------------------------------
 
 Great, now we have some data in the table. Let's check what we've done
 with a SELECT query:
@@ -99,12 +83,6 @@ Or select top rows in a table;
     SELECT TOP 5 hours FROM data;
     SELECT TOP 50 PERCENT hours FROM data;
 
----------------------------------------
-SELECT TOP Syntax:
-    SELECT_TOP [number of rows] / [number percent] PERCENT
-    [column name list]
-    FROM [table name];
----------------------------------------
 We see that there are many ways to filter and query data.
 
 Turns out Alex scored higher than he thought: he actually got a 76. Let's update the table:
