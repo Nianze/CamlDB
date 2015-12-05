@@ -146,6 +146,8 @@ let rec eval ?draw:(draw=true) = function
      (eval expr)
   | InsCol (es, typ_lst, expr) ->
      let colnames = List.map name_of_expr es in
+     (if List.length colnames <> List.length typ_lst then
+       failwith "Insert: wrong number of columns");
      proc_singleton_status (insert_col_values (List.combine colnames typ_lst)
 			   (eval expr));
      (eval expr)
