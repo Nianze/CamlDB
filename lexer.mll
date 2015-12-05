@@ -31,7 +31,7 @@ let frac = '.' digit*
 let exp = ['e' 'E'] ['-' '+']? digit+
 let float = '-'?digit* frac? exp?
 let letter = ['a'-'z' 'A'-'Z']
-let ident = (['a'-'z'] | ['A'-'Z'] | '_') (['a'-'z'] | ['A'-'Z'] | ['0'-'9'] | '_' | '\'')*
+let ident = (['a'-'z'] | '_') (['a'-'z'] | ['A'-'Z'] | ['0'-'9'] | '_' | '\'')*
 (*let str = letter+*)
 
 (* token difinition *)
@@ -92,4 +92,3 @@ rule read =
   | "BAR"       { BAR }
   | "HISTOGRAM" { HISTOG }
   | eof         { EOF }
-  | _           { lex_error lexbuf }
