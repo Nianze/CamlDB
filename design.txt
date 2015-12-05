@@ -1,4 +1,19 @@
----------------------------------------
+Types CamlDB support:
+  CamlDB supports 4 types:
+  STRING - A string
+        ex: "Alex", "bob", "EVE", "fIONA", "BSDFJ DFJS:L", "'''"
+
+  FLOAT - IEEE double-precision floating point, equivalent to C's double
+        ex: 3.14, 2e+19, 2E+19, -31.5, -2e+19, -2E+19, 9e+0, 80E-1, 5.
+
+  INT - 31-bit signed int (roughly +/- 1 billion) on 32-bit
+        processors, or 63-bit signed int on 64-bit processors
+        ex: 001, 3, -35, -00134
+
+  BOOL - A boolean, written either true or false
+        ex: true, false
+
+
 CREATE TABLE
   Syntax:
     CREATE TABLE
@@ -23,4 +38,3 @@ CREATE TABLE
   Example:
     CREATE TABLE data (name STRING, hours FLOAT, score INT);
 
----------------------------------------
