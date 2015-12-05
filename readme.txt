@@ -21,33 +21,17 @@ Let's use CamlDB to help with an experiment. We want to see how amount of sleep 
     CREATE TABLE data (name STRING, hours FLOAT, score INT);
 
 ---------------------------------------
-CREATE TABLE
-  Syntax:
+CREATE TABLE Syntax:
     CREATE TABLE [table name]
     ([column name 1] [column type 1],
     [column name 2] [column type 2],
     ...
     [column name n] [column type n]);
-
-  Syntax Rules:
-    [table name]: case-sensitive; support use any string except for the
-    built-in words reserved for instructions, such as INT, CREATE.
-    If creating a table with the same name as existing table, CamlDB will
-    warn the user and let the user to confirm whether he wants the old table
-    to be overwritten.
-
-    [column name]: case-sensitive; support use any string except for the
-    built-in words reserved for instructions, such as INT, CREATE.
-    [column type]: support 4 types: INT, FLOAT, STRING, BOOL
-
-
-  Example:
-    CREATE TABLE data (name STRING, hours FLOAT, score INT);
-
 ---------------------------------------
 
 
-Now let's add some data to the table. We give the survey to some people and record the results:
+Now let's add some data to the table. We give the survey to some people
+and record the results:
 
     INSERT INTO data VALUES ("Alex", 5., 72);
     INSERT INTO data VALUES ("Bob", 80E-1, 80);
@@ -56,7 +40,17 @@ Now let's add some data to the table. We give the survey to some people and reco
     INSERT INTO data VALUES ("Eve", .07E+2, 76);
     INSERT INTO data VALUES ("Fiona", 9e+0, 88);
 
-Great, now we have some data in the table. Let's check what we've done with a SELECT query:
+---------------------------------------
+INSERT INTO
+  Syntax:
+    INSERT INTO [table name]
+    ([column name 1] [column type 1],
+    [column name 2] [column type 2],
+    ...
+    [column name n] [column type n]);
+---------------------------------------
+Great, now we have some data in the table. Let's check what we've done
+with a SELECT query:
 
     SELECT * FROM data;
 

@@ -26,7 +26,11 @@ insert a new row with values [val_list] in the order of columns
 into table [t] and return a subtable
 *)
 let insert_values (val_list: t list) (t: table) : status =
-  let row = create_node (List.map (fun x -> ref x) val_list) in
+  if List.(length val_list > length (get_colnames table)) then
+  DBError "Insert: inserting more columns in a row than defined columns"
+  else if List.(length val_list < length (get_colnames table)) then
+  DBError "Insert: inserting less columns in a row than defined columns"
+  else let row = create_node (List.map (fun x -> ref x) val_list) in
   insert row t
 
 (*
