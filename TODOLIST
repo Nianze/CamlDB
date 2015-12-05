@@ -39,7 +39,7 @@ Ongoing:
     );
   > INSERT INTO person VALUES (0001, "Tang", "Yuyan", "NYC", 34, false, 341.34);
   Invalid query.
-  > INSERT INTO person VALUES (1, "Tang", "Yuyan", "NYC", 34, false, 341.34);
+  > INSERT INTO person VALUES (1, "Tang", "Yuyan", "55 West Blvd", "NYC", 34, false, 341.34);
   Invalid query.
 
 19. integer longer than bound
