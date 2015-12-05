@@ -25,3 +25,19 @@ Ongoing:
   CREATE TABLE dataSet (name STRING, hours FLOAT, score INT);float_of_string
 16. weird error for wrong type
 17. support Capitalized table name, colnames
+18. weird Invalid query error
+  >   CREATE TABLE person
+    (
+    personID INT,
+    lastName STRING,
+    firstName STRING,
+    address STRING,
+    city STRING,
+    age INT,
+    americanCitizen BOOL,
+    salary FLOAT
+    );
+  > INSERT INTO person VALUES (0001, "Tang", "Yuyan", "NYC", 34, false, 341.34);
+  Invalid query.
+  > INSERT INTO person VALUES (1, "Tang", "Yuyan", "NYC", 34, false, 341.34);
+  Invalid query.
