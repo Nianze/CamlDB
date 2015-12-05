@@ -167,7 +167,7 @@ let rec eval = function
      (try ignore (table_named name) with _ -> ());
      (if List.mem_assoc name !open_tables then
 	 if not (prompt_yn ("Warning: table already exists. Are you sure " ^
-		   "you want to override all of its contents?")) then
+		   "you want to overwrite all of its contents?")) then
 	   failwith "Did not create new table."
      );
      add_table name t;
