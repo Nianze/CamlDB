@@ -153,16 +153,42 @@ let in_some (a: 'a option) : 'a =
 	| None -> failwith "in_some"
 	| Some b -> b
 
+(* [trivial_table ()] return an empty table with no column *)
+let trivial_table () : table =
+  {
+  name = "";
+  colnames = [];
+  numcol = 0;
+  numrow = 0;
+  first = None;
+  last = None
+  }
+
 (* [empty_table name colnames coltypes] is an empty table. *)
-let empty_table (name :string) (colnames: (colname * t) list):table =
-	{
-		name = name;
-		colnames = colnames;
-		numcol = List.length colnames;
-		numrow = 0;
-		first = None;
-		last = None
-	}
+let empty_table (name :string) (colnames: (colname * t) list): status *table =
+	let (names, _) = List.split colnames in
+  let not_empty () = List.length colnames <> 0 in
+	let no_duplicate_colnames names =
+		let (_, has_dup) =  List.(fold_left
+			(fun (l, b) n ->
+			if mem n l then (n::l, false)
+			else (n::l, b) )
+			([], true) names)
+		in has_dup in
+  match (not_empty (), no_duplicate_colnames names) with
+    | (true, true) ->
+  		(Success, {
+  			name = name;
+  			colnames = colnames;
+  			numcol = List.length colnames;
+  			numrow = 0;
+  			first = None;
+  			last = None
+  		})
+    | (false, _ ) ->
+      (DBError "create_table: empty table is not allowed", trivial_table ())
+    | (_, false) ->
+		  (DBError "create_table: duplicate column names", trivial_table ())
 
 (* check if each columns in pair_list has the same type as originally
 	 defined by table in colnames
@@ -301,17 +327,23 @@ let find (cond_list: cond_tree) (t: table): (node list) * status =
  *)
 let list_to_table (node_list: node list) (table_name: string)
 (colnames: (colname * t) list) : status * table =
-	let t = empty_table table_name colnames in
+	let (s, t) = empty_table table_name colnames in
+
 	let rec helper = function
-		| [] -> Success
-		| hd::tl ->
-			let r = create_node hd.value in
-			(match insert r t with
-				| Success -> helper tl
-				| DBError e -> DBError e )
-	in match helper node_list with
-		| Success -> (Success, t)
+	| [] -> Success
+	| hd::tl ->
+		let r = create_node hd.value in
+		(match insert r t with
+			| Success -> helper tl
+			| DBError e -> DBError e ) in
+
+	match s with
 		| DBError e -> (DBError e, t)
+		| Success -> (
+		match helper node_list with
+			| Success -> (Success, t)
+			| DBError e -> (DBError e, t)
+		)
 
 
 (* [delete_list n_list t] deletes a list of rows [n_list] from table [t]. *)
@@ -374,14 +406,17 @@ let table_to_list (t: table): (node list) =
  *)
 let list_to_table (name :string) (colnames: (colname * t) list)
 	(rows: node list) : status * table =
-	let t = empty_table name colnames in
-	(List.fold_right
-		(fun n a ->
-			match a with
-			 	| Success -> insert n t
-			  | DBError e -> a
-		) rows Success,
-	t)
+	let (s, t) = empty_table name colnames in
+	match s with
+		| Success ->
+			(List.fold_right
+				(fun n a ->
+					match a with
+					 	| Success -> insert n t
+					  | DBError e -> a
+				) rows Success,
+			t)
+		| DBError e -> (DBError e, t)
 
 
 (* [get_col_i t col_name] gets the col [col_name] as a t list *)
@@ -411,8 +446,10 @@ let node_list_equal node lst =
  * structurally
  *)
 let table_equal t1 t2 =
-  let l1 = table_to_list t1 in
-  let l2 = table_to_list t2 in
-  List.fold_left2
-  (fun a n1 n2 -> if node_equal n1 n2 then a else false) true l1 l2
+  if t1.numrow = t2.numrow && t1.numcol = t2.numcol then
+    let l1 = table_to_list t1 in
+    let l2 = table_to_list t2 in
+    List.fold_left2
+    (fun a n1 n2 -> if node_equal n1 n2 then a else false) true l1 l2
+  else false
 

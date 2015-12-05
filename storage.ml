@@ -12,7 +12,8 @@
 
 open Table
 
-let save_table t filename =
+let save_table t name =
+  let filename = name ^ ".json" in
   let header =
     let string_of_elt_typ = function
       | Int _ -> "Int"
@@ -75,8 +76,10 @@ let build_table name rows cols header elts =
   let _ = List.map (fun x -> insert (to_node x) t) elts in
   t
 
-let load_table filename =
-  let decoder = Jsonm.decoder (`Channel (open_in filename)) in
+let load_table name =
+  let filename = name ^ ".json" in
+  let fin = open_in filename in
+  let decoder = Jsonm.decoder (`Channel fin) in
 
   let next_lexeme () =
     match Jsonm.decode decoder with

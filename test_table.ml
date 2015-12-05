@@ -37,11 +37,11 @@ TEST "compare" =
 
 
 (******************* Table *******************)
-let t1 = empty_table "test1" [("c1", Int 0);("c2", String "")]
+let (s,t1) = empty_table "test1" [("c1", Int 0);("c2", String "")]
 TEST "empty_table" =
   empty_table "test1" [("c1", Int 0);("c2", String "")]
-  = {name = "test1"; colnames = [("c1", Int 0); ("c2", String "")];
-    numcol = 2; numrow = 0; first = None; last = None}
+  = (Success, {name = "test1"; colnames = [("c1", Int 0); ("c2", String "")];
+    numcol = 2; numrow = 0; first = None; last = None})
 
 TEST "" = (find (Cond ("c2", GT, String "0")) t1) = ([], Success)
 
@@ -68,7 +68,7 @@ let n1 = create_node [ref (Int 0); ref (String "0")]
 let n2 = create_node [ref (Int 1); ref (String "1")]
 let n3 = create_node [ref (Int 2); ref (String "2")]
 let n4 = create_node [ref (Int 3); ref (String "3")]
-let t2 = empty_table "test2" [("c1", Int 0);("c2", String "")]
+let (_, t2) = empty_table "test2" [("c1", Int 0);("c2", String "")]
 let _ = insert n1 t2
 let _ = insert n2 t2
 let _ = insert n3 t2
@@ -133,7 +133,7 @@ let new_table () =
   let n12 = create_node [ref (Int 1); ref (String "1")] in
   let n13 = create_node [ref (Int 2); ref (String "2")] in
   let n14 = create_node [ref (Int 3); ref (String "3")] in
-  let t = empty_table "t" [("c1", Int 0);("c2", String "")] in
+  let (_, t) = empty_table "t" [("c1", Int 0);("c2", String "")] in
   let _ = insert n11 t in
   let _ = insert n12 t in
   let _ = insert n13 t in
@@ -152,7 +152,7 @@ TEST "least recently used" =
   let n12 = create_node [ref (Int 1); ref (String "1")] in
   let n13 = create_node [ref (Int 2); ref (String "2")] in
   let n14 = create_node [ref (Int 3); ref (String "3")] in
-  let t3 = empty_table "t" [("c1", Int 0);("c2", String "")] in
+  let (_, t3) = empty_table "t" [("c1", Int 0);("c2", String "")] in
   let _ = insert n11 t3 in
   let _ = insert n12 t3 in
   let _ = insert n13 t3 in

@@ -7,7 +7,7 @@ let string_of_elt = function
   | Int x -> string_of_int x
   | String x -> x
   | Float x -> string_of_float x
-  | Bool x -> if x then "True" else "False"
+  | Bool x -> if x then "true" else "false"
       
 let calc_widths t =
   let titles = List.map (fun (n, _) -> n) t.colnames in
@@ -82,8 +82,8 @@ let draw_vert_line canvas x =
     done
 (* Source: Bresenham's line algorithm.    https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm *)      
 let draw_line canvas x0 y0 x1 y1 =
-  let (x0, x1) = (min x0 x1, max x0 x1) in
   let (y0, y1) = if x0 < x1 then (y0, y1) else (y1, y0) in
+  let (x0, x1) = (min x0 x1, max x0 x1) in
   if x0 = x1 then
     for y = y0 to y1 do
       draw canvas x0 y '*'
@@ -93,10 +93,10 @@ let draw_line canvas x0 y0 x1 y1 =
     let deltaerr = ref (float_of_int (abs(y1 - y0)) /. (float_of_int (x1 - x0))) in
     let y = ref y0 in
     for x = x0 to x1 do
-      draw canvas x !y '*';
+      draw canvas x !y '.';
       error := !error +. !deltaerr;
       while !error >= 0.5 do
-	draw canvas x !y '*';
+	draw canvas x !y '.';
 	y := !y + (int_of_float(copysign 1.0 (float_of_int(y1 - y0))));
 	error := !error -. 1.0
       done
@@ -142,6 +142,16 @@ let get_cols t =
     | _ -> failwith "Visualizer: invalid data type" in
   (List.map to_num (table_to_list fst_t),
    List.map to_num (table_to_list snd_t))
+
+let axis_labels x1 x2 scrx num =
+  let rec range i j = if i >= j then [] else i::(range (i+1) j) in
+  (int_of_float (interpolate 0. x1 x2 0. (float_of_int (scrx - 1))), "0.0")::
+  (List.map (fun x ->
+    (int_of_float (interpolate (float_of_int x) 0.0 (float_of_int(num-1))
+		                 0.0 (float_of_int(scrx-1))),
+     string_of_float (interpolate (float_of_int x) 0.0
+			(float_of_int(num-1)) x1 x2)
+    )) (range 0 num))
   
 (* precondition: t has 2 columns, each of type int or float *)    
 let vis_points2d t connect =
@@ -170,14 +180,17 @@ let vis_points2d t connect =
       );
       first_line := false;
       last := (scrx, scry)
-    ) else
-      draw canvas scrx scry '*')
+    )) xcol ycol;
+  List.iter2 (fun x y ->
+    let scrx = int_of_float (interpolate x x1 x2 0. w) in
+    let scry = int_of_float (interpolate y y1 y2 0. h) in
+    draw canvas scrx scry '*')
     xcol ycol;
-  print_canvas canvas
-    [(int_of_float (interpolate 0. x1 x2 0. w), "0.0");
-     (0, string_of_float x1); (canvas_width-1, string_of_float x2)]
-    [(int_of_float (interpolate 0. y1 y2 0. h), "0.0");
-     (0, string_of_float y1); (canvas_height-1, string_of_float y2)]
+  print_endline (fst (List.nth (get_colnames t) 1));  (* print y-axis name *)
+  print_canvas canvas (axis_labels x1 x2 canvas_width 4)
+    (axis_labels y1 y2 canvas_height 4);
+  print_endline (((String.make (10 + canvas_width / 2) ' ')) ^
+    (fst (List.hd (get_colnames t))))
   
 (* visualize [t] [v]: visualize the table [t] graphically using *)
 (* the specified method [v]. *)

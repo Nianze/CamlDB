@@ -62,6 +62,14 @@ type expr =
   | Joins    of expr * expr * expr list * (expr * expr) (* (Tb1, Tb2, path list, (path1,path2)) *)
 *)
 
+let prompt_yn s =
+  let ans = ref "" in
+  while !ans <> "y" && !ans <> "n" do
+    print_string (s ^ " (y/n): ");
+    ans := String.lowercase (read_line ());
+  done;
+  !ans = "y"
+
 let open_tables = ref []
 
 let add_table n t =
@@ -75,6 +83,14 @@ let table_named n =
     t
   )
 
+let warn_override name =
+  (try ignore (table_named name) with _ -> ());
+  (if List.mem_assoc name !open_tables then
+      if not (prompt_yn ("Warning: table already exists. Are you sure " ^
+		"you want to overwrite all of its contents?")) then
+	failwith "Did not create new table."
+  )
+     
 let name_of_expr = function
   | ColName n -> n
   | TbName n -> n
@@ -155,7 +171,8 @@ let rec eval = function
      let (es, typs) = List.split lst in
      let colnames = List.map name_of_expr es in
      let name = (name_of_expr n) in
-     let t = create_table name (List.combine colnames typs) in
+     warn_override name;
+     let t = proc_status (create_table name (List.combine colnames typs)) in
      add_table name t;
      t
   | Union (e1, e2) ->
@@ -172,5 +189,5 @@ and path_components = function
   | Path (tb, col) -> (get_tablename (eval tb), name_of_expr col)
   | _ -> failwith "Interp: Syntax error."
 
-let shutdown_interp () =
+let save_open_tables () =
   List.iter (fun (n, t) -> save_table t n) !open_tables
