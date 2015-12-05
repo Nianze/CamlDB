@@ -94,6 +94,37 @@ INSERT INTO COLUMNS
     (2, "Andy", "Forest", "NYC");
 
 
+UPDATE
+  Update the whole table by setting every row of column i to be value i and
+  leave the rest of columns unchanged.
+
+  Syntax:
+    UPDATE [table name]
+    SET
+    [column name 1] = [value 1],
+    [column name 2] = [value 2],
+    ... ,
+    [column name n] = [value n];
+
+  Syntax Rules:
+    [table name]: case-sensitive; table must exist either in current file,
+    stored as [tablename.json] or in cache.
+
+    [column name i]: [column name i] must have been defined.
+
+    [column value i]: The [column value i] updated must match the exact type
+    of [column name i] defined.
+
+  Example:
+    UPDATE person SET personID = 4, city = "Ithaca";
+
+
+UPDATE table_name
+SET column1=value1,column2=value2,...
+WHERE condition list;
+UPDATE -  Update the selected rows by setting every row of column i to be value i and leave the rest of columns unchanged.
+
+
 SELECT TOP
   Syntax:
     SELECT_TOP [number of rows] / [number percent] PERCENT

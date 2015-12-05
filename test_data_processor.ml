@@ -101,6 +101,11 @@ TEST "update_all" =
 
 TEST "update_all" =
   let s =
+  update_all [("error", String "0")] t in
+  is_error s
+
+TEST "update_all" =
+  let s =
   update_all [("c1", String "0"); ("c2", String ""); ("c3", Bool true)] t in
   is_error s
 

@@ -29,10 +29,10 @@ CREATE TABLE - multiple lines     TODO8
   );
 
 CREATE TABLE - create table with same names   FIXED
-CREATE TABLE - same column names        TODO11
+CREATE TABLE - same column names        Fixed
    CREATE TABLE data (name STRING, name FLOAT, name INT);
 
-CREATE TABLE - wrong types      TODO16
+CREATE TABLE - wrong types      Fixed
   CREATE TABLE data (name STRINGS, hours FLOAT, score INT);
   CREATE TABLE data (name STR, hours FLOAT, score BOOLEAN);
   CREATE TABLE data (name string, hours FLOAT, score BOOLEAN);
@@ -63,11 +63,14 @@ INSERT - normal     Pass
   (1, "Tang", "Yuyan", "add", "NYC", 34, false, 341.34);
   INSERT INTO person (personID, lastName, firstName, city)
   VALUES (2, "Andy", "Forest", "NYC");
+  UPDATE person SET personID = 4, city = "Ithaca";
 
 
-INSERT - wrong type     Pass
+INSERT, UPDATE - wrong type     Pass
   INSERT INTO person VALUES
   (1, "Tang", "Yuyan", 234, "NYC", 34, false, 341.34);
+  UPDATE person SET personID = "str", city = "Ithaca";
+  UPDATE person SET personID = "str", city = 3;
 
 INSERT - less column      Pass
   INSERT INTO person VALUES
@@ -80,22 +83,30 @@ INSERT - more column     Pass
 INSERT - nonexistent table  Pass
   INSERT INTO nonexistent VALUES
   (1, "Tang", "Yuyan", "add", "NYC", 34, false, 341.34);
+  UPDATE nonexistent SET personID = "str", city = 3;
 
 INSERT - nonexistent columns  Fixed
   INSERT INTO person (personID, phone, firstName, city)
   VALUES (2, "Andy", "Forest", "NYC");
 
+  UPDATE person SET nocolumn = "str", city = 3;
+
 INSERT - empty columns  Fixed
   INSERT INTO person ()
   VALUES ();
+  UPDATE person SET;
 
-INSERT - unmatched number of columns and values   TODO22
+INSERT - unmatched number of columns and values
   INSERT INTO person (personID, firstName, city)
   VALUES (2, "Andy", "Forest", "NYC");
+
+
 
 SAVE; - PASSED
 SAVE - multiple line      TODO23
 ;
+
+
 ****** Test Type Support ******
   Should pass:
   CREATE TABLE testType
@@ -125,6 +136,8 @@ SAVE - multiple line      TODO23
 
   INSERT INTO testType VALUES (143121515315, "'''", .6e+1, false);
   --> int_of_string
+
+  UPDATE person SET personID = 4, city = "Ithaca";
 
 
 ****** Empty Table ******

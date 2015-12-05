@@ -41,6 +41,17 @@ Fixed
   --> float_of_string
 24. Update  boundary cases    Fixed
 
+22.
+INSERT - unmatched number of columns and values   TODO22
+  INSERT INTO person (personID, firstName, city)
+  VALUES (2, "Andy", "Forest", "NYC");
+
+24. update nonexisting columns
+> UPDATE person SET city = "L";
+> UPDATE person SET noco = "L";
+Syntax error.
+> UPDATE person SET noco = "L";
+Syntax error.
 
 
 Ongoing:
@@ -72,12 +83,10 @@ Warning: table already exists. Are you sure you want to overwrite all of its con
 | int | string | float | bool |
 +-----+--------+-------+------+
 
-22.
-INSERT - unmatched number of columns and values   TODO22
-  INSERT INTO person (personID, firstName, city)
-  VALUES (2, "Andy", "Forest", "NYC");
+
 
 
 
 23. Union rows
+
 

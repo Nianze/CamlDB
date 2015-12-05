@@ -1,6 +1,6 @@
 {
   "name": "person",
-  "rows": 0,
+  "rows": 4,
   "cols": 8,
   "header": [
     [
@@ -22,5 +22,38 @@
       "Float"
     ]
   ],
-  "elements": []
+  "elements": [
+    4,
+    "Andy",
+    "Forest",
+    "",
+    "L",
+    0,
+    true,
+    0,
+    4,
+    "Tang",
+    "Yuyan",
+    "add",
+    "L",
+    34,
+    false,
+    341.34,
+    4,
+    "Tang",
+    "",
+    "",
+    "L",
+    0,
+    true,
+    0,
+    4,
+    "Tang",
+    "Yuyan",
+    "address",
+    "L",
+    34,
+    false,
+    341.34
+  ]
 }

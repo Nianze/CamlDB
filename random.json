@@ -1,0 +1,12 @@
+{
+  "name": "random",
+  "rows": 0,
+  "cols": 1,
+  "header": [
+    [
+      "c1",
+      "String"
+    ]
+  ],
+  "elements": []
+}

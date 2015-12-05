@@ -83,16 +83,6 @@ Or select top rows in a table;
     SELECT TOP 5 hours FROM data;
     SELECT TOP 50 PERCENT hours FROM data;
 
-<<<<<<< HEAD
----------------------------------------
-SELECT TOP
-  Syntax:
-    SELECT_TOP [number of rows] / [number percent] PERCENT
-    [column name list]
-    FROM [table name];
----------------------------------------
-=======
->>>>>>> cc0cbe6ff0b2d9077837f15f5552e8c2c0cf0b4f
 We see that there are many ways to filter and query data.
 
 Turns out Alex scored higher than he thought: he actually got a 76. Let's update the table:
