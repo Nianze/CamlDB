@@ -20,6 +20,7 @@ Let's use CamlDB to help with an experiment. We want to see how amount of sleep 
 
     CREATE TABLE data (name STRING, hours FLOAT, score INT);
 
+---------------------------------------
 CREATE TABLE
   Syntax:
     CREATE TABLE
@@ -43,6 +44,8 @@ CREATE TABLE
 
   Example:
     CREATE TABLE data (name STRING, hours FLOAT, score INT);
+
+---------------------------------------
 
 
 Now let's add some data to the table. We give the survey to some people and record the results:
@@ -197,7 +200,7 @@ We've seen how CamlDB helps with data management through insert/delete, access a
   CREATE TABLE tb1
    (col1_name INT,
     col2_name STRING,
-    col3_name BOOL
+    col3_name BOOL,
     col4_name FLOAT
    );
   SELECT col1,col3 FROM tb1 UNION ALL SELECT * FROM tb2;
