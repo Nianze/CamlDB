@@ -7,8 +7,8 @@ let parse s =
   ast
 
 let rec read_input s =
-  (if s = "" then print_string "> " else print_string ".. ");
-  let input = read_line () in
+  (if s = "" then print_string "> ");
+  let input = String.trim (read_line ()) in
   if String.length input > 0 &&
     String.get input ((String.length input) - 1) = ';' then s ^ input
   else
@@ -16,7 +16,7 @@ let rec read_input s =
       
 let rec repl () =
    (try (
-    let input = read_input "" in
+    let input = String.trim (read_input "") in
     if String.lowercase input = "exit;" then (
       print_endline "Saving all tables.";
       shutdown_interp ();

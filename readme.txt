@@ -20,6 +20,7 @@ Let's use CamlDB to help with an experiment. We want to see how amount of sleep 
 
     CREATE TABLE data (name STRING, hours FLOAT, score INT);
 
+---------------------------------------
 CREATE TABLE
   Syntax:
     CREATE TABLE
@@ -28,17 +29,7 @@ CREATE TABLE
     [column name 2] [column type 2],
     ...
     [column name n] [column type n]);
-
-  Syntax Rules:
-    [table name]: case-sensitive; support use any string except for the
-    built-in words reserved for instructions, such as INT, CREATE.
-    [column name]: case-sensitive; support use any string except for the
-    built-in words reserved for instructions, such as INT, CREATE.
-    [column type]: support 4 types: INT, FLOAT, STRING, BOOL
-
-  Example:
-    CREATE TABLE data (name STRING, hours FLOAT, score INT);
-
+---------------------------------------
 
 Note that queries are case-sensitive: keywords are all caps and identifiers start with a lowercase letter.
 
@@ -194,7 +185,7 @@ We've seen how CamlDB helps with data management through insert/delete, access a
   CREATE TABLE tb1
    (col1_name INT,
     col2_name STRING,
-    col3_name BOOL
+    col3_name BOOL,
     col4_name FLOAT
    );
   SELECT col1,col3 FROM tb1 UNION ALL SELECT * FROM tb2;
