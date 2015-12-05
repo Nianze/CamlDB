@@ -1,0 +1,19 @@
+{
+  "name": "pottery",
+  "rows": 2,
+  "cols": 2,
+  "header": [
+    [
+      "name",
+      "String",
+      "grade",
+      "String"
+    ]
+  ],
+  "elements": [
+    "Bob",
+    "B",
+    "Alex",
+    "A"
+  ]
+}

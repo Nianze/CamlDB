@@ -27,7 +27,6 @@ let rec repl () =
    ) with
    | Failure e -> print_endline e
    | Invalid_argument _ -> print_endline "Invalid query."
-   | Sys_error _ -> print_endline "Table does not exist."
-   |  _ -> print_endline "Syntax error.");
+   | Sys_error _ -> print_endline "Table does not exist.");
   repl ()
    
