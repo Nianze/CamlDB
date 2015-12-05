@@ -5,15 +5,6 @@ open Lexing
 open Parser
 
 exception SyntaxError of string
-(*exception LexErr of string*)
-(*
-let error msg start finish  =
-    Printf.sprintf "(line %d: char %d..%d): %s" start.pos_lnum
-          (start.pos_cnum -start.pos_bol) (finish.pos_cnum - finish.pos_bol) msg
-
-let lex_error lexbuf =
-    raise ( LexErr (error (lexeme lexbuf) (lexeme_start_p lexbuf) (lexeme_end_p lexbuf)))
-*)
 
 let next_line lexbuf =
   let pos = lexbuf.lex_curr_p in
@@ -33,6 +24,7 @@ let exp = ['e' 'E'] ['-' '+']? digit+
 let float = '-'?digit* frac? exp?
 let letter = ['a'-'z' 'A'-'Z']
 let ident = (['a'-'z'] | '_') (['a'-'z'] | ['A'-'Z'] | ['0'-'9'] | '_' | '\'')*
+let id = ['a'-'z' 'A'-'Z' '_'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
 (*let str = letter+*)
 
 (* token difinition *)
