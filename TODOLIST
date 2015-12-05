@@ -12,15 +12,32 @@ Fixed
 11. table: throw error when same column names are passed in
   val empty_table: string -> (colname * t) list -> status * table
   val create_table: string -> (colname * t) list -> status * table
+12. data_processor: select top percent
 
 
+Ongoing:
 6. parser: specify error message
 8. repl: .. issue when pasting multiple line instructions
 
 
-12. data_processor: select top percent
-
 15. weird float_of_string
 >   CREATE TABLE data (name STRING, hours FLOAT, score INT);
   CREATE TABLE dataSet (name STRING, hours FLOAT, score INT);float_of_string
-
+16. weird error for wrong type
+17. support Capitalized table name, colnames
+18. weird Invalid query error
+  >   CREATE TABLE person
+    (
+    personID INT,
+    lastName STRING,
+    firstName STRING,
+    address STRING,
+    city STRING,
+    age INT,
+    americanCitizen BOOL,
+    salary FLOAT
+    );
+  > INSERT INTO person VALUES (0001, "Tang", "Yuyan", "NYC", 34, false, 341.34);
+  Invalid query.
+  > INSERT INTO person VALUES (1, "Tang", "Yuyan", "NYC", 34, false, 341.34);
+  Invalid query.

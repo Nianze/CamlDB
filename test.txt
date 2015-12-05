@@ -5,6 +5,8 @@
 
 CREATE TABLE - all cases of table name/ column names    PASS
   CREATE TABLE data (name STRING, hours FLOAT, score INT);
+  CREATE TABLE dataSet (name STRING, hours FLOAT, score INT);
+
   CREATE TABLE DSDS (name STRING, hours FLOAT, score INT);
   CREATE TABLE Persons (name STRING, hours FLOAT, score INT);
 
@@ -26,19 +28,24 @@ CREATE TABLE - multiple lines     TODO8
   SALARY FLOAT
   );
 
-CREATE TABLE - create table with same names   TODO9
+CREATE TABLE - create table with same names   FIXED
 CREATE TABLE - same column names        TODO11
    CREATE TABLE data (name STRING, name FLOAT, name INT);
 
-CREATE TABLE - wrong types      PASS
+CREATE TABLE - wrong types      TODO16
   CREATE TABLE data (name STRINGS, hours FLOAT, score INT);
   CREATE TABLE data (name STR, hours FLOAT, score BOOLEAN);
   CREATE TABLE data (name string, hours FLOAT, score BOOLEAN);
 
-****** Empty Table ******
+CREATE TABLE - duplicate column names      Fixed
+  CREATE TABLE dup_col (col1 STRING, col1 INT);
+  SELECT * FROM dup_col;
 
-CREATE TABLE - no columns         TODO10
+****** Empty Table ******
+CREATE TABLE - no columns         Fixed
   CREATE TABLE EmptyTable ();
+  SELECT * FROM empty;
+
 
 
 

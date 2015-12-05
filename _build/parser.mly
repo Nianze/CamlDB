@@ -6,6 +6,7 @@ open Parsing
 open Table
 open Visualizer
 
+(*
 exception ParseErr of string
 
 let error msg start finish  =
@@ -15,6 +16,19 @@ let error msg start finish  =
 let parse_error msg nterm =
     raise ( ParseErr (error msg (rhs_start_pos nterm) (Parsing.rhs_end_pos nterm)))
 
+let parse_buf_exn lexbuf =
+    try
+      T.input T.rule lexbuf
+    with exn ->
+      begin
+        let curr = lexbuf.Lexing.lex_curr_p in
+        let line = curr.Lexing.pos_lnum in
+        let cnum = curr.Lexing.pos_cnum - curr.Lexing.pos_bol in
+        let tok = Lexing.lexeme lexbuf in
+        let tail = Sql_lexer.ruleTail "" lexbuf in
+        raise (ParseErr (exn,(line,cnum,tok,tail)))
+      end
+*)
 %}
 
 (* *declarations* *)
@@ -92,8 +106,8 @@ expr:
   ;
 
 statement:
-  | SEL; cols = col_list; FROM; f_tb = filtered_table { SelCol (cols, f_tb, VisNone)}
   | SEL; cols = col_list; FROM; f_tb = filtered_table; plot=vis_method { SelCol (cols, f_tb, plot)}
+  | SEL; cols = col_list; FROM; f_tb = filtered_table { SelCol (cols, f_tb, VisNone)}
   | SEL; TOP; top = top_field; cols = col_list; FROM; f_tb = filtered_table { SelTop(top, cols, f_tb, VisNone) }
   | SEL; TOP; top = top_field; cols = col_list; FROM; f_tb = filtered_table; plot=vis_method  { SelTop(top, cols, f_tb, plot) }
   | SEL; DISTINCT; col = ID; FROM; f_tb = filtered_table { Distin(ColName col, f_tb, VisNone) }
@@ -105,9 +119,8 @@ statement:
   | DELETE; FROM; tb = ID { DelAll (TbName tb) }
   | DELETE; FROM; tb = ID; WHERE; conds = cond_list { Delete (conds,TbName tb) }
   | CREATE; TABLE; tb = ID; LPAREN; colsets = col_typ_list; RPAREN { Create (TbName tb, colsets) }
-  | SEL; cols1 = col_list; FROM; tb1 = filtered_table; UNION; ALL; SEL; cols2 = col_list; FROM; tb2 = filtered_table { Union (SelCol (cols1, tb1, VisNone), SelCol(cols2,tb2, VisNone)) }
-  | SEL; cols = col_list; FROM; tb1 = filtered_table; JOIN; tb2 = filtered_table; ON; j_cond = join_cond { Joins (tb1,tb2, cols, j_cond) }
-  | error  { ignore(parse_error "parser_error" 1); Err}
+  | SEL; cols1 = col_list; FROM; tb1 = ID; UNION; ALL; SEL; cols2 = col_list; FROM; tb2 = ID { Union (SelCol (cols1,TbName tb1, VisNone), SelCol(cols2,TbName tb2, VisNone)) }
+  | SEL; cols = col_list;FROM; tb1 = ID; JOIN; tb2 = ID;ON; j_cond = join_cond { Joins (TbName tb1,TbName tb2, cols, j_cond) }
   ;
 
 top_field:

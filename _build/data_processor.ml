@@ -1,7 +1,5 @@
 open Table
 
-
-
 (*
 SQL:
 CREATE TABLE table_name
@@ -112,7 +110,7 @@ let select_top (top:top_t) (col_list:colname list) (t: table): status * table =
     | TopNum num -> helper t.first Success num
     | TopPercent p -> if p>100 || p<0
       then (DBError "Percentage out of range", out_tb)
-      else helper t.first Success (t.numcol*p/100)
+      else helper t.first Success (t.numrow*p/100)
 
 (*
 SQL:
