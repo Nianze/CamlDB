@@ -1,10 +1,5 @@
-1. visualizer: draw axis tags
-2. visualizer: draw axis numbers
-3. visualizer: draw single point in line graph
-4. interpreter: specify the error when operating on non-existing tables
 5. interpreter: specify the error message in general
 6. parser: specify error message
-7. visualizer?  show boolean values in lower case
 8. repl: .. issue when pasting multiple line instructions
 9. interp: warn the user when creating table with the same name
 
