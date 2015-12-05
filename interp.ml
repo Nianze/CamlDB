@@ -172,7 +172,7 @@ let rec eval = function
      let colnames = List.map name_of_expr es in
      let name = (name_of_expr n) in
      warn_override name;
-     let t = create_table name (List.combine colnames typs) in
+     let t = proc_status (create_table name (List.combine colnames typs)) in
      add_table name t;
      t
   | Union (e1, e2) ->

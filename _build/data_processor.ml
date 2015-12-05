@@ -1,29 +1,5 @@
 open Table
 
-(* type of value *)
-(* type t = Table.t
-type operator = Table.operator
-type table = Table.table
-type condition = Table.condition *)
-(* type order = DESC | ASC
-type top_t = TopNum of int | TopPercent of int *)
-
-(*
-(* helper function:
-   [ins_sel_val cols tb node] returns Success if such an operation is done:
-   a new one row table, i n which
-   the columns names are [cols], correpsonding column types are taken
-   from table [tb], and values are taken from [node]
-*)
-let ins_sel_val col_list t node =
-  let colnames = get_colnames t in
-  let out_cols = List.filter (fun (x,_)-> List.mem x col_list) colnames in
-  let out_tb = empty_table (get_tablename t) out_cols in
-  let out_index = List.map (get_col_i t) col_list in
-  let get_vals val_list = List.map (List.nth val_list) out_index in
-  let pairs = List.combine (col_list) (get_vals node.value) in
-  insert_col_values pairs out_tb
-*)
 
 
 (*
@@ -40,7 +16,7 @@ create a table with name [table_name], specify the type and
 column name of each column by [col_name_list]
 *)
 let create_table (table_name: string) (col_name_list: (colname * t) list)
-: table = empty_table table_name col_name_list
+: status * table = empty_table table_name col_name_list
 
 
 (*
@@ -92,7 +68,7 @@ from table [t] and return a subtable
 let select_col (col_list :colname list) (t: table): status * table =
   let colnames = get_colnames t in
   let out_cols = List.filter (fun (x,_)-> List.mem x col_list) colnames in
-  let out_tb = empty_table (get_tablename t) out_cols in
+  let (_, out_tb) = empty_table (get_tablename t) out_cols in
   let out_index = List.map (get_col_i t) col_list in
   let get_vals val_list = List.map (List.nth val_list) out_index in
   let out node =
@@ -117,7 +93,7 @@ from table [t] and return a subtable
 let select_top (top:top_t) (col_list:colname list) (t: table): status * table =
   let colnames = get_colnames t in
   let out_cols = List.filter (fun (x,_)-> List.mem x col_list) colnames in
-  let out_tb = empty_table (get_tablename t) out_cols in
+  let (_, out_tb) = empty_table (get_tablename t) out_cols in
   let out_index = List.map (get_col_i t) col_list in
   let get_vals val_list =
     List.map (fun n -> !(List.nth val_list n)) out_index in
@@ -147,11 +123,13 @@ from table t and return a subtable
 *)
 let distinct (col_name :colname) (t :table) : status * table =
   if not (col_in_table t col_name)
-    then (DBError "column names not found.", empty_table (get_tablename t) [])
+    then (DBError "column names not found.",
+      snd (empty_table (get_tablename t) [])
+    )
     else
       let colnames = get_colnames t in
       let out_cols = List.find (fun (x,_)-> x = col_name) colnames in
-      let out_tb = empty_table (get_tablename t) [out_cols] in
+      let (_, out_tb) = empty_table (get_tablename t) [out_cols] in
       let out_index = get_col_i t col_name in
       let get_vals val_list = !(List.nth val_list out_index) in
       let out node =
@@ -182,10 +160,10 @@ and return a subtable
 let where (cond_list: cond_tree) (t :table) :status * table =
   match find cond_list t with
   | (nl, Success) -> (
-  	let new_t = create_table (get_tablename t) (get_colnames t) in
+  	let (_, new_t) = create_table (get_tablename t) (get_colnames t) in
   	List.iter (fun n -> ignore (insert (create_node n.value) new_t)) nl;
   	(Success,new_t) )
-  | (_, DBError e) -> (DBError e,empty_table "" [])
+  | (_, DBError e) -> (DBError e, snd (empty_table "" []) )
 
 
 
@@ -370,34 +348,37 @@ let inner_join t1 t2 pathnames (path1, path2) =
     List.map (fun (x, typ) ->
       (get_tablename t) ^ "#" ^ x, typ) (get_colnames t) in
 
-  let t = create_table "join" (make_colnames t1 @ (make_colnames t2)) in
+  let (sts, t) = create_table "join" (make_colnames t1 @ (make_colnames t2)) in
+  match sts with
+  | DBError e -> (sts, t)
+  | Success -> (
+    let c1_index = snd (List.fold_left
+  			(fun (i, found) v ->
+  			  (i + 1, if fst v = c1 then i else found))
+  			    (0, -1) (get_colnames t1)) in
 
-  let c1_index = snd (List.fold_left
-			(fun (i, found) v ->
-			  (i + 1, if fst v = c1 then i else found))
-			    (0, -1) (get_colnames t1)) in
-
-  if c1_index >= 0 then
-    let status = ref Success in
-    iter (fun t1elt ->
-      let c1_entry = !(List.nth t1elt.value c1_index) in
-      match where (Cond (c2, EQ, c1_entry)) t2 with
-      | (Success, matches) ->
-	 iter (fun mtch ->
-	   let node =
-	     {prev = None; next = None; value = t1elt.value @ mtch.value} in
-	   (match insert node t with
-	   | Success -> ()
-	   | DBError _ -> status := DBError "Could not join tables"
-	   )
-	 ) matches
-      | (DBError _, _) -> status := DBError "Could not join tables"
-    ) t1;
-    let joined_colnames = List.map (fun (t, c) -> t ^ "#" ^ c) pathnames in
-    match select_col joined_colnames t with
-    | (Success, t') ->
-       let cn = List.map (fun (n, typ) -> (split_name n, typ)) t'.colnames in
-       let (_, t'') = list_to_table "join" cn (table_to_list t') in
-       (!status, t'')
-    | (DBError _, sel_t) -> (!status, sel_t)
-  else (DBError "Join: column name not found", empty_table "" [])
+    if c1_index >= 0 then
+      let status = ref Success in
+      iter (fun t1elt ->
+        let c1_entry = !(List.nth t1elt.value c1_index) in
+        match where (Cond (c2, EQ, c1_entry)) t2 with
+        | (Success, matches) ->
+  	 iter (fun mtch ->
+  	   let node =
+  	     {prev = None; next = None; value = t1elt.value @ mtch.value} in
+  	   (match insert node t with
+  	   | Success -> ()
+  	   | DBError _ -> status := DBError "Could not join tables"
+  	   )
+  	 ) matches
+        | (DBError _, _) -> status := DBError "Could not join tables"
+      ) t1;
+      let joined_colnames = List.map (fun (t, c) -> t ^ "#" ^ c) pathnames in
+      match select_col joined_colnames t with
+      | (Success, t') ->
+         let cn = List.map (fun (n, typ) -> (split_name n, typ)) t'.colnames in
+         let (_, t'') = list_to_table "join" cn (table_to_list t') in
+         (!status, t'')
+      | (DBError _, sel_t) -> (!status, sel_t)
+    else (DBError "Join: column name not found", snd  (empty_table "" []) )
+  )
