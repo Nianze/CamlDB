@@ -107,7 +107,8 @@ TEST "delete_all" =
 
 let new_table n =
   let t =
-  create_table "name" [("c1", Int 0); ("c2", String ""); ("c3", Bool true)] in
+  create_table "name"
+    [("c1", Int 0); ("c2", String ""); ("c3", Bool true);] in
   for i = 1 to n do
     ignore (insert_values [Int i; String (string_of_int i); Bool false] t)
   done;
@@ -148,9 +149,6 @@ let s5 =
   [("c3", Bool true)]
   t9'
 
-
-
-
 TEST "update_where" =
   s1 = Success && s2 = Success && s3 = Success && s4 = Success &&
   (is_error s5) && (table_equal t9 t9') && (table_equal t5 t5')
@@ -189,14 +187,86 @@ TEST "union_rows" =
   && (s2 = Success) && (s3 = Success) && (s4 = Success) && (s5 = Success)
 
 (******** Select, Select Top, Select Distinct, Where ********)
+let new_db n =
+  let t =
+  create_table "db"
+    [("c1", Int 0); ("c2", String ""); ("c3", Bool true);("c4",Float 0.)] in
+  for i = 1 to n do
+    ignore (insert_values
+      [Int i; String (string_of_int i); Bool false; Float (int_of_float (i*2))] t)
+  done;
+  t
+let tb = new_db 1
+
 TEST "SELECT" =
-  failwith "TODO"
+  let (s, t) = select_col ["c1";"c4"] tb in
+  t =
+  {
+    name = "db";
+    colnames = [("c1",Int 0);("c4",Float 0.)];
+    numcol = 2;
+    numrow = 1;
+    first =
+      Some
+        {prev = None; next = None;
+         value =
+           [{contents = Int 1}; {contents = Float 1.}]};
+    last =
+      Some
+        {prev = None; next = None;
+      value =
+       [{contents = Int 1}; {contents = Float 1.}]}
+  }
+  &&
+  s = Success
+
+let tb1 = new_db 10
+let tb2 = new_db 10
+
+TEST "select" =
+  let (s1,t1) = select_col ["c1";"c4"] tb1 in
+  let (s2,t2) = select_col ["c2";"c4"] tb2 in
+  s1 = Success && s2 = Success &&
+    node_list_equal (in_some t1.first) (in_some t2.first)
 
 TEST "SELECT TOP" =
-  failwith "TODO"
+  let (s1,t1) = select_top (TopNum 5) ["c1";"c4"] "db" in
+  let (s2,t2) = select_top (TopPercent 50) ["c1";"c4"] "db" in
+  s1 = Success && s2 = Success &&
+    node_list_equal (in_some t1.first) (in_some t2.first)
+
+let new_same_col n =
+  let t =
+  create_table "db"
+    [("c1", Int 0); ("c2", String ""); ("c3", Bool true);("c4",Float 0.)] in
+  for i = 1 to n do
+    ignore (insert_values
+      [Int 1; String "same"); Bool false; Float 1.] t)
+  done;
+  t
+
+let sametb = new_same_col 10
 
 TEST "SELECT DISTINCT" =
-  failwith "TODO"
+  let (s1,t1) = distinct ["c1";"c4"] sametb in
+  s1 = Success &&
+    t1 =   {
+    name = "db";
+    colnames = [("c1",Int 0);("c4",Float 0.)];
+    numcol = 2;
+    numrow = 1;
+    first =
+      Some
+        {prev = None; next = None;
+         value =
+           [{contents = Int 1}; {contents = Float 1.}]};
+    last =
+      Some
+        {prev = None; next = None;
+      value =
+       [{contents = Int 1}; {contents = Float 1.}]}
+  }
+
 
 TEST "WHERE" =
   failwith "TODP"

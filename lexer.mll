@@ -69,14 +69,14 @@ rule read =
   | "ON"     { ON }
   | "."      { DOT }
   | "INT"    { TINT }
-  | "FLOAT"  { TFLOAT }
+(*)  | "FLOAT"  { TFLOAT }*)
   | "STRING" { TSTRING }
   | "BOOL"   { TBOOL }
   | "true"   { TRUE }
   | "false"  { FALSE }
   | ident    { ID (Lexing.lexeme lexbuf) }
   | int   { INT (int_of_string (Lexing.lexeme lexbuf)) }
-  | float    { FLOAT (float_of_string (Lexing.lexeme lexbuf)) }
+(*)  | float    { FLOAT (float_of_string (Lexing.lexeme lexbuf)) }*)
   | '"' ([^'"']* as str) '"' { STRING str }
   | "#"       { PLOT }
   | "SCATTER" { SCATT }
