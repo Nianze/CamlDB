@@ -62,6 +62,14 @@ type expr =
   | Joins    of expr * expr * expr list * (expr * expr) (* (Tb1, Tb2, path list, (path1,path2)) *)
 *)
 
+let prompt_yn s =
+  let ans = ref "" in
+  while !ans <> "y" && !ans <> "n" do
+    print_string (s ^ " (y/n): ");
+    ans := String.lowercase (read_line ());
+  done;
+  !ans = "y"
+
 let open_tables = ref []
 
 let add_table n t =
@@ -156,6 +164,12 @@ let rec eval = function
      let colnames = List.map name_of_expr es in
      let name = (name_of_expr n) in
      let t = create_table name (List.combine colnames typs) in
+     (try ignore (table_named name) with _ -> ());
+     (if List.mem_assoc name !open_tables then
+	 if not (prompt_yn ("Warning: table already exists. Are you sure " ^
+		   "you want to override all of its contents?")) then
+	   failwith "Did not create new table."
+     );
      add_table name t;
      t
   | Union (e1, e2) ->

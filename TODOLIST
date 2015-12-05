@@ -1,6 +1,3 @@
-5. interpreter: specify the error message in general
 6. parser: specify error message
 8. repl: .. issue when pasting multiple line instructions
-9. interp: warn the user when creating table with the same name
-
 
