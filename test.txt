@@ -41,6 +41,77 @@ CREATE TABLE - duplicate column names      Fixed
   CREATE TABLE dup_col (col1 STRING, col1 INT);
   SELECT * FROM dup_col;
 
+CREATE TABLE - normal     Pass
+  CREATE TABLE person
+  (
+  personID INT,
+  lastName STRING,
+  firstName STRING,
+  address STRING,
+  city STRING,
+  age INT,
+  americanCitizen BOOL,
+  salary FLOAT
+  );
+
+INSERT - normal     Pass
+  INSERT INTO person VALUES
+  (1, "Tang", "Yuyan", "address", "NYC", 34, false, 341.34);
+  INSERT INTO person (personID, lastName) VALUES
+  (2, "Tang");
+  INSERT INTO person VALUES
+  (1, "Tang", "Yuyan", "add", "NYC", 34, false, 341.34);
+
+
+
+INSERT - wrong type     Pass
+  INSERT INTO person VALUES
+  (1, "Tang", "Yuyan", 234, "NYC", 34, false, 341.34);
+
+INSERT - less column      Pass
+  INSERT INTO person VALUES
+    (1, "Tang", "Yuyan","NYC", 34, false, 341.34);
+
+INSERT - more column     Pass
+  INSERT INTO person VALUES
+  (1, "Tang", "Yuyan", "add", 13, "NYC", 34, false, 341.34);
+
+INSERT - nonexistent table  Pass
+  INSERT INTO nonexistent VALUES
+  (1, "Tang", "Yuyan", "add", "NYC", 34, false, 341.34);
+
+
+****** Test Type Support ******
+  Should pass:
+  CREATE TABLE testType
+  (int INT, string STRING, float FLOAT, bool BOOL);
+  INSERT INTO testType VALUES  (1, "ad", 3., true);
+  INSERT INTO testType VALUES (-1, "ad", -3., false);
+  INSERT INTO testType VALUES (-001, "Ad", 07E+2, false);
+  INSERT INTO testType VALUES (000001, "BSDFJ DFJS:L", .07e+2, false);
+  INSERT INTO testType VALUES (-000001, "'''", -.07e+2, false);
+
+  Should Throw Syntax Error:
+  INSERT INTO testType VALUES (-000001, "'''", -.07e+2, False);
+  INSERT INTO testType VALUES (-000001, "'''", -.07e+2, TRUE);
+  INSERT INTO testType VALUES (-000001, "'''", 3.14.14, true);
+  INSERT INTO testType VALUES (01, "'sat, 3.14, true);
+  INSERT INTO testType VALUES (-0, "string", 3.14, true);
+  INSERT INTO testType VALUES (-0, "string", -0., true);
+  INSERT INTO testType VALUES (-0, "string", -3.00, true);
+  INSERT INTO testType VALUES (-0, "string", -3.01, true);
+  INSERT INTO testType VALUES (-0, "string", -3.2419085001431515151, true);
+  INSERT INTO testType VALUES (-0, "string", -32419085001431515151.1234, true);
+
+  Unhandled Exceptions:
+  INSERT INTO testType VALUES (-0, "string", -, true);
+  INSERT INTO testType VALUES (-, "stirng", 3.14, true);
+  --> float_of_stirng
+
+  INSERT INTO testType VALUES (143121515315, "'''", .6e+1, false);
+  --> int_of_string
+
+
 ****** Empty Table ******
 CREATE TABLE - no columns         Fixed
   CREATE TABLE EmptyTable ();

@@ -105,26 +105,6 @@ SELECT TOP
     SELECT_TOP [number of rows] / [number percent] PERCENT
     [column name list]
     FROM [table name];
-
-  Syntax Rules:
-
-    [number of rows]: integer; if [number of rows] is larger than the actual
-    number of rows of table, CamlDB will return the full table.
-
-    [number percent] PERCENT: [number percent] is an integer that is in the
-    range [0, 100] inclusive. The actual number of rows selected is going to
-    be rounded to the greatest integer <= numrow * [number percent] / 100
-
-    [column name list]: case-sensitive; separate by comma.
-
-    [table name]: Case-sensitive; table has to exist.
-
-    [column type]: support 4 types: INT, FLOAT, STRING, BOOL
-
-
-  Example:
-    CREATE TABLE data (name STRING, hours FLOAT, score INT);
-
 ---------------------------------------
 We see that there are many ways to filter and query data.
 

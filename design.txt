@@ -1,4 +1,4 @@
-Types CamlDB support:
+Types in CamlDB:
   CamlDB supports 4 types:
   STRING - A string
         ex: "Alex", "bob", "EVE", "fIONA", "BSDFJ DFJS:L", "'''"
@@ -15,6 +15,10 @@ Types CamlDB support:
 
 
 CREATE TABLE
+    Create a table by specifying the name and type of each column and store
+    the table in cache. When exit from CamlDB or user SAVE, each table in cache
+    will be stored into separate json files named [tablename.json].
+
   Syntax:
     CREATE TABLE
     CREATE TABLE [table name]
@@ -36,5 +40,80 @@ CREATE TABLE
 
 
   Example:
-    CREATE TABLE data (name STRING, hours FLOAT, score INT);
+    CREATE TABLE person
+      (
+      personID INT,
+      lastName STRING,
+      firstName STRING,
+      address STRING,
+      city STRING,
+      age INT,
+      americanCitizen BOOL,
+      salary FLOAT
+      );
 
+
+INSERT INTO
+  Syntax:
+    INSERT INTO [table name]
+    ([column value 1], [column value 2], ... , [column value n]);
+
+  Syntax Rules:
+    [table name]: case-sensitive; table must exist either in current file,
+    stored as [tablename.json] or in cache.
+
+    [column value i]: The column values inserted must match the exact type
+    in the right order of the columns defined.
+
+  Example:
+    INSERT INTO person VALUES
+    (1, "Tang", "Yuyan", "address", "NYC", 34, false, 341.34);
+
+
+INSERT INTO COLUMNS
+  insert a row with some rows specified and the rest set as default value
+
+  Syntax:
+    INSERT INTO [table name]
+    ([column name1], [column name 2], ... , [column name m])
+    ([column value 1], [column value 2], ... , [column value m]);
+
+  Syntax Rules:
+    [table name]: case-sensitive; table must exist either in current file,
+    stored as [tablename.json] or in cache.
+
+    [column name i]: [column name i] must have been defined.
+
+    [column value i]: The [column value i] inserted must match the exact type
+    of [column name i] defined.
+
+  Example:
+    INSERT INTO person (personID, lastName, firstName, city)
+    VALUES
+    (2, "Andy", "Forest", "NYC");
+
+
+SELECT TOP
+  Syntax:
+    SELECT_TOP [number of rows] / [number percent] PERCENT
+    [column name list]
+    FROM [table name];
+
+  Syntax Rules:
+
+    [number of rows]: integer; if [number of rows] is larger than the actual
+    number of rows of table, CamlDB will return the full table.
+
+    [number percent] PERCENT: [number percent] is an integer that is in the
+    range [0, 100] inclusive. The actual number of rows selected is going to
+    be rounded to the greatest integer <= numrow * [number percent] / 100
+
+    [column name list]: case-sensitive; separate by comma.
+
+    [table name]: Case-sensitive; table has to exist.
+
+    [column type]: support 4 types: INT, FLOAT, STRING, BOOL
+
+
+  Example:
+    CREATE TABLE data (name STRING, hours FLOAT, score INT);
