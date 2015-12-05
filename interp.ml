@@ -189,5 +189,5 @@ and path_components = function
   | Path (tb, col) -> (get_tablename (eval tb), name_of_expr col)
   | _ -> failwith "Interp: Syntax error."
 
-let shutdown_interp () =
+let save_open_tables () =
   List.iter (fun (n, t) -> save_table t n) !open_tables
