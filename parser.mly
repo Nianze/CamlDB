@@ -6,29 +6,6 @@ open Parsing
 open Table
 open Visualizer
 
-(*
-exception ParseErr of string
-
-let error msg start finish  =
-    Printf.sprintf "(line %d: char %d..%d): %s" start.pos_lnum
-          (start.pos_cnum -start.pos_bol) (finish.pos_cnum - finish.pos_bol) msg
-
-let parse_error msg nterm =
-    raise ( ParseErr (error msg (rhs_start_pos nterm) (Parsing.rhs_end_pos nterm)))
-
-let parse_buf_exn lexbuf =
-    try
-      T.input T.rule lexbuf
-    with exn ->
-      begin
-        let curr = lexbuf.Lexing.lex_curr_p in
-        let line = curr.Lexing.pos_lnum in
-        let cnum = curr.Lexing.pos_cnum - curr.Lexing.pos_bol in
-        let tok = Lexing.lexeme lexbuf in
-        let tail = Sql_lexer.ruleTail "" lexbuf in
-        raise (ParseErr (exn,(line,cnum,tok,tail)))
-      end
-*)
 %}
 
 (* *declarations* *)
