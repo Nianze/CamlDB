@@ -113,23 +113,33 @@ let new_table n =
     ignore (insert_values [Int i; String (string_of_int i); Bool false] t)
   done;
   t
-
 let t9 = new_table 9
 let t5 = new_table 5
 let s1 =
   delete_where (Or (Cond ("c1", LE, Int 2), Cond ("c2", GT, String "5"))) t9
+let (s1', t1') =
+  where (Or (Cond ("c1", LE, Int 2), Cond ("c2", GT, String "5"))) t9
 let s2 =
   delete_where (And (Cond ("c1", LE, Int 2), Cond ("c2", LT, String "6"))) t5
+let (s2', t2') =
+  where (And (Cond ("c1", LE, Int 2), Cond ("c2", LT, String "6"))) t5
 let s3 =
   delete_where
   (And (Cond ("error", LE, Int 2), Cond ("error", LT, String "6")))
   t5
-
+let (s3', t3') =
+  where
+  (And (Cond ("error", LE, Int 2), Cond ("error", LT, String "6")))
+  t5
 
 TEST "delete_where" =
   s1 = Success && s2 = Success && (is_error s3)
   && (table_equal t9 t5)
 
+TEST "where" =
+  s1' = Success && t1'.numrow = 0
+  && s2' = Success && t2'.numrow = 0 &&
+  is_error s3'
 
 let t9' = new_table 9
 let t5' = new_table 5
@@ -186,7 +196,7 @@ TEST "union_rows" =
   (table_equal t2 t3) && (table_equal t4 t5) && (s1 = Success) && (s = Success)
   && (s2 = Success) && (s3 = Success) && (s4 = Success) && (s5 = Success)
 
-(******** Select, Select Top, Select Distinct, Where ********)
+(******** Select, Select Top, Select Distinct ********)
 let new_db n =
   let (_,t) =
   (create_table "db"
@@ -224,8 +234,12 @@ let tb2 = new_db 10
 TEST "select" =
   let (s1,t1) = select_col ["c1";"c4"] tb1 in
   let (s2,t2) = select_col ["c2";"c4"] tb2 in
-  s1 = Success && s2 = Success &&
-    node_equal (in_some t1.first) (in_some t2.first)
+  let (s3,t3) = select_col ["c1";"c4"] tb2 in
+
+  s1 = Success && s2 = Success && s3 = Success &&
+  table_equal t1 t2 = false && table_equal t1 t3 = true
+
+
 
 TEST "SELECT TOP" =
   let (s1,t1) = select_top (TopNum 5) ["c1";"c4"] tb1 in
@@ -245,26 +259,15 @@ let new_same_col n =
 
 let sametb = new_same_col 10
 
-(* TEST "SELECT DISTINCT" =
+TEST "SELECT DISTINCT" =
   let (s1,t1) = distinct "c1" sametb in
   s1 = Success &&
-    t1 =   {
-    name = "db";
-    colnames = [("c1",Int 0)];
-    numcol = 2;
+    t1 =
+    {name = "db";
+    colnames = [("c1", Int 0)];
+    numcol = 1;
     numrow = 1;
-    first =
-      Some
-        {prev = None; next = None;
-         value =
-           [{contents = Int 1}; {contents = Float 1.}]};
-    last =
-      Some
-        {prev = None; next = None;
-      value =
-       [{contents = Int 1}; {contents = Float 1.}]}
-  }
+   first = Some {prev = None; next = None; value = [{contents = Int 1}]};
+   last = Some {prev = None; next = None; value = [{contents = Int 1}]}}
 
 
-TEST "WHERE" =
-  failwith "TODP" *)
