@@ -1,32 +1,35 @@
 {
   "name": "data",
-  "rows": 5,
+  "rows": 6,
   "cols": 3,
   "header": [
     [
       "name",
       "String",
       "hours",
-      "Int",
+      "Float",
       "score",
       "Int"
     ]
   ],
   "elements": [
+    "David",
+    6,
+    75,
+    "Cindy",
+    6,
+    70,
+    "Alex",
+    5,
+    72,
     "Fiona",
     9,
     88,
     "Eve",
     7,
     76,
-    "Cindy",
-    6,
-    70,
     "Bob",
     8,
-    80,
-    "Alex",
-    5,
-    72
+    80
   ]
 }
