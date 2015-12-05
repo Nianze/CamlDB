@@ -3,9 +3,14 @@ open Lexer
 
 (* Parse a string into an ast *)
 let parse s =
-  let lexbuf = Lexing.from_string s in
-  let ast = Parser.prog Lexer.read lexbuf in
-  ast
+  let helper s =
+    let lexbuf = Lexing.from_string s in
+    let ast = Parser.prog Lexer.read lexbuf in
+  ast in
+  try helper s with
+    | Failure "int_of_string" -> failwith "Input integer out of range"
+    | Failure _ -> failwith "Invalid input."
+    | _ -> helper s
 
 let rec read_input s =
   (if s = "" then print_string "> ");
@@ -24,7 +29,7 @@ let get_command s =
     else String.sub trim 0 ((String.length trim) - 1) in
   let trim_again = String.trim rm_semi in
   trim_again ^ (if has_semi then "" else "`")
-      
+
 let rec repl () =
    (try (
      let input = String.trim (read_input "") in
@@ -46,4 +51,4 @@ let rec repl () =
    | Sys_error _ -> print_endline "Table does not exist."
    |  _ -> print_endline "Syntax error.");
   repl ()
-   
+
