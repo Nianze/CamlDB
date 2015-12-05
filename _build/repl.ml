@@ -14,14 +14,24 @@ let rec read_input s =
     String.get input ((String.length input) - 1) = ';' then s ^ input
   else
     read_input (s ^ input ^ " ")
+
+let get_command s =
+  let lower = String.lowercase s in
+  let trim = String.trim lower in
+  let has_semi = String.get trim ((String.length trim) - 1) = ';' in
+  let rm_semi =
+    if String.length trim = 0 then ""
+    else String.sub trim 0 ((String.length trim) - 1) in
+  let trim_again = String.trim rm_semi in
+  trim_again ^ (if has_semi then "" else "`")
       
 let rec repl () =
    (try (
      let input = String.trim (read_input "") in
-     if String.lowercase input = "save;" then (
+     if get_command input = "save" then (
        save_open_tables ();
        print_endline "Saved all open tables."
-     ) else if String.lowercase input = "exit;" then (
+     ) else if get_command input = "exit" then (
        print_endline "Saving all tables.";
        save_open_tables ();
        print_endline "Exiting.";
