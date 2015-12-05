@@ -1,0 +1,26 @@
+---------------------------------------
+CREATE TABLE
+  Syntax:
+    CREATE TABLE
+    CREATE TABLE [table name]
+    ([column name 1] [column type 1],
+    [column name 2] [column type 2],
+    ...
+    [column name n] [column type n]);
+
+  Syntax Rules:
+    [table name]: case-sensitive; support use any string except for the
+    built-in words reserved for instructions, such as INT, CREATE.
+    If creating a table with the same name as existing table, CamlDB will
+    warn the user and let the user to confirm whether he wants the old table
+    to be overwritten.
+
+    [column name]: case-sensitive; support use any string except for the
+    built-in words reserved for instructions, such as INT, CREATE.
+    [column type]: support 4 types: INT, FLOAT, STRING, BOOL
+
+
+  Example:
+    CREATE TABLE data (name STRING, hours FLOAT, score INT);
+
+---------------------------------------

@@ -23,7 +23,6 @@ Let's use CamlDB to help with an experiment. We want to see how amount of sleep 
 ---------------------------------------
 CREATE TABLE
   Syntax:
-    CREATE TABLE
     CREATE TABLE [table name]
     ([column name 1] [column type 1],
     [column name 2] [column type 2],
@@ -101,6 +100,38 @@ Or select only distinct entries in a column:
 
     SELECT DISTINCT hours FROM data;
 
+Or select top rows in a table;
+
+    SELECT TOP 5 hours FROM data;
+    SELECT TOP 50 PERCENT hours FROM data;
+
+---------------------------------------
+SELECT TOP
+  Syntax:
+    SELECT_TOP [number of rows] / [number percent] PERCENT
+    [column name list]
+    FROM [table name];
+
+  Syntax Rules:
+
+    [number of rows]: integer; if [number of rows] is larger than the actual
+    number of rows of table, CamlDB will return the full table.
+
+    [number percent] PERCENT: [number percent] is an integer that is in the
+    range [0, 100] inclusive. The actual number of rows selected is going to
+    be rounded to the greatest integer <= numrow * [number percent] / 100
+
+    [column name list]: case-sensitive; separate by comma.
+
+    [table name]: Case-sensitive; table has to exist.
+
+    [column type]: support 4 types: INT, FLOAT, STRING, BOOL
+
+
+  Example:
+    CREATE TABLE data (name STRING, hours FLOAT, score INT);
+
+---------------------------------------
 We see that there are many ways to filter and query data.
 
 Turns out Alex scored higher than he thought: he actually got a 76. Let's update the table:
@@ -118,25 +149,25 @@ Now that our survey is complete, we'd like to have a better understanding of the
 We get a graphical display:
 
 score
-       89.8 |                                                           
-            |                                                           
-            |                                                     *     
-            |                                                           
-            |                                                           
-            |                                                           
-            |                                                           
-       82.6 |                                                           
-            |                                                           
-            |                                        *                  
-            |                                                           
-            |                                                           
-            |                                                           
-       75.4 |   *                        *                              
-            |                                                           
-            |                                                           
-            |                                                           
-            |                                                           
-            |                *                                          
+       89.8 |
+            |
+            |                                                     *
+            |
+            |
+            |
+            |
+       82.6 |
+            |
+            |                                        *
+            |
+            |
+            |
+       75.4 |   *                        *
+            |
+            |
+            |
+            |
+            |                *
        68.2 |-----------------------------------------------------------
             4.6                6.2                 7.8                 9.4
                                         hours
@@ -148,25 +179,25 @@ Let's draw a line graph to get a sense for the overall trend. Let's sort our dat
 We get this curve:
 
 score
-       89.8 |                                                           
-            |                                                           
-            |                                                     *     
-            |                                                   ..      
-            |                                                 ..        
-            |                                               ..          
-            |                                             ..            
-       82.6 |                                           ..              
-            |                                         ..                
-            |                                       .*                  
-            |                                    ...                    
-            |                                 ...                       
-            |                              ...                          
-       75.4 |   *.                      .*.                             
-            |     ..                  ..                                
-            |       ...            ...                                  
-            |          ...       ..                                     
-            |             ..   ..                                       
-            |               .*.                                         
+       89.8 |
+            |
+            |                                                     *
+            |                                                   ..
+            |                                                 ..
+            |                                               ..
+            |                                             ..
+       82.6 |                                           ..
+            |                                         ..
+            |                                       .*
+            |                                    ...
+            |                                 ...
+            |                              ...
+       75.4 |   *.                      .*.
+            |     ..                  ..
+            |       ...            ...
+            |          ...       ..
+            |             ..   ..
+            |               .*.
        68.2 |-----------------------------------------------------------
             4.6                6.2                 7.8                 9.4
                                         hours

@@ -12,15 +12,16 @@ Fixed
 11. table: throw error when same column names are passed in
   val empty_table: string -> (colname * t) list -> status * table
   val create_table: string -> (colname * t) list -> status * table
+12. data_processor: select top percent
 
 
+Ongoing:
 6. parser: specify error message
 8. repl: .. issue when pasting multiple line instructions
 
 
-12. data_processor: select top percent
-
 15. weird float_of_string
 >   CREATE TABLE data (name STRING, hours FLOAT, score INT);
   CREATE TABLE dataSet (name STRING, hours FLOAT, score INT);float_of_string
-
+16. weird error for wrong type
+17. support Capitalized table name, colnames

@@ -1,8 +1,4 @@
-
 exception Error
-
-let _eRR =
-  Error
 
 type token = 
   | WHERE
@@ -58,7 +54,7 @@ type token =
   | AND
   | ALL
 
-type _menhir_env = {
+and _menhir_env = {
   _menhir_lexer: Lexing.lexbuf -> token;
   _menhir_lexbuf: Lexing.lexbuf;
   _menhir_token: token;
@@ -99,6 +95,7 @@ and _menhir_state =
   | MenhirState15
   | MenhirState6
   | MenhirState4
+
   
 open Ast
 open Lexing
@@ -115,6 +112,8 @@ let error msg start finish  =
 let parse_error msg nterm =
     raise ( ParseErr (error msg (rhs_start_pos nterm) (Parsing.rhs_end_pos nterm)))
 
+let _eRR =
+  Error
 
 let rec _menhir_run32 : _menhir_env -> 'ttv_tail * _menhir_state * (Ast.c_tree) -> 'ttv_return =
   fun _menhir_env _menhir_stack ->
@@ -152,9 +151,6 @@ and _menhir_goto_vis_method : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.
         let _menhir_stack = Obj.magic _menhir_stack in
         let plot = _v in
         let ((((_menhir_stack, _), top), _, cols), _, f_tb) = _menhir_stack in
-        let _5 = () in
-        let _2 = () in
-        let _1 = () in
         let _v : (Ast.expr) =                                                                                               ( SelTop(top, cols, f_tb, plot) ) in
         _menhir_goto_statement _menhir_env _menhir_stack _v
     | MenhirState81 ->
@@ -162,9 +158,6 @@ and _menhir_goto_vis_method : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.
         let _menhir_stack = Obj.magic _menhir_stack in
         let plot = _v in
         let (((_menhir_stack, _), col), _, f_tb) = _menhir_stack in
-        let _4 = () in
-        let _2 = () in
-        let _1 = () in
         let _v : (Ast.expr) =                                                                           ( Distin(ColName col, f_tb, plot) ) in
         _menhir_goto_statement _menhir_env _menhir_stack _v
     | MenhirState85 ->
@@ -172,8 +165,6 @@ and _menhir_goto_vis_method : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.
         let _menhir_stack = Obj.magic _menhir_stack in
         let plot = _v in
         let ((_menhir_stack, _, cols), _, f_tb) = _menhir_stack in
-        let _3 = () in
-        let _1 = () in
         let _v : (Ast.expr) =                                                                        ( SelCol (cols, f_tb, plot)) in
         _menhir_goto_statement _menhir_env _menhir_stack _v
     | _ ->
@@ -197,8 +188,6 @@ and _menhir_goto_cond_list : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.c
             let _menhir_env = _menhir_discard _menhir_env in
             let _menhir_stack = Obj.magic _menhir_stack in
             let ((_menhir_stack, _menhir_s), _, c) = _menhir_stack in
-            let _3 = () in
-            let _1 = () in
             let _v : (Ast.c_tree) =                                    ( c ) in
             _menhir_goto_cond_list _menhir_env _menhir_stack _menhir_s _v
         | _ ->
@@ -217,7 +206,6 @@ and _menhir_goto_cond_list : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.c
         | JOIN | ON | OR | ORDER | PLOT | RPAREN | SEMICOLON | UNION ->
             let _menhir_stack = Obj.magic _menhir_stack in
             let ((_menhir_stack, _menhir_s, left), _, right) = _menhir_stack in
-            let _2 = () in
             let _v : (Ast.c_tree) =                                              ( (Or  (left,right)) ) in
             _menhir_goto_cond_list _menhir_env _menhir_stack _menhir_s _v
         | _ ->
@@ -230,7 +218,6 @@ and _menhir_goto_cond_list : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.c
         let _menhir_stack = Obj.magic _menhir_stack in
         let _menhir_stack = Obj.magic _menhir_stack in
         let ((_menhir_stack, _menhir_s, left), _, right) = _menhir_stack in
-        let _2 = () in
         let _v : (Ast.c_tree) =                                              ( (And (left,right)) ) in
         _menhir_goto_cond_list _menhir_env _menhir_stack _menhir_s _v
     | MenhirState15 ->
@@ -245,9 +232,6 @@ and _menhir_goto_cond_list : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.c
         | SEMICOLON ->
             let _menhir_stack = Obj.magic _menhir_stack in
             let (((_menhir_stack, tb), _, pairs), _, conds) = _menhir_stack in
-            let _5 = () in
-            let _3 = () in
-            let _1 = () in
             let _v : (Ast.expr) =                                                                       (Update (conds,pairs,TbName tb) ) in
             _menhir_goto_statement _menhir_env _menhir_stack _v
         | _ ->
@@ -286,10 +270,6 @@ and _menhir_goto_cond_list : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.c
                         let _menhir_env = _menhir_discard _menhir_env in
                         let _menhir_stack = Obj.magic _menhir_stack in
                         let (((_menhir_stack, _menhir_s, tb), _, conds), col) = _menhir_stack in
-                        let _7 = () in
-                        let _5 = () in
-                        let _4 = () in
-                        let _2 = () in
                         let _v : (Ast.expr) =                                                                 ( Where (conds, Sort (ColName col, ASC, TbName tb) ) ) in
                         _menhir_goto_filtered_table _menhir_env _menhir_stack _menhir_s _v
                     | DESC ->
@@ -297,10 +277,6 @@ and _menhir_goto_cond_list : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.c
                         let _menhir_env = _menhir_discard _menhir_env in
                         let _menhir_stack = Obj.magic _menhir_stack in
                         let (((_menhir_stack, _menhir_s, tb), _, conds), col) = _menhir_stack in
-                        let _7 = () in
-                        let _5 = () in
-                        let _4 = () in
-                        let _2 = () in
                         let _v : (Ast.expr) =                                                                  ( Where (conds, Sort (ColName col, DESC, TbName tb) ) ) in
                         _menhir_goto_filtered_table _menhir_env _menhir_stack _menhir_s _v
                     | _ ->
@@ -324,7 +300,6 @@ and _menhir_goto_cond_list : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.c
         | JOIN | ON | PLOT | SEMICOLON | UNION ->
             let _menhir_stack = Obj.magic _menhir_stack in
             let ((_menhir_stack, _menhir_s, tb), _, conds) = _menhir_stack in
-            let _2 = () in
             let _v : (Ast.expr) =                                        ( Where (conds,TbName tb) ) in
             _menhir_goto_filtered_table _menhir_env _menhir_stack _menhir_s _v
         | _ ->
@@ -345,9 +320,6 @@ and _menhir_goto_cond_list : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.c
         | SEMICOLON ->
             let _menhir_stack = Obj.magic _menhir_stack in
             let ((_menhir_stack, tb), _, conds) = _menhir_stack in
-            let _4 = () in
-            let _2 = () in
-            let _1 = () in
             let _v : (Ast.expr) =                                                     ( Delete (conds,TbName tb) ) in
             _menhir_goto_statement _menhir_env _menhir_stack _v
         | _ ->
@@ -370,8 +342,6 @@ and _menhir_run69 : _menhir_env -> 'ttv_tail -> _menhir_state -> 'ttv_return =
         let _menhir_env = _menhir_discard _menhir_env in
         let _menhir_stack = Obj.magic _menhir_stack in
         let (_menhir_stack, _menhir_s) = _menhir_stack in
-        let _2 = () in
-        let _1 = () in
         let _v : (Ast.plot) =                  ( BarGraph ) in
         _menhir_goto_vis_method _menhir_env _menhir_stack _menhir_s _v
     | HISTOG ->
@@ -379,8 +349,6 @@ and _menhir_run69 : _menhir_env -> 'ttv_tail -> _menhir_state -> 'ttv_return =
         let _menhir_env = _menhir_discard _menhir_env in
         let _menhir_stack = Obj.magic _menhir_stack in
         let (_menhir_stack, _menhir_s) = _menhir_stack in
-        let _2 = () in
-        let _1 = () in
         let _v : (Ast.plot) =                  ( Hist2d ) in
         _menhir_goto_vis_method _menhir_env _menhir_stack _menhir_s _v
     | LINE ->
@@ -388,8 +356,6 @@ and _menhir_run69 : _menhir_env -> 'ttv_tail -> _menhir_state -> 'ttv_return =
         let _menhir_env = _menhir_discard _menhir_env in
         let _menhir_stack = Obj.magic _menhir_stack in
         let (_menhir_stack, _menhir_s) = _menhir_stack in
-        let _2 = () in
-        let _1 = () in
         let _v : (Ast.plot) =                  ( LineGraph ) in
         _menhir_goto_vis_method _menhir_env _menhir_stack _menhir_s _v
     | SCATT ->
@@ -397,8 +363,6 @@ and _menhir_run69 : _menhir_env -> 'ttv_tail -> _menhir_state -> 'ttv_return =
         let _menhir_env = _menhir_discard _menhir_env in
         let _menhir_stack = Obj.magic _menhir_stack in
         let (_menhir_stack, _menhir_s) = _menhir_stack in
-        let _2 = () in
-        let _1 = () in
         let _v : (Ast.plot) =                  ( Scatter2d ) in
         _menhir_goto_vis_method _menhir_env _menhir_stack _menhir_s _v
     | _ ->
@@ -416,7 +380,6 @@ and _menhir_goto_separated_nonempty_list_COMMA_value_field_ : _menhir_env -> 'tt
         let _menhir_stack = Obj.magic _menhir_stack in
         let xs = _v in
         let (_menhir_stack, _menhir_s, x) = _menhir_stack in
-        let _2 = () in
         let _v : (Ast.typ list) =     ( x :: xs ) in
         _menhir_goto_separated_nonempty_list_COMMA_value_field_ _menhir_env _menhir_stack _menhir_s _v
     | MenhirState120 | MenhirState108 ->
@@ -450,7 +413,6 @@ and _menhir_goto_separated_nonempty_list_COMMA_pair_field_ : _menhir_env -> 'ttv
         let _menhir_stack = Obj.magic _menhir_stack in
         let xs = _v in
         let (_menhir_stack, _menhir_s, x) = _menhir_stack in
-        let _2 = () in
         let _v : ((Ast.expr * Ast.typ) list) =     ( x :: xs ) in
         _menhir_goto_separated_nonempty_list_COMMA_pair_field_ _menhir_env _menhir_stack _menhir_s _v
     | _ ->
@@ -475,7 +437,6 @@ and _menhir_goto_separated_nonempty_list_COMMA_col_field_ : _menhir_env -> 'ttv_
         let _menhir_stack = Obj.magic _menhir_stack in
         let xs = _v in
         let (_menhir_stack, _menhir_s, x) = _menhir_stack in
-        let _2 = () in
         let _v : (Ast.expr list) =     ( x :: xs ) in
         _menhir_goto_separated_nonempty_list_COMMA_col_field_ _menhir_env _menhir_stack _menhir_s _v
     | _ ->
@@ -489,7 +450,6 @@ and _menhir_goto_separated_nonempty_list_COMMA_typ_field_ : _menhir_env -> 'ttv_
         let _menhir_stack = Obj.magic _menhir_stack in
         let xs = _v in
         let (_menhir_stack, _menhir_s, x) = _menhir_stack in
-        let _2 = () in
         let _v : ((Ast.expr * Ast.typ) list) =     ( x :: xs ) in
         _menhir_goto_separated_nonempty_list_COMMA_typ_field_ _menhir_env _menhir_stack _menhir_s _v
     | MenhirState131 ->
@@ -515,9 +475,6 @@ and _menhir_goto_filtered_table : _menhir_env -> 'ttv_tail -> _menhir_state -> (
         | SEMICOLON ->
             let _menhir_stack = Obj.magic _menhir_stack in
             let ((((_menhir_stack, _), top), _, cols), _, f_tb) = _menhir_stack in
-            let _5 = () in
-            let _2 = () in
-            let _1 = () in
             let _v : (Ast.expr) =                                                                             ( SelTop(top, cols, f_tb, VisNone) ) in
             _menhir_goto_statement _menhir_env _menhir_stack _v
         | _ ->
@@ -534,9 +491,6 @@ and _menhir_goto_filtered_table : _menhir_env -> 'ttv_tail -> _menhir_state -> (
         | SEMICOLON ->
             let _menhir_stack = Obj.magic _menhir_stack in
             let (((_menhir_stack, _), col), _, f_tb) = _menhir_stack in
-            let _4 = () in
-            let _2 = () in
-            let _1 = () in
             let _v : (Ast.expr) =                                                          ( Distin(ColName col, f_tb, VisNone) ) in
             _menhir_goto_statement _menhir_env _menhir_stack _v
         | _ ->
@@ -605,8 +559,6 @@ and _menhir_goto_filtered_table : _menhir_env -> 'ttv_tail -> _menhir_state -> (
         | SEMICOLON ->
             let _menhir_stack = Obj.magic _menhir_stack in
             let ((_menhir_stack, _, cols), _, f_tb) = _menhir_stack in
-            let _3 = () in
-            let _1 = () in
             let _v : (Ast.expr) =                                                       ( SelCol (cols, f_tb, VisNone)) in
             _menhir_goto_statement _menhir_env _menhir_stack _v
         | _ ->
@@ -617,12 +569,6 @@ and _menhir_goto_filtered_table : _menhir_env -> 'ttv_tail -> _menhir_state -> (
         let _menhir_stack = Obj.magic _menhir_stack in
         let _menhir_stack = Obj.magic _menhir_stack in
         let (((((_menhir_stack, _, cols1), _, tb1), _), _, cols2), _, tb2) = _menhir_stack in
-        let _9 = () in
-        let _7 = () in
-        let _6 = () in
-        let _5 = () in
-        let _3 = () in
-        let _1 = () in
         let _v : (Ast.expr) =                                                                                                                      ( Union (SelCol (cols1, tb1, VisNone), SelCol(cols2,tb2, VisNone)) ) in
         _menhir_goto_statement _menhir_env _menhir_stack _v
     | MenhirState92 ->
@@ -674,18 +620,11 @@ and _menhir_goto_filtered_table : _menhir_env -> 'ttv_tail -> _menhir_state -> (
                                         let _menhir_stack = Obj.magic _menhir_stack in
                                         let col2 = _v in
                                         let (((_menhir_stack, tb1), col1), tb2) = _menhir_stack in
-                                        let _6 = () in
-                                        let _4 = () in
-                                        let _2 = () in
                                         let _v : (Ast.expr * Ast.expr) =                            ( (Path(TbName tb1, ColName col1),Path(TbName tb2, ColName col2)) ) in
                                         let _menhir_stack = Obj.magic _menhir_stack in
                                         let _menhir_stack = Obj.magic _menhir_stack in
                                         let j_cond = _v in
                                         let ((((_menhir_stack, _, cols), _, tb1), _), _, tb2) = _menhir_stack in
-                                        let _7 = () in
-                                        let _5 = () in
-                                        let _3 = () in
-                                        let _1 = () in
                                         let _v : (Ast.expr) =                                                                                                          ( Joins (tb1,tb2, cols, j_cond) ) in
                                         _menhir_goto_statement _menhir_env _menhir_stack _v
                                     | _ ->
@@ -755,11 +694,6 @@ and _menhir_goto_loption_separated_nonempty_list_COMMA_value_field__ : _menhir_e
             let _menhir_env = _menhir_discard _menhir_env in
             let _menhir_stack = Obj.magic _menhir_stack in
             let ((_menhir_stack, tb), _, vals) = _menhir_stack in
-            let _7 = () in
-            let _5 = () in
-            let _4 = () in
-            let _2 = () in
-            let _1 = () in
             let _v : (Ast.expr) =                                                                   (InsRow (vals,TbName tb)) in
             _menhir_goto_statement _menhir_env _menhir_stack _v
         | _ ->
@@ -778,13 +712,6 @@ and _menhir_goto_loption_separated_nonempty_list_COMMA_value_field__ : _menhir_e
             let _menhir_env = _menhir_discard _menhir_env in
             let _menhir_stack = Obj.magic _menhir_stack in
             let (((_menhir_stack, tb), _, cols), _, vals) = _menhir_stack in
-            let _10 = () in
-            let _8 = () in
-            let _7 = () in
-            let _6 = () in
-            let _4 = () in
-            let _2 = () in
-            let _1 = () in
             let _v : (Ast.expr) =                                                                                                    (InsCol (cols,vals,TbName(tb))) in
             _menhir_goto_statement _menhir_env _menhir_stack _v
         | _ ->
@@ -804,7 +731,6 @@ and _menhir_goto_value_field : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast
         let _menhir_stack = Obj.magic _menhir_stack in
         let _menhir_stack = Obj.magic _menhir_stack in
         let ((_menhir_stack, _menhir_s, col), _, vl) = _menhir_stack in
-        let _2 = () in
         let _v : (Ast.expr * Ast.typ) =                                       ( (ColName col, vl) ) in
         let _menhir_stack = (_menhir_stack, _menhir_s, _v) in
         let _menhir_stack = Obj.magic _menhir_stack in
@@ -837,42 +763,36 @@ and _menhir_goto_value_field : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast
         let _menhir_stack = Obj.magic _menhir_stack in
         let _menhir_stack = Obj.magic _menhir_stack in
         let ((_menhir_stack, _menhir_s, e1), _, e2) = _menhir_stack in
-        let _2 = () in
         let _v : (Table.condition) =                                   ( (e1,NE,e2) ) in
         _menhir_goto_cond_field _menhir_env _menhir_stack _menhir_s _v
     | MenhirState20 ->
         let _menhir_stack = Obj.magic _menhir_stack in
         let _menhir_stack = Obj.magic _menhir_stack in
         let ((_menhir_stack, _menhir_s, e1), _, e2) = _menhir_stack in
-        let _2 = () in
         let _v : (Table.condition) =                                   ( (e1,LT,e2) ) in
         _menhir_goto_cond_field _menhir_env _menhir_stack _menhir_s _v
     | MenhirState22 ->
         let _menhir_stack = Obj.magic _menhir_stack in
         let _menhir_stack = Obj.magic _menhir_stack in
         let ((_menhir_stack, _menhir_s, e1), _, e2) = _menhir_stack in
-        let _2 = () in
         let _v : (Table.condition) =                                   ( (e1,LE,e2) ) in
         _menhir_goto_cond_field _menhir_env _menhir_stack _menhir_s _v
     | MenhirState24 ->
         let _menhir_stack = Obj.magic _menhir_stack in
         let _menhir_stack = Obj.magic _menhir_stack in
         let ((_menhir_stack, _menhir_s, e1), _, e2) = _menhir_stack in
-        let _2 = () in
         let _v : (Table.condition) =                                   ( (e1,GT,e2) ) in
         _menhir_goto_cond_field _menhir_env _menhir_stack _menhir_s _v
     | MenhirState26 ->
         let _menhir_stack = Obj.magic _menhir_stack in
         let _menhir_stack = Obj.magic _menhir_stack in
         let ((_menhir_stack, _menhir_s, e1), _, e2) = _menhir_stack in
-        let _2 = () in
         let _v : (Table.condition) =                                   ( (e1,GE,e2) ) in
         _menhir_goto_cond_field _menhir_env _menhir_stack _menhir_s _v
     | MenhirState28 ->
         let _menhir_stack = Obj.magic _menhir_stack in
         let _menhir_stack = Obj.magic _menhir_stack in
         let ((_menhir_stack, _menhir_s, e1), _, e2) = _menhir_stack in
-        let _2 = () in
         let _v : (Table.condition) =                                   ( (e1,EQ,e2) ) in
         _menhir_goto_cond_field _menhir_env _menhir_stack _menhir_s _v
     | MenhirState120 | MenhirState110 | MenhirState108 ->
@@ -1141,8 +1061,6 @@ and _menhir_goto_loption_separated_nonempty_list_COMMA_pair_field__ : _menhir_en
     | SEMICOLON ->
         let _menhir_stack = Obj.magic _menhir_stack in
         let ((_menhir_stack, tb), _, pairs) = _menhir_stack in
-        let _3 = () in
-        let _1 = () in
         let _v : (Ast.expr) =                                             (UpdAll (pairs,TbName tb) ) in
         _menhir_goto_statement _menhir_env _menhir_stack _v
     | _ ->
@@ -1229,9 +1147,6 @@ and _menhir_run55 : _menhir_env -> 'ttv_tail -> _menhir_state -> (string) -> 'tt
                     let _menhir_env = _menhir_discard _menhir_env in
                     let _menhir_stack = Obj.magic _menhir_stack in
                     let ((_menhir_stack, _menhir_s, tb), col) = _menhir_stack in
-                    let _5 = () in
-                    let _3 = () in
-                    let _2 = () in
                     let _v : (Ast.expr) =                                        ( Sort (ColName col, ASC, TbName tb) ) in
                     _menhir_goto_filtered_table _menhir_env _menhir_stack _menhir_s _v
                 | DESC ->
@@ -1239,9 +1154,6 @@ and _menhir_run55 : _menhir_env -> 'ttv_tail -> _menhir_state -> (string) -> 'tt
                     let _menhir_env = _menhir_discard _menhir_env in
                     let _menhir_stack = Obj.magic _menhir_stack in
                     let ((_menhir_stack, _menhir_s, tb), col) = _menhir_stack in
-                    let _5 = () in
-                    let _3 = () in
-                    let _2 = () in
                     let _v : (Ast.expr) =                                        ( Sort (ColName col, DESC,TbName tb) ) in
                     _menhir_goto_filtered_table _menhir_env _menhir_stack _menhir_s _v
                 | _ ->
@@ -1296,7 +1208,6 @@ and _menhir_run7 : _menhir_env -> 'ttv_tail -> _menhir_state -> 'ttv_return =
   fun _menhir_env _menhir_stack _menhir_s ->
     let _menhir_env = _menhir_discard _menhir_env in
     let _menhir_stack = Obj.magic _menhir_stack in
-    let _1 = () in
     let _v : (Ast.typ) =          ( Bool true ) in
     _menhir_goto_value_field _menhir_env _menhir_stack _menhir_s _v
 
@@ -1328,7 +1239,6 @@ and _menhir_run11 : _menhir_env -> 'ttv_tail -> _menhir_state -> 'ttv_return =
   fun _menhir_env _menhir_stack _menhir_s ->
     let _menhir_env = _menhir_discard _menhir_env in
     let _menhir_stack = Obj.magic _menhir_stack in
-    let _1 = () in
     let _v : (Ast.typ) =           ( Bool false ) in
     _menhir_goto_value_field _menhir_env _menhir_stack _menhir_s _v
 
@@ -1354,7 +1264,6 @@ and _menhir_run47 : _menhir_env -> 'ttv_tail -> _menhir_state -> (string) -> 'tt
             let _menhir_stack = Obj.magic _menhir_stack in
             let col = _v in
             let (_menhir_stack, _menhir_s, tb) = _menhir_stack in
-            let _2 = () in
             let _v : (Ast.expr) =                            ( Path(TbName tb, ColName col) ) in
             _menhir_goto_col_field _menhir_env _menhir_stack _menhir_s _v
         | _ ->
@@ -1379,7 +1288,6 @@ and _menhir_run50 : _menhir_env -> 'ttv_tail -> _menhir_state -> 'ttv_return =
   fun _menhir_env _menhir_stack _menhir_s ->
     let _menhir_env = _menhir_discard _menhir_env in
     let _menhir_stack = Obj.magic _menhir_stack in
-    let _1 = () in
     let _v : (Ast.expr) =         ( ColName "*" ) in
     _menhir_goto_col_field _menhir_env _menhir_stack _menhir_s _v
 
@@ -1395,7 +1303,6 @@ and _menhir_goto_statement : _menhir_env -> 'ttv_tail -> (Ast.expr) -> 'ttv_retu
         let _menhir_env = _menhir_discard _menhir_env in
         let _menhir_stack = Obj.magic _menhir_stack in
         let (_menhir_stack, s) = _menhir_stack in
-        let _2 = () in
         let _v : (Ast.expr) =                              ( s ) in
         let _menhir_stack = (_menhir_stack, _v) in
         let _menhir_stack = Obj.magic _menhir_stack in
@@ -1406,7 +1313,6 @@ and _menhir_goto_statement : _menhir_env -> 'ttv_tail -> (Ast.expr) -> 'ttv_retu
             let _menhir_stack = Obj.magic _menhir_stack in
             let _menhir_stack = Obj.magic _menhir_stack in
             let (_menhir_stack, e) = _menhir_stack in
-            let _2 = () in
             let _v : (Ast.expr) =                   (e) in
             let _menhir_stack = Obj.magic _menhir_stack in
             let _menhir_stack = Obj.magic _menhir_stack in
@@ -1572,7 +1478,6 @@ and _menhir_error0 : _menhir_env -> 'ttv_tail -> 'ttv_return =
     let _menhir_stack = Obj.magic _menhir_stack in
     let _menhir_env = _menhir_discard _menhir_env in
     let _menhir_stack = Obj.magic _menhir_stack in
-    let _1 = () in
     let _v : (Ast.expr) =            ( ignore(parse_error "parser_error" 1); Err) in
     _menhir_goto_statement _menhir_env _menhir_stack _v
 
@@ -1731,10 +1636,6 @@ and _menhir_goto_loption_separated_nonempty_list_COMMA_typ_field__ : _menhir_env
         let _menhir_env = _menhir_discard _menhir_env in
         let _menhir_stack = Obj.magic _menhir_stack in
         let ((_menhir_stack, tb), _, colsets) = _menhir_stack in
-        let _6 = () in
-        let _4 = () in
-        let _2 = () in
-        let _1 = () in
         let _v : (Ast.expr) =                                                                    ( Create (TbName tb, colsets) ) in
         _menhir_goto_statement _menhir_env _menhir_stack _v
     | _ ->
@@ -1755,7 +1656,6 @@ and _menhir_run132 : _menhir_env -> 'ttv_tail -> _menhir_state -> (string) -> 't
         let _menhir_env = _menhir_discard _menhir_env in
         let _menhir_stack = Obj.magic _menhir_stack in
         let (_menhir_stack, _menhir_s, col) = _menhir_stack in
-        let _2 = () in
         let _v : (Ast.expr * Ast.typ) =                      ( (ColName col, Bool false) ) in
         _menhir_goto_typ_field _menhir_env _menhir_stack _menhir_s _v
     | TFLOAT ->
@@ -1763,7 +1663,6 @@ and _menhir_run132 : _menhir_env -> 'ttv_tail -> _menhir_state -> (string) -> 't
         let _menhir_env = _menhir_discard _menhir_env in
         let _menhir_stack = Obj.magic _menhir_stack in
         let (_menhir_stack, _menhir_s, col) = _menhir_stack in
-        let _2 = () in
         let _v : (Ast.expr * Ast.typ) =                      ( (ColName col, Float 0.0) ) in
         _menhir_goto_typ_field _menhir_env _menhir_stack _menhir_s _v
     | TINT ->
@@ -1771,7 +1670,6 @@ and _menhir_run132 : _menhir_env -> 'ttv_tail -> _menhir_state -> (string) -> 't
         let _menhir_env = _menhir_discard _menhir_env in
         let _menhir_stack = Obj.magic _menhir_stack in
         let (_menhir_stack, _menhir_s, col) = _menhir_stack in
-        let _2 = () in
         let _v : (Ast.expr * Ast.typ) =                    ( (ColName col, Int 0) ) in
         _menhir_goto_typ_field _menhir_env _menhir_stack _menhir_s _v
     | TSTRING ->
@@ -1779,7 +1677,6 @@ and _menhir_run132 : _menhir_env -> 'ttv_tail -> _menhir_state -> (string) -> 't
         let _menhir_env = _menhir_discard _menhir_env in
         let _menhir_stack = Obj.magic _menhir_stack in
         let (_menhir_stack, _menhir_s, col) = _menhir_stack in
-        let _2 = () in
         let _v : (Ast.expr * Ast.typ) =                       ( (ColName col, String "") ) in
         _menhir_goto_typ_field _menhir_env _menhir_stack _menhir_s _v
     | _ ->
@@ -1799,7 +1696,7 @@ and _menhir_discard : _menhir_env -> _menhir_env =
       _menhir_lexbuf = lexbuf;
       _menhir_token = _tok;
       _menhir_error = false;
-    }
+      }
 
 and prog : (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Ast.expr) =
   fun lexer lexbuf ->
@@ -1809,7 +1706,7 @@ and prog : (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Ast.expr) =
       _menhir_lexbuf = lexbuf;
       _menhir_token = _tok;
       _menhir_error = false;
-    } in
+      } in
     Obj.magic (let _menhir_stack = () in
     let _menhir_env = _menhir_discard _menhir_env in
     let _tok = _menhir_env._menhir_token in
@@ -1894,8 +1791,6 @@ and prog : (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Ast.expr) =
                 | SEMICOLON ->
                     let _menhir_stack = Obj.magic _menhir_stack in
                     let (_menhir_stack, tb) = _menhir_stack in
-                    let _2 = () in
-                    let _1 = () in
                     let _v : (Ast.expr) =                           ( DelAll (TbName tb) ) in
                     _menhir_goto_statement _menhir_env _menhir_stack _v
                 | _ ->
@@ -2056,7 +1951,6 @@ and prog : (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Ast.expr) =
                     let _menhir_env = _menhir_discard _menhir_env in
                     let _menhir_stack = Obj.magic _menhir_stack in
                     let (_menhir_stack, i) = _menhir_stack in
-                    let _2 = () in
                     let _v : (Ast.top_t) =                      ( TopPercent i) in
                     _menhir_goto_top_field _menhir_env _menhir_stack _v
                 | ANY | FROM | ID _ ->
@@ -2123,5 +2017,6 @@ and prog : (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Ast.expr) =
         assert (not _menhir_env._menhir_error);
         _menhir_env._menhir_error <- true;
         _menhir_error0 _menhir_env (Obj.magic _menhir_stack))
-  
+
+
 
