@@ -167,7 +167,8 @@ UPDATE WHERE
 
 
   Example:
-    UPDATE person SET personID = 4, city = "Ithaca";
+    UPDATE person SET personID = 4, city = "Ithaca"
+    WHERE personID > 1 AND firstName <> "Lydia";
 
 
 SELECT TOP
