@@ -19,7 +19,10 @@ To run, run main.byte:
 
 Note: see design.txt for full commands specification.
 
-Let's use CamlDB to help with an experiment. We want to see how amount of sleep affects test scores. We'll ask people for their names, average hours slept and their score on the last exam. So run main.byte to start the REPL, and create a table:
+Let's use CamlDB to help with an experiment. We want to see how amount of
+sleep affects test scores. We'll ask people for their names, average hours
+slept and their score on the last exam. So run main.byte to start the REPL,
+and create a table:
 
     CREATE TABLE data (name STRING, hours FLOAT, score INT);
 
@@ -56,15 +59,18 @@ We get a tabular display of our table:
 | Alex  | 5.    | 72    |
 +-------+-------+-------+
 
-Let's try some more complex queries. Select all students who slept less than 7 hours:
+Let's try some more complex queries. Select all students who slept less
+than 7 hours:
 
     SELECT * FROM data WHERE hours < 7.;
 
-Note that the table uses an optimization strategy, moving the most recently accessed entries to the front. We can see this by viewing the whole table again:
+Note that the table uses an optimization strategy, moving the most recently
+accessed entries to the front. We can see this by viewing the whole table again:
 
     SELECT * FROM data;
 
-Note that the light sleepers have moved to the top of the table. This helps improve speed since recent accesses are more likely to be accessed later.
+Note that the light sleepers have moved to the top of the table. This helps
+improve speed since recent accesses are more likely to be accessed later.
 
 We can also select only their hours and scores:
 
@@ -85,7 +91,8 @@ Or select top rows in a table;
 
 We see that there are many ways to filter and query data.
 
-Turns out Alex scored higher than he thought: he actually got a 76. Let's update the table:
+Turns out Alex scored higher than he thought: he actually got a 76. Let's
+update the table:
 
     UPDATE data SET score=76 WHERE name="Alex";
 
@@ -93,7 +100,9 @@ Oops, David isn't even in the class. Delete his entry:
 
     DELETE FROM data WHERE name="David";
 
-Now that our survey is complete, we'd like to have a better understanding of the data. One way CamlDB lets us do this is with visualizations, specifically scatterplots and line graphs. We can draw a scatterplot with a hashtag #SCATTER:
+Now that our survey is complete, we'd like to have a better understanding of
+the data. One way CamlDB lets us do this is with visualizations, specifically
+scatterplots and line graphs. We can draw a scatterplot with a hashtag #SCATTER:
 
     SELECT hours, score FROM data #SCATTER;
 
@@ -123,7 +132,8 @@ score
             4.6                6.2                 7.8                 9.4
                                         hours
 
-Let's draw a line graph to get a sense for the overall trend. Let's sort our data and plot:
+Let's draw a line graph to get a sense for the overall trend. Let's sort our
+data and plot:
 
     SELECT hours, score FROM data ORDER BY hours ASC #LINE;
 
@@ -153,7 +163,9 @@ score
             4.6                6.2                 7.8                 9.4
                                         hours
 
-Some of the students are in a different class as well (pottery), and we want to merge their grades from that class into this table. Create a table with data to represent this other class:
+Some of the students are in a different class as well (pottery), and we want to
+merge their grades from that class into this table. Create a table with data to
+represent this other class:
 
     CREATE TABLE pottery (name STRING, grade STRING);
     INSERT INTO pottery VALUES ("Alex", "A");
@@ -174,11 +186,15 @@ We get a merged table.
 | Alex | 76    | A     |
 +------+-------+-------+
 
-To save your work, simply type SAVE; at the REPL. To save and quit, type EXIT; and CamlDB will save your tables for the next time you start the REPL.
+To save your work, simply type SAVE; at the REPL. To save and quit, type EXIT;
+and CamlDB will save your tables for the next time you start the REPL.
 
-Also note the robust error handling: try breaking the syntax and semantics and see the responses.
+Also note the robust error handling: try breaking the syntax and semantics and
+see the responses.
 
-We've seen how CamlDB helps with data management through insert/delete, access and visualization features. We hope it can make data more accessible and fun to work with.
+We've seen how CamlDB helps with data management through insert/delete, access
+and visualization features. We hope it can make data more accessible and fun
+to work with.
 
 -- Examples of all supported operations. --
 
