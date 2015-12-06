@@ -13,11 +13,25 @@ Types in CamlDB:
   BOOL - A boolean, written either true or false
         ex: true, false
 
+Table Names and Colunm Names:
+  [string] - The name should start with 'a'-'z' or '_', other letters in name should among letters ['a'-'z'], ['A'-'Z'], numbers ['0'-'9'] and '_'
+  Example:
+    _data_table, student42, _TABLE, sColumn
+
+Colunm list:
+  [colunm name list] - separate by comma. Support wildcard to choose all.
+  The first letter of each colunm has to be among 'a'-'z' and '_'.
+
+  Example:
+    *
+    col_Name1, col_Name2, col_Name3
+
 Conditions:
   [condition] -
     Syntax: [column name] [operator] [value]
 
-    [column name]: [column name] must have been defined.
+    [column name]: [column name] must have been defined and satisfy the basic conditions above.
+
     [operator] :
       There are 6 operators that CamlDB support:
         >   greater than
@@ -27,13 +41,29 @@ Conditions:
         <=  smaller or equal
         <>  not equal
 
-  [conditions] -
+  [conditions]:
     Syntax:
       [condition]
       ([conditions])
       [conditions] AND [conditions]
       [conditions] OR [conditions]
     Note: AND has precedence over OR
+
+PLOT:
+  When select two numerical type colunm, user is able to use command "#SCATTER" or "#LINE" to visualize the outcome 2-dimensional table.
+
+  Syntax:
+    SELECT col1,col2 FROM tb1 #SCATTER;
+    SELECT TOP 10 col1,col2 FROM tb2 #LINE;
+    SELECT DISTINCT col1,col3 FROM tb3 #SCATTER;
+
+  Syntax Rules:
+    Plot command goes with SELECT command, and always appears at the end of each query, started by sign "#".
+    #SCATTER
+    Draw a two-dimensional scatter graph.
+    #LINE
+    Draw a two-dimensional line graph.
+
 
 CREATE TABLE
     Create a table by specifying the name and type of each column and store
@@ -157,15 +187,12 @@ UPDATE WHERE
 
     [column name i]: [column name i] must have been defined.
 
-    [column value i]: The [column value i] updated must match the exact type
-    of [column name i] defined.
+    [column value i]: The [column value i] updated must match the exact type of [column name i] defined.
 
     [conditions]: specified above
 
   Example:
     UPDATE person SET personID = 4 WHERE city = "Ithaca" AND personID > 0;
-
-
   Example:
     UPDATE person SET personID = 4, city = "Ithaca"
     WHERE personID > 1 AND firstName <> "Lydia";
@@ -184,27 +211,66 @@ SELECT TOP
     [number of rows]: integer; if [number of rows] is larger than the actual
     number of rows of table, CamlDB will return the full table.
 
-    [number percent] PERCENT: [number percent] is an integer that is in the
-    range [0, 100] inclusive. The actual number of rows selected is going to
-    be rounded to the greatest integer <= numrow * [number percent] / 100
+    [number percent] PERCENT: [number percent] is an integer that is in the range [0, 100] inclusive. The actual number of rows selected is going to be rounded to the greatest integer <= numrow * [number percent] / 100
 
-    [column name list]: case-sensitive; separate by comma.
+    [column name list]: case-sensitive; separate by comma. Support wildcard to choose all. The first letter of each colunm have to be among 'a'-'z' and '_'.
 
     [table name]: Case-sensitive; table has to exist.
 
     [column type]: support 4 types: INT, FLOAT, STRING, BOOL
 
   Example:
-    CREATE TABLE data (name STRING, hours FLOAT, score INT);
+    SELECT TOP 10 * FROM table1;
+    SELECT TOP 50 PERCENT co1,col2 FROM tb;
+
 
 SELECT DISTINCT
   Select only distinct values in selected colunm
+
   Syntax:
     SELECT DISTINCT [column name]
     FROM [table name];
 
   Syntax Rules:
-    [column name]: case-sensitive; The first letter have to be among 'a'-'z' and '_'.
+    [column name]: case-sensitive; The first letter of each colunm has to be among 'a'-'z' and '_'. Support wildcard to choose all.
 
-    [table name]: case-sensitive; The first letter have to be among 'a'-'z' and '_'.
+    [table name]: case-sensitive; table has to exist. The first letter has to be among 'a'-'z' and '_'.
 
+  Example:
+    SELECT DISTINCT hours FROM data WHERE name = "Joseph" OR score >= 4.;
+
+SELECT UNION
+  Union two tables together with selected colunms. Columns must match in terms of types
+
+  Syntax:
+    SELECT [colunm name list] FROM [table name 1]
+    UNION ALL
+    SELECT [colunm name list] FROM [table name 2]
+
+  Syntax Rules:
+    [column name list]: case-sensitive; separate by comma. Support wildcard to choose all. The first letter of each colunm has to be among 'a'-'z' and '_'.
+
+    [table name i]: Case-sensitive; table has to exist. The first letter has to be among 'a'-'z' and '_'.
+
+  Example:
+    SELECT name,score FROM student UNION ALL SELECT * FROM class;
+
+SELECT JOIN
+  Combine rows from two or more tables, based on a common field between them.
+
+  Syntax:
+    SELECT [path list] FROM [table name 1]
+    JOIN [table name 2]
+    ON [join conditions]
+
+  Syntax Rules:
+    [path list]: refers to [table name].[colunm name], such as data.hours and student.score; both table name and colunm name are case-sensitive. The first letter of table and colunm name has to be among 'a'-'z' and '_'.
+
+    [table name i]: Case-sensitive; table has to exist. The first letter has to be among 'a'-'z' and '_'.
+
+    [join condition]: refers to [table1.colunm1]=[table2.column2], indicating the type of table1.colunm1 should be the same as that of table2.colunm2 to join the two table.
+
+  Example:
+    SELECT tb1.col1, tb2.col2 FROM tb1
+    JOIN tb2
+    ON tb1.col3=tb2.col2;
