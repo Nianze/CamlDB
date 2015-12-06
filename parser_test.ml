@@ -17,9 +17,12 @@ let run_tests () =
   parse "SELECT TOP 20 PERCENT * FROM tb WHERE col1 = 2 OR col2 = 4;";
   parse "SELECT DISTINCT col1 FROM tb #SCATTER;";
   parse "SELECT DISTINCT col1 FROM tb WHERE col1 = 2 OR col2 = 4;";
-  parse "SELECT col1,col2 FROM a WHERE col1 = 2 AND col2 < 3 OR col3 > 1 AND col4 = 5;";
-  parse "SELECT col1,col2 FROM a WHERE col1 = 2 OR col2 < 3 AND col3 > 1 OR col4 = 5;";
-  parse "SELECT col1,col2 FROM a WHERE col1 = 2 AND (col2 < 3 OR col3 > 1) AND col4 = 5;";
+  parse "SELECT col1,col2 FROM a WHERE col1 = 2 AND col2 < 3 OR col3 > 1
+  AND col4 = 5;";
+  parse "SELECT col1,col2 FROM a WHERE col1 = 2 OR col2 < 3 AND col3 > 1 OR
+  col4 = 5;";
+  parse "SELECT col1,col2 FROM a WHERE col1 = 2 AND (col2 < 3 OR col3 > 1)
+  AND col4 = 5;";
   parse "SELECT col1,col2 FROM a ORDER BY col2 ASC;";
   parse "SELECT col1,col2 FROM a ORDER BY col4 DESC;";
   parse "SELECT col1,col2 FROM a WHERE col1=10 ORDER BY col3 DESC;";

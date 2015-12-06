@@ -82,21 +82,40 @@ expr:
   ;
 
 statement:
-  | SEL; cols = col_list; FROM; f_tb = filtered_table; plot=vis_method { SelCol (cols, f_tb, plot)}
-  | SEL; cols = col_list; FROM; f_tb = filtered_table { SelCol (cols, f_tb, VisNone)}
-  | SEL; TOP; top = top_field; cols = col_list; FROM; f_tb = filtered_table { SelTop(top, cols, f_tb, VisNone) }
-  | SEL; TOP; top = top_field; cols = col_list; FROM; f_tb = filtered_table; plot=vis_method  { SelTop(top, cols, f_tb, plot) }
-  | SEL; DISTINCT; col = ID; FROM; f_tb = filtered_table { Distin(ColName col, f_tb, VisNone) }
-  | SEL; DISTINCT; col = ID; FROM; f_tb = filtered_table; plot=vis_method { Distin(ColName col, f_tb, plot) }
-  | INSERT; INTO; tb = ID; VALUES; LPAREN; vals = val_list;RPAREN {InsRow (vals,TbName tb)}
-  | INSERT; INTO; tb = ID; LPAREN; cols = col_list; RPAREN; VALUES; LPAREN; vals = val_list;RPAREN {InsCol (cols,vals,TbName(tb))}
+  | SEL; cols = col_list; FROM; f_tb = filtered_table; plot=vis_method
+    { SelCol (cols, f_tb, plot)}
+  | SEL; cols = col_list; FROM; f_tb = filtered_table
+    { SelCol (cols, f_tb, VisNone)}
+  | SEL; TOP; top = top_field; cols = col_list; FROM; f_tb = filtered_table
+    { SelTop(top, cols, f_tb, VisNone) }
+  | SEL; TOP; top = top_field; cols = col_list;
+    FROM; f_tb = filtered_table; plot=vis_method
+    { SelTop(top, cols, f_tb, plot) }
+  | SEL; DISTINCT; col = ID; FROM; f_tb = filtered_table
+    { Distin(ColName col, f_tb, VisNone) }
+  | SEL; DISTINCT; col = ID; FROM; f_tb = filtered_table; plot=vis_method
+    { Distin(ColName col, f_tb, plot) }
+  | INSERT; INTO; tb = ID; VALUES; LPAREN; vals = val_list;RPAREN
+    {InsRow (vals,TbName tb)}
+  | INSERT; INTO; tb = ID; LPAREN; cols = col_list;
+    RPAREN; VALUES; LPAREN; vals = val_list;RPAREN
+    {InsCol (cols,vals,TbName(tb))}
   | UPDATE; tb = ID; SET; pairs = pair_list {UpdAll (pairs,TbName tb) }
-  | UPDATE; tb = ID; SET; pairs = pair_list; WHERE; conds = cond_list {Update (conds,pairs,TbName tb) }
+  | UPDATE; tb = ID; SET; pairs = pair_list; WHERE; conds = cond_list
+    {Update (conds,pairs,TbName tb) }
   | DELETE; FROM; tb = ID { DelAll (TbName tb) }
-  | DELETE; FROM; tb = ID; WHERE; conds = cond_list { Delete (conds,TbName tb) }
-  | CREATE; TABLE; tb = ID; LPAREN; colsets = col_typ_list; RPAREN { Create (TbName tb, colsets) }
-  | SEL; cols1 = col_list; FROM; tb1 = ID; UNION; ALL; SEL; cols2 = col_list; FROM; tb2 = ID { Union (SelCol (cols1,TbName tb1, VisNone), SelCol(cols2,TbName tb2, VisNone)) }
-  | SEL; cols = col_list;FROM; tb1 = ID; JOIN; tb2 = ID;ON; j_cond = join_cond { Joins (TbName tb1,TbName tb2, cols, j_cond) }
+  | DELETE; FROM; tb = ID; WHERE; conds = cond_list
+    { Delete (conds,TbName tb) }
+  | CREATE; TABLE; tb = ID; LPAREN; colsets = col_typ_list; RPAREN
+    { Create (TbName tb, colsets) }
+  | SEL; cols1 = col_list; FROM; tb1 = ID;
+    UNION; ALL; SEL; cols2 = col_list; FROM; tb2 = ID
+    { Union
+      (SelCol (cols1,TbName tb1, VisNone), SelCol(cols2,TbName tb2, VisNone))}
+  | SEL; cols = col_list;FROM; tb1 = ID;
+    JOIN;
+    tb2 = ID;ON; j_cond = join_cond
+    { Joins (TbName tb1,TbName tb2, cols, j_cond) }
   ;
 
 top_field:
@@ -107,8 +126,10 @@ top_field:
 filtered_table:
   | tb = ID  { TbName tb }
   | tb = ID; WHERE; conds = cond_list  { Where (conds,TbName tb) }
-  | tb = ID; WHERE; conds = cond_list; ORDER; BY; col = ID; ASC { Where (conds, Sort (ColName col, ASC, TbName tb) ) }
-  | tb = ID; WHERE; conds = cond_list; ORDER; BY; col = ID; DESC { Where (conds, Sort (ColName col, DESC, TbName tb) ) }
+  | tb = ID; WHERE; conds = cond_list; ORDER; BY; col = ID; ASC
+    { Where (conds, Sort (ColName col, ASC, TbName tb) ) }
+  | tb = ID; WHERE; conds = cond_list; ORDER; BY; col = ID; DESC
+    { Where (conds, Sort (ColName col, DESC, TbName tb) ) }
   | tb = ID; ORDER; BY; col = ID; ASC  { Sort (ColName col, ASC, TbName tb) }
   | tb = ID; ORDER; BY; col = ID; DESC { Sort (ColName col, DESC,TbName tb) }
   ;
@@ -174,5 +195,5 @@ typ_field:
   ;
 
 join_cond:
-  tb1 = ID; DOT; col1 = ID; EQ;
-  tb2 = ID; DOT; col2 = ID { (Path(TbName tb1, ColName col1),Path(TbName tb2, ColName col2)) }
+  tb1 = ID; DOT; col1 = ID; EQ;tb2 = ID; DOT; col2 = ID
+    { (Path(TbName tb1, ColName col1),Path(TbName tb2, ColName col2)) }

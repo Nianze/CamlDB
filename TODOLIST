@@ -2,7 +2,7 @@ Ongoing:
 None
 
 
-Fixed
+Fixed Bugs:
 1. visualizer: draw axis tags
 2. visualizer: draw axis numbers
 3. visualizer: draw single point in line graph
