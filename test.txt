@@ -54,7 +54,7 @@ CREATE TABLE - normal     Pass
   salary FLOAT
   );
 
-INSERT - normal     Pass
+Normal Cases    Pass
   INSERT INTO person VALUES
   (1, "Tang", "Yuyan", "address", "NYC", 34, false, 341.34);
   INSERT INTO person (personID, lastName) VALUES
@@ -64,47 +64,60 @@ INSERT - normal     Pass
   INSERT INTO person (personID, lastName, firstName, city)
   VALUES (2, "Andy", "Forest", "NYC");
   UPDATE person SET personID = 4, city = "Ithaca";
+  UPDATE person SET city = "Ithaca" WHERE city = "L" AND personID > 0;
+  UPDATE person SET city = "nowhere" WHERE city = "Ithaca" OR personID > 0;
+  UPDATE person SET address = "adds", city = "B" WHERE americanCitizen = true;
 
 
-INSERT, UPDATE - wrong type     Pass
+wrong type     Pass
   INSERT INTO person VALUES
   (1, "Tang", "Yuyan", 234, "NYC", 34, false, 341.34);
   UPDATE person SET personID = "str", city = "Ithaca";
   UPDATE person SET personID = "str", city = 3;
+  UPDATE person SET city = 3 WHERE city = "Ithaca" OR personID > 0;
 
-INSERT - less column      Pass
+
+INSERT less column      Pass
   INSERT INTO person VALUES
     (1, "Tang", "Yuyan","NYC", 34, false, 341.34);
 
-INSERT - more column     Pass
+INSERT more column     Pass
   INSERT INTO person VALUES
   (1, "Tang", "Yuyan", "add", 13, "NYC", 34, false, 341.34);
 
-INSERT - nonexistent table  Pass
+nonexistent table  Pass
   INSERT INTO nonexistent VALUES
   (1, "Tang", "Yuyan", "add", "NYC", 34, false, 341.34);
   UPDATE nonexistent SET personID = "str", city = 3;
 
-INSERT - nonexistent columns  Fixed
+duplicate columns
+  UPDATE person SET city = "a", city = "B"
+  WHERE city = "Ithaca" OR personID > 0;
+
+
+nonexistent columns  Fixed
   INSERT INTO person (personID, phone, firstName, city)
   VALUES (2, "Andy", "Forest", "NYC");
 
   UPDATE person SET nocolumn = "str", city = 3;
 
-INSERT - empty columns  Fixed
+empty columns  Fixed
   INSERT INTO person ()
   VALUES ();
   UPDATE person SET;
 
-INSERT - unmatched number of columns and values
+unmatched number of columns and values
   INSERT INTO person (personID, firstName, city)
   VALUES (2, "Andy", "Forest", "NYC");
 
 
 
+
+
 SAVE; - PASSED
-SAVE - multiple line      TODO23
-;
+SAVE - multiple line    Fixed
+  Save
+  ;
 
 
 ****** Test Type Support ******

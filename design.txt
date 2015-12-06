@@ -13,6 +13,27 @@ Types in CamlDB:
   BOOL - A boolean, written either true or false
         ex: true, false
 
+Conditions:
+  [condition] -
+    Syntax: [column name] [operator] [value]
+
+    [column name]: [column name] must have been defined.
+    [operator] :
+      There are 6 operators that CamlDB support:
+        >   greater than
+        <   smaller than
+        =   equal to
+        >=  greater or equal
+        <=  smaller or equal
+        <>  not equal
+
+  [conditions] -
+    Syntax:
+      [condition]
+      ([conditions])
+      [conditions] AND [conditions]
+      [conditions] OR [conditions]
+
 
 CREATE TABLE
     Create a table by specifying the name and type of each column and store
@@ -118,11 +139,35 @@ UPDATE
   Example:
     UPDATE person SET personID = 4, city = "Ithaca";
 
+UPDATE WHERE
+  update all the rows that satisfy the conditions
 
-UPDATE table_name
-SET column1=value1,column2=value2,...
-WHERE condition list;
-UPDATE -  Update the selected rows by setting every row of column i to be value i and leave the rest of columns unchanged.
+  Syntax:
+    UPDATE [table name]
+    SET
+    [column name 1] = [value 1],
+    [column name 2] = [value 2],
+    ... ,
+    [column name n] = [value n];
+    WHERE [conditions]
+
+  Syntax Rules:
+    [table name]: case-sensitive; table must exist either in current file,
+    stored as [tablename.json] or in cache.
+
+    [column name i]: [column name i] must have been defined.
+
+    [column value i]: The [column value i] updated must match the exact type
+    of [column name i] defined.
+
+    [conditions]: specified above
+
+  Example:
+    UPDATE person SET personID = 4 WHERE city = "Ithaca" AND personID > 0;
+
+
+  Example:
+    UPDATE person SET personID = 4, city = "Ithaca";
 
 
 SELECT TOP
