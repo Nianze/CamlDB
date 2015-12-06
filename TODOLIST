@@ -1,3 +1,7 @@
+Ongoing:
+None
+
+
 Fixed
 1. visualizer: draw axis tags
 2. visualizer: draw axis numbers
@@ -52,13 +56,8 @@ INSERT - unmatched number of columns and values   TODO22
 Syntax error.
 > UPDATE person SET noco = "L";
 Syntax error.
-
-
-Ongoing:
-8. repl: .. issue when pasting multiple line instructions
-
+23. Union rows
 17. support Capitalized table name, colnames
-
 19. Type bugs:
   INSERT INTO testType VALUES (-0, "string", -, true);
   INSERT INTO testType VALUES (-, "stirng", 3.14, true);
@@ -69,6 +68,8 @@ Ongoing:
 
   INSERT INTO testType VALUES (-, "'sat, 3.14.14, TRUE);
   --> float_of_string
+
+8. repl: .. issue when pasting multiple line instructions
 
 20. table overwriting
 >   CREATE TABLE testType
@@ -87,6 +88,9 @@ Warning: table already exists. Are you sure you want to overwrite all of its con
 
 
 
-23. Union rows
+
+
+
+
 
 
