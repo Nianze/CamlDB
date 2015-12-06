@@ -1,0 +1,32 @@
+{
+  "name": "data2",
+  "rows": 5,
+  "cols": 3,
+  "header": [
+    [
+      "name",
+      "String",
+      "hours",
+      "Float",
+      "score",
+      "Int"
+    ]
+  ],
+  "elements": [
+    "Alex",
+    5,
+    76,
+    "Fiona",
+    9,
+    88,
+    "Eve",
+    7,
+    76,
+    "Bob",
+    8,
+    80,
+    "Cindy",
+    6,
+    70
+  ]
+}
