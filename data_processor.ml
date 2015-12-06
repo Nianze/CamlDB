@@ -139,7 +139,8 @@ let select_top (top:top_t) (col_list:colname list) (t: table): status * table =
             helper next (out node) (count_down-1)
           | None -> (Success, out_tb) in
   match top with
-    | TopNum num -> helper t.first Success num
+    | TopNum num -> if (num<0) then (DBError "Top number cannot be negative.", out_tb)
+      else helper t.first Success num
     | TopPercent p -> if p>100 || p<0
       then (DBError "Percentage out of range", out_tb)
       else helper t.first Success (t.numrow*p/100)

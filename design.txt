@@ -33,7 +33,7 @@ Conditions:
       ([conditions])
       [conditions] AND [conditions]
       [conditions] OR [conditions]
-
+    Note: AND has precedence over OR
 
 CREATE TABLE
     Create a table by specifying the name and type of each column and store
@@ -50,13 +50,13 @@ CREATE TABLE
 
   Syntax Rules:
     [table name]: case-sensitive; support use any string except for the
-    built-in words reserved for instructions, such as INT, CREATE.
+    built-in words reserved for instructions, such as INT, CREATE. The first letter have to be among 'a'-'z' and '_'.
     If creating a table with the same name as existing table, CamlDB will
-    warn the user and let the user to confirm whether he wants the old table
-    to be overwritten.
+    warn the user and let the user to confirm whether he wants the old table to be overwritten.
 
     [column name]: case-sensitive; support use any string except for the
-    built-in words reserved for instructions, such as INT, CREATE.
+    built-in words reserved for instructions, such as INT, CREATE. The first letter have to be among 'a'-'z' and '_'.
+
     [column type]: support 4 types: INT, FLOAT, STRING, BOOL
 
 
@@ -171,8 +171,10 @@ UPDATE WHERE
 
 
 SELECT TOP
+  Specify the number of records to return.
+
   Syntax:
-    SELECT_TOP [number of rows] / [number percent] PERCENT
+    SELECT TOP [number of rows] / [number percent] PERCENT
     [column name list]
     FROM [table name];
 
@@ -191,6 +193,17 @@ SELECT TOP
 
     [column type]: support 4 types: INT, FLOAT, STRING, BOOL
 
-
   Example:
     CREATE TABLE data (name STRING, hours FLOAT, score INT);
+
+SELECT DISTINCT
+  Select only distinct values in selected colunm
+  Syntax:
+    SELECT DISTINCT [column name]
+    FROM [table name];
+
+  Syntax Rules:
+    [column name]: case-sensitive; The first letter have to be among 'a'-'z' and '_'.
+
+    [table name]: case-sensitive; The first letter have to be among 'a'-'z' and '_'.
+
