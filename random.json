@@ -1,12 +1,10 @@
 {
-  "name": "test",
+  "name": "random",
   "rows": 0,
-  "cols": 2,
+  "cols": 1,
   "header": [
     [
-      "col1",
-      "Int",
-      "col2",
+      "c1",
       "String"
     ]
   ],

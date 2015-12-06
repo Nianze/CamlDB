@@ -1,7 +1,4 @@
-    CREATE TABLE data (name STRING, hours FLOAT, score INT);
-
-
-****** Normal Cases ******
+***************** Normal Cases *****************
 
 CREATE TABLE - all cases of table name/ column names    PASS
   CREATE TABLE data (name STRING, hours FLOAT, score INT);
@@ -15,7 +12,7 @@ CREATE TABLE - use built-in words as table name   PASS
   CREATE TABLE INT (name STRING, hours FLOAT, score INT);
   CREATE TABLE CREATE (name STRING, hours FLOAT, score INT);
 
-CREATE TABLE - multiple lines     TODO8
+CREATE TABLE - multiple lines     FIXED
   CREATE TABLE SS
   (
   PersonID INT,
@@ -29,10 +26,10 @@ CREATE TABLE - multiple lines     TODO8
   );
 
 CREATE TABLE - create table with same names   FIXED
-CREATE TABLE - same column names        TODO11
+CREATE TABLE - same column names        Fixed
    CREATE TABLE data (name STRING, name FLOAT, name INT);
 
-CREATE TABLE - wrong types      TODO16
+CREATE TABLE - wrong types      Fixed
   CREATE TABLE data (name STRINGS, hours FLOAT, score INT);
   CREATE TABLE data (name STR, hours FLOAT, score BOOLEAN);
   CREATE TABLE data (name string, hours FLOAT, score BOOLEAN);
@@ -41,10 +38,263 @@ CREATE TABLE - duplicate column names      Fixed
   CREATE TABLE dup_col (col1 STRING, col1 INT);
   SELECT * FROM dup_col;
 
-****** Empty Table ******
+
+Normal Cases    Pass
+  CREATE TABLE person
+  (
+  personID INT,
+  lastName STRING,
+  firstName STRING,
+  address STRING,
+  city STRING,
+  age INT,
+  americanCitizen BOOL,
+  salary FLOAT
+  );
+
+  CREATE TABLE person_simple
+  (
+  personID INT,
+  lastName STRING,
+  firstName STRING
+  );
+
+  INSERT INTO person VALUES
+  (1, "Tang", "Yuyan", "address", "NYC", 34, false, 341.34);
+  INSERT INTO person (personID, lastName) VALUES
+  (2, "Tang");
+  INSERT INTO person VALUES
+  (1, "Tang", "Yuyan", "add", "NYC", 34, false, 341.34);
+  INSERT INTO person (personID, lastName, firstName, city)
+  VALUES (2, "Andy", "Forest", "NYC");
+  UPDATE person SET personID = 4, city = "Ithaca";
+  UPDATE person SET city = "Ithaca" WHERE city = "L" AND personID > 0;
+  UPDATE person SET city = "nowhere" WHERE city = "Ithaca" OR personID > 0;
+  UPDATE person SET address = "adds", city = "B" WHERE americanCitizen = true;
+
+  INSERT INTO person VALUES
+  (5, "Mary", "Anto", "3241 banana st.", "Philadelphia", 21, true, 4141514.);
+  INSERT INTO person VALUES
+  (6, "Jerry", "Cain", "123 walnut st.", "NJ", 18, true, 139.02);
+  INSERT INTO person VALUES
+  (1, "Jack", "Y", "afd", "San Fransisco", 20, false, 963563e+2);
+  INSERT INTO person VALUES
+  (2, "Rose", "Ma", "address", "LA", 34, true, 10e+3);
+  INSERT INTO person VALUES
+  (3, "Peter", "Pan", "962 apt.", "DC", 54, true, 341.34e-2);
+  INSERT INTO person VALUES
+  (4, "Linda", "Picky", "324 fifth ave.", "Wonderland", 49, true, -24.);
+  INSERT INTO person VALUES
+  (7, "Mike", "Papaya", "123 fruit forest", "Mars", 09, false, 13913121.02);
+  INSERT INTO person VALUES
+  (8, "Patrick", "Cute", "alphaca land", "St. Louis", 46, true, 9633e-2);
+  INSERT INTO person VALUES
+  (9, "Queen", "T", "kindom of quees", "Lapagayo", 20, false, 10e+10);
+  INSERT INTO person VALUES
+  (10, "Teska", "Tequilla", "962 apt.", "DKNY", 25, true, 0.);
+
+
+  INSERT INTO person_simple VALUES
+  (11, "Murbury", "Lee");
+  INSERT INTO person_simple VALUES
+  (12, "Jerry", "Tan");
+  INSERT INTO person_simple VALUES
+  (13, "Christ", "Johnson");
+  INSERT INTO person_simple VALUES
+  (14, "Lisa", "Ma");
+  INSERT INTO person_simple VALUES
+  (15, "Peter", "Pan");
+  INSERT INTO person_simple VALUES
+  (16, "Jack", "Ma");
+
+  DELETE FROM person WHERE city = "a" OR city = "B" AND salary < 100.;
+  DELETE FROM person WHERE city = "a" OR city = "B" OR salary < 100.;
+  DELETE FROM person WHERE (city = "a" OR city = "B") OR salary < 100.;
+  DELETE FROM person WHERE ((city = "a" OR city = "B") OR (salary < 100.));
+
+
+
+  SELECT lastName FROM person WHERE lastName = "Tang";
+  SELECT DISTINCT personID FROM person;
+  SELECT TOP 5 PERCENT salary FROM person;
+  SELECT TOP 65 PERCENT salary FROM person;
+  SELECT TOP 15 PERCENT salary FROM person;
+  SELECT TOP 5 salary FROM person;
+  SELECT TOP 65 salary FROM person;
+  SELECT TOP 15 salary FROM person;
+
+  SELECT TOP -15 salary FROM person;
+  SELECT TOP 5. salary FROM person;
+
+  SELECT * FROM person ORDER BY salary ASC;
+  SELECT * FROM person ORDER BY salary DESC;
+  SELECT DISTINCT personID FROM person WHERE personID > 4 AND age < 34
+  ORDER BY personID ASC;
+
+  SELECT DISTINCT personID FROM person WHERE  age < 34
+  ORDER BY personID ASC;
+
+  SELECT * FROM person WHERE age < 34 AND
+  (personID > 4 OR americanCitizen <> true)
+  ORDER BY personID ASC;
+
+  SELECT * FROM person WHERE  city = "ITHACA" OR city = "LA"
+
+  SELECT DISTINCT personID FROM person WHERE age < 34 OR personID > 4
+  ORDER BY personID ASC;
+
+  SELECT * FROM person WHERE personID > 4 ORDER BY salary ASC;
+
+  SELECT personID, firstName, lastName FROM person
+  UNION ALL
+  SELECT * FROM person_simple;
+
+  SELECT lastName FROM person
+  UNION ALL
+  SELECT lastName FROM person_simple;
+
+  DELETE FROM person WHERE salary > 100000.;
+  SELECT age, salary FROM person #SCATTER;
+  SELECT age, salary FROM person ORDER BY salary ASC #SCATTER;
+
+  SELECT age, salary FROM person #LINE;
+
+
+  DELETE FROM table;
+  SELECT * FROM person;
+
+
+  SAVE; - PASSED
+  SAVE - multiple line    Fixed
+    Save
+    ;
+  Exit;
+  EXIT;
+
+***************** Special Cases *****************
+
+----------------- Empty Table -----------------
 CREATE TABLE - no columns         Fixed
   CREATE TABLE EmptyTable ();
   SELECT * FROM empty;
+
+
+
+----------------- Wrong type -----------------      Pass
+  INSERT INTO person VALUES
+  (1, "Tang", "Yuyan", 234, "NYC", 34, false, 341.34);
+  UPDATE person SET personID = "str", city = "Ithaca";
+  UPDATE person SET personID = "str", city = 3;
+  UPDATE person SET city = 3 WHERE city = "Ithaca" OR personID > 0;
+  DELETE FROM person WHERE city = "a" OR city = "B" AND salary < 100;
+  DELETE FROM person WHERE salary > 31;
+  SELECT TOP 145. PERCENT salary FROM person;
+  SELECT age FROM person WHERE salary > 100000;
+  SELECT TOP 145. salary FROM person;
+
+
+----------------- column number mismatch -----------------    Fixed
+  INSERT INTO person VALUES
+    (1, "Tang", "Yuyan","NYC", 34, false, 341.34);
+  INSERT INTO person VALUES
+  (1, "Tang", "Yuyan", "add", 13, "NYC", 34, false, 341.34);
+
+----------------- nonexistent table -----------------         Fixed
+  INSERT INTO nonexistent VALUES
+  (1, "Tang", "Yuyan", "add", "NYC", 34, false, 341.34);
+  UPDATE nonexistent SET personID = "str", city = 3;
+
+----------------- duplicate columns -----------------         Fixed
+  UPDATE person SET city = "a", city = "B"
+  WHERE city = "Ithaca" OR personID > 0;
+
+  INSERT INTO person (firstName, lastName, firstName)
+  VALUES ("Andy", "Forest", "NYC");
+
+----------------- nonexistent columns-----------------        Fixed
+  INSERT INTO person (personID, phone, firstName, city)
+  VALUES (2, "Andy", "Forest", "NYC");
+
+  UPDATE person SET nocolumn = "str", city = 3;
+
+----------------- empty inputs/columns -----------------        Fixed
+  INSERT INTO person ()
+  VALUES ();
+  UPDATE person SET;
+
+  SELECT * FROM person ORDER BY  ASC;
+  SELECT * FROM person ORDER BY  DESC;
+
+  SELECT * FROM person WHERE;
+
+  SELECT DISTINCT personID FROM person WHERE
+  ORDER BY personID ASC;
+
+  SELECT DISTINCT personID FROM person WHERE
+  ORDER BY personID ASC;
+
+  SELECT DISTINCT  FROM person;
+
+
+
+
+----------------- unmatched number of columns and values -----------------
+  INSERT INTO person (personID, firstName, city)
+  VALUES (2, "Andy", "Forest", "NYC");
+
+----------------- parameters out of range -----------------
+  SELECT TOP 145 PERCENT salary FROM person;
+  SELECT TOP -25 PERCENT salary FROM person;
+
+-----------------  not supported by design choice -----------------
+  SELECT firstName FROM person
+  UNION ALL
+  SELECT lastName FROM person_simple;
+
+  SELECT DISTINCT lastName FROM person
+  UNION ALL
+  SELECT DISTINCT lastName FROM person_simple;
+
+  SELECT * FROM person
+  UNION ALL
+  SELECT * FROM person_simple;
+
+
+
+****** Test Type Support ******
+  Should pass:
+  CREATE TABLE testType
+  (int INT, string STRING, float FLOAT, bool BOOL);
+  INSERT INTO testType VALUES  (1, "ad", 3., true);
+  INSERT INTO testType VALUES (-1, "ad", -3., false);
+  INSERT INTO testType VALUES (-001, "Ad", 07E+2, false);
+  INSERT INTO testType VALUES (000001, "BSDFJ DFJS:L", .07e+2, false);
+  INSERT INTO testType VALUES (-000001, "'''", -.07e+2, false);
+  UPDATE person SET personID = 4, city = "Ithaca";
+
+  Should Throw Syntax Error:
+  INSERT INTO testType VALUES (-000001, "'''", -.07e+2, False);
+  INSERT INTO testType VALUES (-000001, "'''", -.07e+2, TRUE);
+  INSERT INTO testType VALUES (-000001, "'''", 3.14.14, true);
+  INSERT INTO testType VALUES (01, "'sat, 3.14, true);
+  INSERT INTO testType VALUES (-0, "string", 3.14, true);
+  INSERT INTO testType VALUES (-0, "string", -0., true);
+  INSERT INTO testType VALUES (-0, "string", -3.00, true);
+  INSERT INTO testType VALUES (-0, "string", -3.01, true);
+  INSERT INTO testType VALUES (-0, "string", -3.2419085001431515151, true);
+  INSERT INTO testType VALUES (-0, "string", -32419085001431515151.1234, true);
+  INSERT INTO testType VALUES (-0, "string", -, true);
+  INSERT INTO testType VALUES (-, "stirng", 3.14, true);
+  --> float_of_stirng   FIXED
+  INSERT INTO testType VALUES (143121515315, "'''", .6e+1, false);
+  --> int_of_string     FIXED
+
+  Unhandled Exceptions:
+  All exceptions handled
+
+
+
+
 
 
 
