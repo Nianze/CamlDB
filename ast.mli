@@ -42,7 +42,8 @@ type plot = Visualizer.vis_method
      - TbName "Student" represents table_name Student
      - ColName "GPA" represents column name "GPA"
      - Path (tb,col) represents the column [col] in table [tb]
-     - SelCol ([col1;col2], tb, plot) represents SELECT col1,col2 FROM tb (# plot);
+     - SelCol ([col1;col2], tb, plot) represents SELECT col1,col2 FROM tb
+        (# plot);
      - SelTop (top, [col1;col2], tb, plot)
          represents SELECT TOP top col1,col2 FROM tb (#plot);
          top = TopNum int || TopPercent int

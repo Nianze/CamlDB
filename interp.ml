@@ -90,7 +90,7 @@ let warn_override name =
 		"you want to overwrite all of its contents?")) then
 	failwith "Did not create new table."
   )
-     
+
 let name_of_expr = function
   | ColName n -> n
   | TbName n -> n
@@ -115,7 +115,7 @@ let plot t plot_type =
     visualize t plot_type
   else
     failwith "Error: invalid visualization method."
-  
+
 let rec eval ?draw:(draw=true) = function
   | TbName n ->
      table_named n
@@ -197,4 +197,5 @@ and path_components = function
   | _ -> failwith "Interp: Syntax error."
 
 let save_open_tables () =
-  List.iter (fun (n, t) -> print_endline ("Saving [" ^ n ^ "]"); save_table t n) !open_tables
+  List.iter (fun (n, t) -> print_endline ("Saving [" ^ n ^ "]"); save_table t n)
+  !open_tables

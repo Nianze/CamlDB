@@ -1,3 +1,4 @@
+let cmp = compare
 open Table
 open Data_processor
   
@@ -90,7 +91,8 @@ let draw_line canvas x0 y0 x1 y1 =
     done
   else
     let error = ref 0.0 in
-    let deltaerr = ref (float_of_int (abs(y1 - y0)) /. (float_of_int (x1 - x0))) in
+    let deltaerr =
+      ref (float_of_int (abs(y1 - y0)) /. (float_of_int (x1 - x0))) in
     let y = ref y0 in
     for x = x0 to x1 do
       draw canvas x !y '.';
@@ -140,8 +142,9 @@ let get_cols t =
     | Float x -> x
     | Int x -> float_of_int x
     | _ -> failwith "Visualizer: invalid data type" in
-  (List.map to_num (table_to_list fst_t),
-   List.map to_num (table_to_list snd_t))
+  List.split (List.sort cmp (List.combine
+			       (List.map to_num (table_to_list fst_t))
+                               (List.map to_num (table_to_list snd_t))))
 
 let axis_labels x1 x2 scrx num =
   let rec range i j = if i >= j then [] else i::(range (i+1) j) in
