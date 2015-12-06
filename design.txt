@@ -49,21 +49,6 @@ Conditions:
       [conditions] OR [conditions]
     Note: AND has precedence over OR
 
-PLOT:
-  When select two numerical type colunm, user is able to use command "#SCATTER" or "#LINE" to visualize the outcome 2-dimensional table.
-
-  Syntax:
-    SELECT col1,col2 FROM tb1 #SCATTER;
-    SELECT TOP 10 col1,col2 FROM tb2 #LINE;
-    SELECT DISTINCT col1,col3 FROM tb3 #SCATTER;
-
-  Syntax Rules:
-    Plot command goes with SELECT command, and always appears at the end of each query, started by sign "#".
-    #SCATTER
-    Draw a two-dimensional scatter graph.
-    #LINE
-    Draw a two-dimensional line graph.
-
 
 CREATE TABLE
     Create a table by specifying the name and type of each column and store
@@ -274,3 +259,19 @@ SELECT JOIN
     SELECT tb1.col1, tb2.col2 FROM tb1
     JOIN tb2
     ON tb1.col3=tb2.col2;
+
+PLOT:
+  When select two numerical type colunm, user is able to use command "#SCATTER" or "#LINE" to visualize the outcome 2-dimensional table.
+
+  Syntax:
+    SELECT [column name 1], [column name 2] FROM
+    [table name] #SCATTER;
+    SELECT TOP 10 [column name 1], [column name 2]
+    FROM [table name] #LINE;
+    SELECT DISTINCT [column name 1], [column name 2]
+    FROM [table name] #SCATTER;
+
+  Syntax Rules:
+    Plot command goes with SELECT command, and always appears at the end of each query, started by sign "#".
+    #SCATTER : Draw a two-dimensional scatter graph.
+    #LINE : Draw a two-dimensional line graph.
