@@ -5,7 +5,6 @@ open Lexing
 open Parsing
 open Table
 open Visualizer
-
 %}
 
 (* *declarations* *)
